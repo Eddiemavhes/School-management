@@ -347,7 +347,8 @@ class StudentPaymentHistoryView(LoginRequiredMixin, DetailView):
         # Use StudentBalance amount_paid instead of Payment records (more reliable)
         total_ever_paid = sum([Decimal(str(b.amount_paid)) for b in all_balances]) if all_balances else Decimal('0')
         
-        # Final balance after all credits
+        # Final balance calculation: total fees - total paid
+        # This works correctly when payment amounts represent actual cash paid per term
         overall_balance = total_ever_due - total_ever_paid
         if overall_balance < 0:
             overall_balance = Decimal('0')
