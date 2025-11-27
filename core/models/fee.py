@@ -232,7 +232,8 @@ class StudentBalance(models.Model):
             term=term,
             defaults={
                 'term_fee': term_fee.amount,
-                'previous_arrears': previous_arrears
+                'previous_arrears': previous_arrears,
+                'amount_paid': Decimal('0')  # New balances always start at 0 paid
             }
         )
         
