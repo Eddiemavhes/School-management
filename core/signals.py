@@ -7,6 +7,7 @@ from .models.academic import Payment
 def update_student_balance_on_payment(sender, instance, created, **kwargs):
     """Update StudentBalance.amount_paid when a payment is recorded"""
     from .models.fee import StudentBalance
+    from .models.academic import AcademicTerm
     from django.db.models import Sum
     
     student = instance.student
@@ -26,6 +27,28 @@ def update_student_balance_on_payment(sender, instance, created, **kwargs):
             
             balance.amount_paid = total_paid
             balance.save(update_fields=['amount_paid'])
+        
+        # IMPORTANT: When a payment changes the balance for the current term,
+        # we need to recalculate arrears for NEXT term(s) since they depend on
+        # the current term's balance
+        if term and balance:
+            # Get all subsequent terms in the same year
+            next_terms = AcademicTerm.objects.filter(
+                academic_year=term.academic_year,
+                term__gt=term.term
+            ).order_by('term')
+            
+            for next_term in next_terms:
+                StudentBalance.initialize_term_balance(student, next_term)
+            
+            # Also check if there are terms in the next year
+            next_year_terms = AcademicTerm.objects.filter(
+                academic_year__year=term.academic_year.year + 1
+            ).order_by('term')
+            
+            for next_year_term in next_year_terms:
+                StudentBalance.initialize_term_balance(student, next_year_term)
+                
     except Exception as e:
         print(f"Error updating StudentBalance for payment {instance.id}: {e}")
 

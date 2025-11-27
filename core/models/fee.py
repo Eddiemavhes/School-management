@@ -237,10 +237,22 @@ class StudentBalance(models.Model):
         )
         
         if not created:
-            # Balance already exists - only update term_fee, not arrears
-            # (arrears should remain as they were set during creation)
+            # Balance already exists - update term_fee and recalculate arrears
+            # Arrears might change if previous term's balance was updated
+            updates_needed = False
+            
             if balance.term_fee != term_fee.amount:
                 balance.term_fee = term_fee.amount
-                balance.save(update_fields=['term_fee'])
+                updates_needed = True
+            
+            # IMPORTANT: Always recalculate arrears in case previous term changed
+            # This ensures credits/arrears carry forward correctly
+            recalculated_arrears = cls.calculate_arrears(student, term)
+            if balance.previous_arrears != recalculated_arrears:
+                balance.previous_arrears = recalculated_arrears
+                updates_needed = True
+            
+            if updates_needed:
+                balance.save()
             
         return balance
