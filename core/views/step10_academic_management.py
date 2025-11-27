@@ -655,7 +655,7 @@ def create_terms_api(request):
         balances_created = 0
         
         for student in active_students:
-            for idx, term in enumerate(term_objects):
+            for term in term_objects:
                 # Skip future terms - only create up to current term
                 if term.academic_year > current_term.academic_year or (
                     term.academic_year == current_term.academic_year and term.term > current_term.term
@@ -666,68 +666,13 @@ def create_terms_api(request):
                 if StudentBalance.objects.filter(student=student, term=term).exists():
                     continue
                 
-                # Determine previous arrears
-                previous_arrears = Decimal('0.00')
-                
-                if idx > 0:
-                    # Get balance from previous term
-                    prev_term = term_objects[idx - 1]
-                    prev_balance = StudentBalance.objects.filter(
-                        student=student, 
-                        term=prev_term
-                    ).first()
-                    
-                    if prev_balance:
-                        # Previous arrears = what was owed at end of previous term
-                        previous_arrears = (
-                            Decimal(str(prev_balance.term_fee)) + 
-                            Decimal(str(prev_balance.previous_arrears)) - 
-                            Decimal(str(prev_balance.amount_paid))
-                        )
-                else:
-                    # For first term, check if student has arrears from previous year
-                    previous_year = academic_year - 1
-                    previous_year_obj = AcademicYear.objects.filter(year=previous_year).first()
-                    
-                    if previous_year_obj:
-                        last_term_prev_year = AcademicTerm.objects.filter(
-                            academic_year=previous_year,
-                            term=3
-                        ).first()
-                        
-                        if last_term_prev_year:
-                            last_balance = StudentBalance.objects.filter(
-                                student=student,
-                                term=last_term_prev_year
-                            ).first()
-                            
-                            if last_balance:
-                                previous_arrears = (
-                                    Decimal(str(last_balance.term_fee)) + 
-                                    Decimal(str(last_balance.previous_arrears)) - 
-                                    Decimal(str(last_balance.amount_paid))
-                                )
-                
-                # Get or create TermFee for this term
-                term_fee_obj = TermFee.objects.filter(term=term).first()
-                if not term_fee_obj:
-                    # Default to 100
-                    term_fee_obj, _ = TermFee.objects.get_or_create(
-                        term=term,
-                        defaults={
-                            'amount': Decimal('100.00')
-                        }
-                    )
-                
-                # Create the balance
-                StudentBalance.objects.create(
-                    student=student,
-                    term=term,
-                    term_fee=Decimal(str(term_fee_obj.amount)),
-                    previous_arrears=previous_arrears,
-                    amount_paid=Decimal('0.00')
-                )
-                balances_created += 1
+                # Use the standard initialize_term_balance method which properly calculates arrears
+                try:
+                    balance = StudentBalance.initialize_term_balance(student, term)
+                    if balance:
+                        balances_created += 1
+                except Exception as e:
+                    print(f"Warning: Could not create balance for {student.full_name} in {term}: {e}")
         
         return JsonResponse({
             'status': 'success',

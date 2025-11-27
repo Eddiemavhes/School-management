@@ -294,17 +294,13 @@ class AcademicYear(models.Model):
                     
                     student.save()
 
-                # Store arrears for first term of new year
-                # Credits (negative balance) carry over to reduce next year's arrears
+                # Store arrears for first term of new year using initialize_term_balance
+                # This ensures proper calculation of what carries over from previous year
                 first_term = AcademicTerm.objects.get(academic_year=new_year, term=1)
-                term_fee = TermFee.objects.get(term=first_term)
-                StudentBalance.objects.create(
-                    student=student,
-                    term=first_term,
-                    term_fee=term_fee.amount,
-                    previous_arrears=total_arrears,
-                    amount_paid=0
-                )
+                try:
+                    StudentBalance.initialize_term_balance(student, first_term)
+                except Exception as e:
+                    print(f"Warning: Could not initialize balance for {student.full_name} in {new_year}: {e}")
 
             return new_academic_year
 

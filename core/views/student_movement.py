@@ -384,24 +384,11 @@ def bulk_promote_students(request):
                             ).first()
                             
                             if first_term:
-                                # Check if balance already exists
-                                existing = StudentBalance.objects.filter(
-                                    student=student,
-                                    term=first_term
-                                ).exists()
-                                
-                                if not existing:
-                                    # Get term fee
-                                    term_fee = TermFee.objects.filter(term=first_term).first()
-                                    
-                                    if term_fee:
-                                        StudentBalance.objects.create(
-                                            student=student,
-                                            term=first_term,
-                                            term_fee=term_fee.amount,
-                                            previous_arrears=max(Decimal('0'), current_arrears),
-                                            amount_paid=Decimal('0')
-                                        )
+                                # Use initialize_term_balance which properly calculates arrears from previous year
+                                try:
+                                    StudentBalance.initialize_term_balance(student, first_term)
+                                except Exception as e:
+                                    print(f"Warning: Could not initialize balance for {student.full_name}: {e}")
                         
                         successful += 1
                         
