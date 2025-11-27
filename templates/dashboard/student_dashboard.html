@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Student Dashboard - {{ student.get_full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-box {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+    }
+
+    .stat-card.success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .stat-card.warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .stat-card.info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .stat-card h3 {
+        font-size: 14px;
+        font-weight: 600;
+        opacity: 0.9;
+        margin: 0 0 8px 0;
+    }
+
+    .stat-card .value {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 24px;
+    }
+
+    .progress-bar {
+        height: 28px;
+        background-color: #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        margin: 12px 0;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #11998e, #38ef7d);
+        transition: width 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .arrears-alert {
+        background: rgba(239, 68, 68, 0.1);
+        border-left: 4px solid #ef4444;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+    }
+
+    .arrears-alert strong {
+        color: #dc2626;
+    }
+
+    .balance-highlight {
+        font-size: 36px;
+        font-weight: bold;
+        color: #1f2937;
+        margin: 12px 0;
+    }
+
+    .payment-table {
+        font-size: 13px;
+    }
+
+    .payment-table td {
+        padding: 10px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .payment-table tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .timeline-item {
+        display: flex;
+        margin-bottom: 16px;
+    }
+
+    .timeline-marker {
+        width: 12px;
+        height: 12px;
+        background: #667eea;
+        border-radius: 50%;
+        margin-right: 12px;
+        margin-top: 4px;
+        flex-shrink: 0;
+    }
+
+    .timeline-content {
+        flex: 1;
+    }
+
+    .timeline-content strong {
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .timeline-content small {
+        color: #999;
+    }
+
+    .projection-card {
+        background: rgba(255, 255, 255, 0.5);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border-left: 4px solid #667eea;
+    }
+
+    h1, h2, h3 {
+        color: #1f2937;
+    }
+
+    .header-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .student-info {
+        flex: 1;
+    }
+
+    .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    .status-paid { background: #11998e; }
+    .status-partial { background: #f59e0b; }
+    .status-unpaid { background: #ef4444; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% else %}
+
+    <!-- Header -->
+    <div class="header-info">
+        <div class="student-info">
+            <h1>{{ student.get_full_name }}</h1>
+            <p class="text-muted">ID: {{ student.id }} | Class: {{ student.current_class.grade }}-{{ student.current_class.section }}</p>
+        </div>
+    </div>
+
+    <!-- Current Balance Alert -->
+    {% if current_arrears > 0 %}
+    <div class="arrears-alert">
+        <strong>⚠️ Outstanding Arrears</strong>
+        <p style="margin: 8px 0 0 0;">You have <strong>${{ current_arrears }}</strong> in arrears from previous terms</p>
+    </div>
+    {% endif %}
+
+    <!-- Current Term Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card success">
+                <h3>Amount Paid</h3>
+                <p class="value">${{ current_amount_paid }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card info">
+                <h3>Current Term Fee</h3>
+                <p class="value">${{ current_term_fee }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card warning">
+                <h3>Current Balance Due</h3>
+                <p class="value">${{ current_balance }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h3>Total Due (with Arrears)</h3>
+                <p class="value">${{ current_total_due }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Term Progress -->
+    <div class="glass-box">
+        <h3>Current Term Payment Progress</h3>
+        <p class="text-muted">Total Due: <strong>${{ current_total_due }}</strong> (Fee: ${{ current_term_fee }} + Arrears: ${{ current_arrears }})</p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ payment_progress }}%">
+                {% if payment_progress > 5 %}{{ payment_progress|floatformat:0 }}%{% endif %}
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px;">
+            <div style="background: rgba(17, 153, 142, 0.1); padding: 12px; border-radius: 8px;">
+                <p style="margin: 0; font-size: 12px; color: #666;">Paid Amount</p>
+                <p style="margin: 4px 0 0 0; font-size: 20px; font-weight: bold; color: #11998e;">${{ current_amount_paid }}</p>
+            </div>
+            <div style="background: rgba(239, 68, 68, 0.1); padding: 12px; border-radius: 8px;">
+                <p style="margin: 0; font-size: 12px; color: #666;">Remaining Balance</p>
+                <p style="margin: 4px 0 0 0; font-size: 20px; font-weight: bold; color: #ef4444;">${{ current_balance }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lifetime Summary -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="glass-box">
+                <h3>Lifetime Summary</h3>
+                <table class="table table-sm" style="margin-bottom: 0;">
+                    <tr>
+                        <td>Total Ever Due:</td>
+                        <td class="text-end"><strong>${{ total_ever_due }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Total Ever Paid:</td>
+                        <td class="text-end"><strong class="text-success">${{ total_ever_paid }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Lifetime Balance:</td>
+                        <td class="text-end"><strong class="text-danger">${{ lifetime_balance }}</strong></td>
+                    </tr>
+                    <tr style="border-top: 2px solid #e5e7eb;">
+                        <td>Collection Rate:</td>
+                        <td class="text-end"><strong>{{ collection_rate|floatformat:1 }}%</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="glass-box">
+                <h3>Payment Method Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="paymentMethodChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arrears & Balance Timeline -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="glass-box">
+                <h3>Arrears History</h3>
+                <div class="chart-container">
+                    <canvas id="arrearsTimelineChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="glass-box">
+                <h3>Balance Timeline</h3>
+                <div class="chart-container">
+                    <canvas id="balanceTimelineChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projected Next Terms -->
+    {% if projected_next_terms %}
+    <div class="glass-box">
+        <h3>Projected Next Terms</h3>
+        <p class="text-muted" style="font-size: 12px;">Based on current outstanding balance becoming arrears</p>
+        
+        <div class="row mt-3">
+            {% for projection in projected_next_terms %}
+            <div class="col-md-6">
+                <div class="projection-card">
+                    <strong style="color: #667eea;">{{ projection.term }}</strong>
+                    <p style="margin: 8px 0; font-size: 13px;">
+                        Fee: ${{ projection.fee|floatformat:2 }}<br>
+                        Projected Arrears: <span class="text-danger">${{ projection.projected_arrears|floatformat:2 }}</span><br>
+                        <strong>Projected Total Due: ${{ projection.projected_total|floatformat:2 }}</strong>
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Payment History -->
+    {% if all_payments %}
+    <div class="glass-box">
+        <h3>Payment History</h3>
+        <table class="table payment-table">
+            <thead style="background: rgba(0, 0, 0, 0.02);">
+                <tr>
+                    <th>Date</th>
+                    <th>Term</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Receipt #</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in all_payments|dictsort:"payment_date"|slice:":20" reversed %}
+                <tr>
+                    <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                    <td>{{ payment.term.academic_year }} T{{ payment.term.term }}</td>
+                    <td><strong>${{ payment.amount }}</strong></td>
+                    <td>{{ payment.payment_method }}</td>
+                    <td>{{ payment.receipt_number|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if all_payments|length > 20 %}
+        <p class="text-muted" style="font-size: 12px; margin-top: 12px;">Showing last 20 payments</p>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="glass-box">
+        <p class="text-muted">No payment history recorded</p>
+    </div>
+    {% endif %}
+
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Payment Method Chart
+    const paymentMethodCtx = document.getElementById('paymentMethodChart');
+    if (paymentMethodCtx) {
+        new Chart(paymentMethodCtx, {
+            type: 'pie',
+            data: {
+                labels: {{ payment_method_labels|safe }},
+                datasets: [{
+                    data: {{ payment_method_data|safe }},
+                    backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#11998e'],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Arrears Timeline Chart
+    const arrearsTimelineCtx = document.getElementById('arrearsTimelineChart');
+    if (arrearsTimelineCtx) {
+        new Chart(arrearsTimelineCtx, {
+            type: 'line',
+            data: {
+                labels: {{ arrears_timeline_labels|safe }},
+                datasets: [{
+                    label: 'Arrears Amount',
+                    data: {{ arrears_timeline_data|safe }},
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#ef4444',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // Balance Timeline Chart
+    const balanceTimelineCtx = document.getElementById('balanceTimelineChart');
+    if (balanceTimelineCtx) {
+        new Chart(balanceTimelineCtx, {
+            type: 'line',
+            data: {
+                labels: {{ arrears_timeline_labels|safe }},
+                datasets: [{
+                    label: 'Balance Due',
+                    data: {{ balance_timeline_data|safe }},
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#667eea',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

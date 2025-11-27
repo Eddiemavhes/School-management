@@ -1,0 +1,556 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Record Payment - School Management System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-3xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="mb-12 animate-slideInUp">
+            <h1 class="text-5xl font-bold bg-gradient-to-r from-purple-300 via-violet-300 to-blue-300 bg-clip-text text-transparent mb-3">Record Payment</h1>
+            <p class="text-slate-400 text-lg">Add a new payment transaction</p>
+        </div>
+
+        <!-- Payment Form Card -->
+        <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.1s;">
+            
+            {% if student %}
+            <!-- Student Payment Details -->
+            <div class="mb-8 bg-gradient-to-br from-purple-500/10 to-violet-500/10 border border-purple-500/30 rounded-xl p-6">
+                <h3 class="text-lg font-bold text-slate-100 mb-4 flex items-center gap-2">
+                    <div class="w-1.5 h-6 bg-gradient-to-b from-purple-400 to-violet-400 rounded-full"></div>
+                    Payment Details for <span id="student-name" class="text-purple-300">{{ student.get_full_name }}</span>
+                </h3>
+                
+                <!-- Payment Priority Alert -->
+                <div id="payment-priority-alert" class="mb-6 p-4 rounded-lg bg-blue-500/20 border border-blue-500/50 text-blue-200">
+                    <p class="font-semibold" id="payment-priority-text">{{ payment_priority }}</p>
+                </div>
+                
+                <!-- Arrears Breakdown (New) -->
+                {% if previous_arrears > 0 %}
+                <div class="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/40">
+                    <p class="text-sm font-bold text-red-300 mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        Arrears from Previous Terms
+                    </p>
+                    <p class="text-lg font-bold text-red-300">${{ previous_arrears|floatformat:2 }}</p>
+                </div>
+                {% endif %}
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-700/40 rounded-lg p-4">
+                        <p class="text-slate-400 text-xs font-medium mb-1">Current Term Fee</p>
+                        <p class="text-2xl font-bold text-slate-100" id="term-fee">${{ term_fee|floatformat:2 }}</p>
+                    </div>
+                    <div class="bg-slate-700/40 rounded-lg p-4">
+                        <p class="text-slate-400 text-xs font-medium mb-1">Amount Paid</p>
+                        <p class="text-xl font-bold text-emerald-400" id="amount-paid">${{ amount_paid|floatformat:2 }}</p>
+                    </div>
+                    <div class="bg-slate-700/40 rounded-lg p-4">
+                        <p class="text-slate-400 text-xs font-medium mb-1">Current Balance</p>
+                        <p id="balance-value" class="text-xl font-bold {% if current_balance > 0 %}text-red-400{% else %}text-emerald-400{% endif %}">
+                            <span id="current-balance">${{ current_balance|floatformat:2 }}</span>
+                        </p>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/40 rounded-lg p-4">
+                        <p class="text-orange-300 text-xs font-bold mb-1 uppercase tracking-wide">⚠️ Total Outstanding</p>
+                        <p class="text-2xl font-bold text-orange-300" id="total-outstanding">${{ total_outstanding|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- Student Payment Details (Hidden initially) -->
+            <div class="mb-8 bg-gradient-to-br from-purple-500/10 to-violet-500/10 border border-purple-500/30 rounded-xl p-6">
+                <h3 class="text-lg font-bold text-slate-100 mb-4 flex items-center gap-2">
+                    <div class="w-1.5 h-6 bg-gradient-to-b from-purple-400 to-violet-400 rounded-full"></div>
+                    Payment Details for <span id="student-name" class="text-amber-300">(select a student below)</span>
+                </h3>
+                
+                <!-- Payment Priority Alert -->
+                <div id="payment-priority-alert" class="mb-6 p-4 rounded-lg bg-blue-500/20 border border-blue-500/50 text-blue-200" style="display: none;">
+                    <p class="font-semibold" id="payment-priority-text">Payment priority will appear here</p>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-700/40 rounded-lg p-4">
+                        <p class="text-slate-400 text-xs font-medium mb-1">Current Term Fee</p>
+                        <p class="text-2xl font-bold text-slate-100" id="term-fee">$0.00</p>
+                    </div>
+                    <div class="bg-slate-700/40 rounded-lg p-4">
+                        <p class="text-slate-400 text-xs font-medium mb-1">Amount Paid</p>
+                        <p class="text-xl font-bold text-emerald-400" id="amount-paid">$0.00</p>
+                    </div>
+                    <div class="bg-slate-700/40 rounded-lg p-4">
+                        <p class="text-slate-400 text-xs font-medium mb-1">Current Balance</p>
+                        <p id="balance-value" class="text-xl font-bold text-red-400">
+                            <span id="current-balance">$0.00</span>
+                        </p>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/40 rounded-lg p-4">
+                        <p class="text-orange-300 text-xs font-bold mb-1 uppercase tracking-wide">⚠️ Total Outstanding</p>
+                        <p class="text-2xl font-bold text-orange-300" id="total-outstanding">$0.00</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                {% if field.name == 'student' %}
+                    <div class="space-y-3">
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-bold text-slate-200 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            {{ field.label }}
+                        </label>
+                        {% if field.errors %}
+                        <p class="mt-1 text-sm text-red-400 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18.101 12.93a1 1 0 00-1.414-1.414L10 14.586l-3.293-3.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8z" clip-rule="evenodd"/></path></svg>
+                            {{ field.errors.0 }}
+                        </p>
+                        {% endif %}
+                        <div class="relative">
+                            {{ field }}
+                            <style>
+                                #id_student {
+                                    background: rgba(71, 85, 105, 0.4) !important;
+                                    border: 1px solid rgba(71, 85, 105, 0.5) !important;
+                                    color: #e2e8f0 !important;
+                                }
+                                #id_student:focus {
+                                    border-color: rgba(168, 85, 247, 0.5) !important;
+                                    outline: none !important;
+                                    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1) !important;
+                                }
+                            </style>
+                        </div>
+                    </div>
+                {% elif field.name == 'amount' %}
+                    <div class="space-y-3">
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-bold text-slate-200 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            {{ field.label }}
+                        </label>
+                        {% if field.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ field.errors.0 }}</p>
+                        {% endif %}
+                        {{ field }}
+                        
+                        <div class="mt-4 flex flex-wrap gap-2" id="quick-amounts">
+                            <!-- Quick amount buttons will be added here via JS -->
+                        </div>
+                    </div>
+                {% elif field.name == 'reference_number' %}
+                    <div class="space-y-3">
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-bold text-slate-200 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            {{ field.label }}
+                        </label>
+                        <div class="mb-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs">
+                            <p class="flex items-center gap-2">
+                                <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2z" clip-rule="evenodd"/></path></svg>
+                                💡 <strong>Auto-generated format:</strong> [METHOD]-[TIMESTAMP]-[UNIQUE] (e.g., BNK-20251122141234-5829)
+                            </p>
+                            <p class="mt-2 ml-6">Leave blank and the system will generate based on payment method:</p>
+                            <ul class="mt-1 ml-6 space-y-1 text-xs">
+                                <li>🪙 <strong>Cash</strong> → CSH-*</li>
+                                <li>🏦 <strong>Bank Transfer</strong> → BNK-*</li>
+                                <li>📱 <strong>Mobile Money</strong> → MOB-*</li>
+                                <li>✓ <strong>Cheque</strong> → CHQ-*</li>
+                            </ul>
+                        </div>
+                        {% if field.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ field.errors.0 }}</p>
+                        {% endif %}
+                        {{ field }}
+                    </div>
+                {% else %}
+                    <div class="space-y-3">
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-bold text-slate-200 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            {{ field.label }}
+                        </label>
+                        {% if field.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ field.errors.0 }}</p>
+                        {% endif %}
+                        {{ field }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-4 pt-6 border-t border-slate-600/30">
+                <a href="{% url 'payment_list' %}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-slate-300 bg-slate-700/40 hover:bg-slate-700/60 border border-slate-600/50 transition-all duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Cancel
+                </a>
+                <button type="submit" class="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 hover:shadow-2xl hover:shadow-purple-500/40 transition-all transform hover:scale-105 active:scale-95">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Record Payment
+                </button>
+            </div>
+        </form>
+        
+        <!-- Inline data for debugging -->
+        <div style="display: none;">
+            <span id="debug-log"></span>
+        </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-slideInUp {
+        animation: slideInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(20px);
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    select,
+    textarea {
+        background: rgba(71, 85, 105, 0.4);
+        border: 1px solid rgba(71, 85, 105, 0.5);
+        color: #e2e8f0;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        width: 100%;
+        transition: all 0.2s;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="email"]::placeholder,
+    input[type="number"]::placeholder,
+    textarea::placeholder {
+        color: #94a3b8;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+        border-color: rgba(168, 85, 247, 0.5);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+        background: rgba(71, 85, 105, 0.6);
+    }
+
+    #quick-amounts button {
+        background: rgba(168, 85, 247, 0.2);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        color: #c4b5fd;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    #quick-amounts button:hover {
+        background: rgba(168, 85, 247, 0.4);
+        border-color: rgba(168, 85, 247, 0.6);
+        box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
+    }
+</style>
+
+{% block extra_js %}
+<script>
+(function() {
+    'use strict';
+    
+    function initPaymentForm() {
+        console.log('=== Payment Form Initialization ===');
+        
+        // Get the student dropdown
+        var studentSelect = document.getElementById('id_student');
+        console.log('Student select element found:', studentSelect ? 'YES' : 'NO');
+        
+        if (!studentSelect) {
+            console.error('ERROR: Student select element not found!');
+            return;
+        }
+        
+        // Get all elements we need to update
+        var studentNameSpan = document.getElementById('student-name');
+        var termFeeEl = document.getElementById('term-fee');
+        var amountPaidEl = document.getElementById('amount-paid');
+        var currentBalanceEl = document.getElementById('current-balance');
+        var balanceValueEl = document.getElementById('balance-value');
+        
+        console.log('All elements found:', {
+            studentName: studentNameSpan ? 'YES' : 'NO',
+            termFee: termFeeEl ? 'YES' : 'NO',
+            amountPaid: amountPaidEl ? 'YES' : 'NO',
+            currentBalance: currentBalanceEl ? 'YES' : 'NO',
+            balanceValue: balanceValueEl ? 'YES' : 'NO'
+        });
+        
+        // Function to update payment details
+        function updatePaymentDetails(studentId) {
+            console.log('updatePaymentDetails called with:', studentId);
+            
+            if (!studentId) {
+                console.log('No student selected, clearing details');
+                studentNameSpan.textContent = '(select a student below)';
+                studentNameSpan.style.color = '#fbbf24';
+                termFeeEl.textContent = '$0.00';
+                amountPaidEl.textContent = '$0.00';
+                currentBalanceEl.textContent = '$0.00';
+                return;
+            }
+            
+            // Build API URL
+            var apiUrl = '/api/student-payment-details/' + studentId + '/';
+            console.log('Fetching from:', apiUrl);
+            
+            // Call the API
+            fetch(apiUrl)
+                .then(function(response) {
+                    console.log('Fetch response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error('HTTP Error: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    console.log('API response data:', data);
+                    
+                    // Check for error
+                    if (data.error) {
+                        console.error('API returned error:', data.error);
+                        studentNameSpan.textContent = '(Error: ' + data.error + ')';
+                        return;
+                    }
+                    
+                    // Check if student is archived - if so, disable the form completely
+                    if (data.is_archived) {
+                        console.log('Student is archived - disabling form');
+                        studentNameSpan.textContent = data.student_name + ' (Archived)';
+                        studentNameSpan.style.color = '#ef4444';
+                        
+                        termFeeEl.textContent = '$' + parseFloat(data.term_fee).toFixed(2);
+                        amountPaidEl.textContent = '$' + parseFloat(data.amount_paid).toFixed(2);
+                        currentBalanceEl.textContent = '$' + parseFloat(data.current_balance).toFixed(2);
+                        
+                        // Disable all form inputs and buttons
+                        var amountField = document.getElementById('id_amount');
+                        var submitBtn = document.querySelector('button[type="submit"]');
+                        var quickAmountBtns = document.querySelectorAll('#quick-amounts button');
+                        
+                        if (amountField) {
+                            amountField.disabled = true;
+                            amountField.style.opacity = '0.5';
+                            amountField.style.cursor = 'not-allowed';
+                        }
+                        
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.style.opacity = '0.5';
+                            submitBtn.style.cursor = 'not-allowed';
+                        }
+                        
+                        quickAmountBtns.forEach(function(btn) {
+                            btn.disabled = true;
+                            btn.style.opacity = '0.5';
+                            btn.style.cursor = 'not-allowed';
+                        });
+                        
+                        // Show error message in priority alert
+                        var priorityAlert = document.getElementById('payment-priority-alert');
+                        var priorityText = document.getElementById('payment-priority-text');
+                        if (priorityAlert && priorityText) {
+                            priorityText.textContent = '⛔ This student is archived and cannot accept payments.';
+                            priorityAlert.style.display = 'block';
+                            priorityAlert.className = 'mb-6 p-4 rounded-lg bg-red-900/30 border border-red-500 text-red-300';
+                        }
+                        
+                        // Update balance color to red
+                        balanceValueEl.className = 'text-xl font-bold text-red-400';
+                        
+                        console.log('Form disabled for archived student');
+                        return;
+                    }
+                    
+                    // Update the display for active students
+                    console.log('Updating UI with:', data);
+                    
+                    // Re-enable form inputs if they were disabled
+                    var amountField = document.getElementById('id_amount');
+                    var submitBtn = document.querySelector('button[type="submit"]');
+                    var quickAmountBtns = document.querySelectorAll('#quick-amounts button');
+                    
+                    if (amountField) {
+                        amountField.disabled = false;
+                        amountField.style.opacity = '1';
+                        amountField.style.cursor = 'auto';
+                    }
+                    
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = '1';
+                        submitBtn.style.cursor = 'auto';
+                    }
+                    
+                    quickAmountBtns.forEach(function(btn) {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        btn.style.cursor = 'auto';
+                    });
+                    
+                    studentNameSpan.textContent = data.student_name;
+                    studentNameSpan.style.color = '#c084fc';
+                    
+                    termFeeEl.textContent = '$' + parseFloat(data.term_fee).toFixed(2);
+                    amountPaidEl.textContent = '$' + parseFloat(data.amount_paid).toFixed(2);
+                    currentBalanceEl.textContent = '$' + parseFloat(data.current_balance).toFixed(2);
+                    
+                    // Update total outstanding
+                    var totalOutstandingEl = document.getElementById('total-outstanding');
+                    if (totalOutstandingEl) {
+                        totalOutstandingEl.textContent = '$' + parseFloat(data.total_outstanding || 0).toFixed(2);
+                    }
+                    
+                    // Update payment priority message
+                    var priorityAlert = document.getElementById('payment-priority-alert');
+                    var priorityText = document.getElementById('payment-priority-text');
+                    if (priorityAlert && priorityText) {
+                        priorityText.textContent = data.payment_priority;
+                        priorityAlert.style.display = 'block';
+                        
+                        // Change color based on priority
+                        if (data.arrears_remaining > 0) {
+                            // Red for arrears
+                            priorityAlert.className = 'mb-6 p-4 rounded-lg bg-red-500/20 border border-red-500/50 text-red-200';
+                        } else if (data.term_fee_remaining > 0) {
+                            // Amber for current term fee
+                            priorityAlert.className = 'mb-6 p-4 rounded-lg bg-amber-500/20 border border-amber-500/50 text-amber-200';
+                        } else {
+                            // Emerald for fully paid
+                            priorityAlert.className = 'mb-6 p-4 rounded-lg bg-emerald-500/20 border border-emerald-500/50 text-emerald-200';
+                        }
+                    }
+                    
+                    // Update balance color
+                    var balance = parseFloat(data.current_balance);
+                    if (balance > 0) {
+                        balanceValueEl.className = 'text-xl font-bold text-red-400';
+                    } else {
+                        balanceValueEl.className = 'text-xl font-bold text-emerald-400';
+                    }
+                    
+                    console.log('UI updated successfully');
+                })
+                .catch(function(error) {
+                    console.error('Fetch error:', error);
+                    // Clear details on error
+                    studentNameSpan.textContent = '(select a student below)';
+                    studentNameSpan.style.color = '#fbbf24';
+                    termFeeEl.textContent = '$0.00';
+                    amountPaidEl.textContent = '$0.00';
+                    currentBalanceEl.textContent = '$0.00';
+                    var totalOutstandingEl = document.getElementById('total-outstanding');
+                    if (totalOutstandingEl) {
+                        totalOutstandingEl.textContent = '$0.00';
+                    }
+                });
+        }
+        
+        // Listen for changes to the student select
+        console.log('Adding change listener to student select');
+        studentSelect.addEventListener('change', function() {
+            console.log('Student select changed to:', this.value);
+            updatePaymentDetails(this.value);
+        });
+        
+        // If a student is already selected, load their details
+        if (studentSelect.value) {
+            console.log('Student already selected:', studentSelect.value);
+            updatePaymentDetails(studentSelect.value);
+        }
+        
+        // Add quick payment buttons
+        var amountField = document.getElementById('id_amount');
+        var quickAmountsDiv = document.getElementById('quick-amounts');
+        
+        if (quickAmountsDiv && amountField) {
+            console.log('Adding quick amount buttons');
+            var amounts = [1000, 2000, 5000, 10000];
+            amounts.forEach(function(amount) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'px-4 py-2 rounded-lg text-sm font-medium bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/30 transition-all duration-200';
+                btn.textContent = '$' + amount.toLocaleString();
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    amountField.value = amount;
+                    console.log('Amount set to:', amount);
+                });
+                quickAmountsDiv.appendChild(btn);
+            });
+        }
+        
+        console.log('=== Initialization Complete ===');
+        
+        // Auto-refresh student data every 3 seconds to catch payment updates
+        setInterval(function() {
+            var studentSelect = document.getElementById('id_student');
+            if (studentSelect && studentSelect.value) {
+                console.log('Auto-refreshing student data...');
+                updatePaymentDetails(studentSelect.value);
+            }
+        }, 3000);
+    }
+    
+    // Run when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPaymentForm);
+    } else {
+        initPaymentForm();
+    }
+})();
+</script>
+{% endblock %}
+{% endblock %}

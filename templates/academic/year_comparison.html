@@ -1,0 +1,506 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Year Comparison{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-box {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+    }
+
+    .comparison-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .header h1 {
+        font-size: 32px;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 8px;
+    }
+
+    .header p {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .export-section {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+
+    .comparison-table thead {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    }
+
+    .comparison-table th {
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #667eea;
+        border-bottom: 2px solid #667eea;
+    }
+
+    .comparison-table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .comparison-table tbody tr:hover {
+        background: rgba(102, 126, 234, 0.03);
+    }
+
+    .year-cell {
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .term-fee {
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    .fee-cell {
+        background: rgba(56, 239, 125, 0.05);
+        color: #38ef7d;
+        font-weight: 600;
+    }
+
+    .metric-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 16px;
+        text-align: center;
+        margin: 8px 0;
+    }
+
+    .metric-label {
+        font-size: 12px;
+        color: #999;
+        margin-bottom: 6px;
+    }
+
+    .metric-value {
+        font-size: 20px;
+        font-weight: bold;
+        color: #667eea;
+    }
+
+    .metric-value.positive {
+        color: #38ef7d;
+    }
+
+    .metric-value.negative {
+        color: #ef4444;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #1f2937;
+        margin: 24px 0 16px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-icon {
+        font-size: 20px;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 16px 0;
+        border: 1px solid #e5e7eb;
+        height: 400px;
+    }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 16px 0;
+    }
+
+    @media (max-width: 768px) {
+        .grid-2 {
+            grid-template-columns: 1fr;
+        }
+        .comparison-table {
+            font-size: 13px;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 10px 8px;
+        }
+    }
+
+    .trend-indicator {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .trend-up {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+    }
+
+    .trend-down {
+        background: rgba(56, 239, 125, 0.1);
+        color: #38ef7d;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 32px;
+        color: #999;
+    }
+
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .summary-card {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+    }
+
+    .summary-card-label {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 8px;
+    }
+
+    .summary-card-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #667eea;
+    }
+
+    .summary-card-unit {
+        font-size: 12px;
+        color: #999;
+        margin-top: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="comparison-container">
+        <!-- Header -->
+        <div class="header glass-box">
+            <h1>📊 Academic Year Comparison</h1>
+            <p>Compare fees, financial performance, and metrics across academic years</p>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <button class="btn btn-primary" onclick="exportComparison()">
+                📥 Export Comparison (CSV)
+            </button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="glass-box">
+            <h2 class="section-title"><span class="section-icon">📈</span>5-Year Summary</h2>
+            
+            {% if comparison_data %}
+            <div class="summary-cards">
+                {% for year_data in comparison_data %}
+                <div class="summary-card">
+                    <div class="summary-card-label">{{ year_data.year }}</div>
+                    <div class="summary-card-value">${{ year_data.total_fees|floatformat:0 }}</div>
+                    <div class="summary-card-unit">Annual Fees</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-data">No academic years found</div>
+            {% endif %}
+        </div>
+
+        <!-- Fee Structure Comparison Table -->
+        <div class="glass-box">
+            <h2 class="section-title"><span class="section-icon">💰</span>Fee Structure Comparison</h2>
+            
+            {% if comparison_data %}
+            <div style="overflow-x: auto;">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Term</th>
+                            {% for year_data in comparison_data %}
+                            <th>{{ year_data.year }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for term_num in "123" %}
+                        <tr>
+                            <td class="year-cell">Term {{ term_num }}</td>
+                            {% for year_data in comparison_data %}
+                            <td class="fee-cell">
+                                ${{ year_data.term_fees|get_item:term_num|floatformat:2 }}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        <tr style="background: rgba(102, 126, 234, 0.1); font-weight: bold;">
+                            <td>Total Annual Fee</td>
+                            {% for year_data in comparison_data %}
+                            <td class="fee-cell">${{ year_data.total_fees|floatformat:2 }}</td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="no-data">No fee data available</div>
+            {% endif %}
+        </div>
+
+        <!-- Financial Metrics -->
+        <div class="glass-box">
+            <h2 class="section-title"><span class="section-icon">📊</span>Financial Metrics</h2>
+            
+            {% if comparison_data %}
+            <div class="grid-2">
+                {% for year_data in comparison_data %}
+                <div class="metric-card">
+                    <div class="metric-label">Academic Year {{ year_data.year }}</div>
+                    <div style="margin: 12px 0;">
+                        <div>
+                            <span style="color: #666; font-size: 12px;">Total Students</span>
+                            <div class="metric-value">{{ year_data.student_count }}</div>
+                        </div>
+                    </div>
+                    <div style="margin: 12px 0; padding: 12px 0; border-top: 1px solid #e5e7eb;">
+                        <span style="color: #666; font-size: 12px;">Total Fees Expected</span>
+                        <div class="metric-value positive">${{ year_data.total_expected|floatformat:2 }}</div>
+                    </div>
+                    <div style="margin: 12px 0; padding: 12px 0; border-top: 1px solid #e5e7eb;">
+                        <span style="color: #666; font-size: 12px;">Total Collected</span>
+                        <div class="metric-value positive">${{ year_data.total_collected|floatformat:2 }}</div>
+                    </div>
+                    <div style="margin: 12px 0; padding: 12px 0; border-top: 1px solid #e5e7eb;">
+                        <span style="color: #666; font-size: 12px;">Outstanding Arrears</span>
+                        <div class="metric-value negative">${{ year_data.total_arrears|floatformat:2 }}</div>
+                    </div>
+                    {% if year_data.collection_rate %}
+                    <div style="margin: 12px 0; padding: 12px 0; border-top: 1px solid #e5e7eb;">
+                        <span style="color: #666; font-size: 12px;">Collection Rate</span>
+                        <div class="metric-value">{{ year_data.collection_rate|floatformat:1 }}%</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-data">No financial data available</div>
+            {% endif %}
+        </div>
+
+        <!-- Student Movement Analysis -->
+        {% if has_movement_data %}
+        <div class="glass-box">
+            <h2 class="section-title"><span class="section-icon">👥</span>Student Movement Analysis</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Promoted Students</th>
+                        <th>Graduates</th>
+                        <th>New Enrollments</th>
+                        <th>Total Students</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for year_data in comparison_data %}
+                    {% if year_data.promoted_count or year_data.graduates_count %}
+                    <tr>
+                        <td class="year-cell">{{ year_data.year }}</td>
+                        <td>{{ year_data.promoted_count|default:"—" }}</td>
+                        <td>{{ year_data.graduates_count|default:"—" }}</td>
+                        <td>{{ year_data.new_enrollments|default:"—" }}</td>
+                        <td class="metric-value">{{ year_data.student_count }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- Trend Analysis -->
+        <div class="glass-box">
+            <h2 class="section-title"><span class="section-icon">📉</span>Year-over-Year Trends</h2>
+            
+            {% if comparison_data %}
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Comparison</th>
+                        <th>Change</th>
+                        <th>Percentage</th>
+                        <th>Trend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if comparison_data|length >= 2 %}
+                    {% with most_recent=comparison_data.0 previous=comparison_data.1 %}
+                    <tr>
+                        <td class="year-cell">Annual Fee ({{ previous.year }} → {{ most_recent.year }})</td>
+                        <td>${{ most_recent.total_fees|add:previous.total_fees|dictsub|floatformat:2 }}</td>
+                        <td>
+                            {% if most_recent.total_fees > previous.total_fees %}
+                                +{{ most_recent.total_fees|subtract:previous.total_fees|multiply:100|divide:previous.total_fees|floatformat:1 }}%
+                            {% elif most_recent.total_fees < previous.total_fees %}
+                                -{{ previous.total_fees|subtract:most_recent.total_fees|multiply:100|divide:previous.total_fees|floatformat:1 }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if most_recent.total_fees > previous.total_fees %}
+                            <span class="trend-indicator trend-up">↑ Increase</span>
+                            {% elif most_recent.total_fees < previous.total_fees %}
+                            <span class="trend-indicator trend-down">↓ Decrease</span>
+                            {% else %}
+                            <span class="trend-indicator">— No Change</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="year-cell">Students ({{ previous.year }} → {{ most_recent.year }})</td>
+                        <td>{{ most_recent.student_count|add:previous.student_count|dictsub }}</td>
+                        <td>
+                            {% if most_recent.student_count > previous.student_count %}
+                                +{{ most_recent.student_count|subtract:previous.student_count|multiply:100|divide:previous.student_count|floatformat:1 }}%
+                            {% elif most_recent.student_count < previous.student_count %}
+                                -{{ previous.student_count|subtract:most_recent.student_count|multiply:100|divide:previous.student_count|floatformat:1 }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if most_recent.student_count > previous.student_count %}
+                            <span class="trend-indicator trend-up">↑ Growth</span>
+                            {% elif most_recent.student_count < previous.student_count %}
+                            <span class="trend-indicator trend-down">↓ Decline</span>
+                            {% else %}
+                            <span class="trend-indicator">— Stable</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endwith %}
+                    {% endif %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-data">Need at least 2 years for trend analysis</div>
+            {% endif %}
+        </div>
+
+        <!-- Notes Section -->
+        <div class="glass-box" style="background: rgba(56, 239, 125, 0.05); border-left: 4px solid #38ef7d;">
+            <h3 style="color: #38ef7d; margin: 0;">💡 Key Insights</h3>
+            <ul style="margin: 12px 0; padding-left: 20px; color: #666; font-size: 13px;">
+                <li>Fee structures are updated during year rollover to match new year requirements</li>
+                <li>Collection rates help identify years with better financial performance</li>
+                <li>Arrears tracking ensures no outstanding balances are lost during transitions</li>
+                <li>Student movement analysis shows enrollment trends across years</li>
+                <li>Export comparison data for detailed records and reporting</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    function exportComparison() {
+        const data = {{ comparison_json|safe }};
+        let csv = 'Academic Year Comparison Report\n\n';
+        
+        // Header
+        csv += 'Year,Total Annual Fee,Total Students,Total Expected,Total Collected,Outstanding Arrears,Collection Rate\n';
+        
+        // Data rows
+        data.forEach(year => {
+            csv += `${year.year},${year.total_fees},${year.student_count},${year.total_expected},${year.total_collected},${year.total_arrears},${year.collection_rate || 'N/A'}\n`;
+        });
+        
+        csv += '\n\nFee Structure Breakdown\n';
+        csv += 'Year,Term 1,Term 2,Term 3\n';
+        
+        data.forEach(year => {
+            csv += `${year.year},${year.term_fees['1']},${year.term_fees['2']},${year.term_fees['3']}\n`;
+        });
+        
+        // Download
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'academic_year_comparison.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+</script>
+
+<!-- Custom Template Filters -->
+{% load custom_filters %}
+
+{% endblock %}

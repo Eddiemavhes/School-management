@@ -1,0 +1,51 @@
+<!-- Students Widget -->
+<div class="glass rounded-2xl p-8 border border-slate-500/20 hover:border-slate-400/30 transition-all duration-300 widget-card">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h2 class="text-2xl font-bold text-white mb-1">Recent Students</h2>
+            <p class="text-slate-400 text-sm">Latest enrolled students</p>
+        </div>
+        <a href="{% url 'student_list' %}" class="inline-flex items-center gap-2 text-teal-300 hover:text-teal-100 font-semibold px-4 py-2 rounded-lg bg-teal-500/20 border border-teal-500/30 hover:border-teal-400/60 transition-all hover:bg-teal-500/30">
+            View All
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </a>
+    </div>
+    
+    {% if recent_students %}
+    <div class="space-y-3">
+        {% for student in recent_students %}
+        <div class="group p-4 rounded-xl border border-slate-500/20 hover:border-teal-400/50 bg-slate-500/5 hover:bg-slate-400/10 transition-all duration-300 cursor-pointer">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4 flex-1">
+                    <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-teal-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                        {{ student.first_name|first|upper }}
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-white font-semibold group-hover:text-teal-200 transition-colors">{{ student.first_name }} {{ student.surname }}</p>
+                        <p class="text-slate-400 text-sm">{{ student.current_class }}</p>
+                    </div>
+                </div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold 
+                    {% if student.is_active %}
+                        bg-emerald-500/20 text-emerald-300 border border-emerald-400/50
+                    {% else %}
+                        bg-slate-500/20 text-slate-300 border border-slate-400/30
+                    {% endif %}">
+                    {% if student.is_active %}<span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1.5 inline-block"></span>Active{% else %}<span class="w-1.5 h-1.5 bg-slate-400 rounded-full mr-1.5 inline-block"></span>Inactive{% endif %}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <svg class="w-12 h-12 text-slate-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        <p class="text-slate-400 font-medium">No students found</p>
+    </div>
+    {% endif %}
+</div>

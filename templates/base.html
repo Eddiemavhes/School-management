@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}School Management System{% endblock %}</title>
+    {% load static %}
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366F1',
+                        secondary: '#EC4899',
+                        accent: '#14B8A6',
+                        dark: '#0F172A',
+                    }
+                }
+            }
+        }
+    </script>
+    {% block head_js %}{% endblock %}
+    <style>
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(236, 72, 153, 0.4); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        body {
+            min-height: 100vh;
+            background: #0f172a;
+            color: white;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-light {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* Modern form controls */
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            color: #1e3a5f;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:hover,
+        .form-select:hover,
+        .form-textarea:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: rgba(99, 102, 241, 0.6);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), inset 0 0 0 1px rgba(99, 102, 241, 0.3);
+        }
+
+        .form-input::placeholder,
+        .form-select::placeholder,
+        .form-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            color: #0f172a !important;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        select:focus,
+        textarea:focus {
+            color: #0f172a !important;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            color: #0f172a !important;
+        }
+
+        /* Premium button styling */
+        .premium-button {
+            background: linear-gradient(135deg, #6366F1 0%, #EC4899 100%);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .premium-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Login nav button styling */
+        .login-nav-btn {
+            background: linear-gradient(135deg, #2d3e7e 0%, #3d5a9e 50%, #4a7c9e 100%);
+            background-size: 300% 300%;
+            color: white;
+            padding: 0.65rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 20px rgba(45, 62, 126, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.6s ease;
+            z-index: 0;
+        }
+
+        .login-nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-nav-btn:hover {
+            background-position: 100% 0;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(45, 62, 126, 0.5), 0 0 20px rgba(96, 165, 250, 0.3);
+        }
+
+        .login-nav-btn:active {
+            transform: translateY(-1px);
+        }
+            color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            padding: 0.75rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .premium-button:hover::before {
+            left: 100%;
+        }
+
+        .premium-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 20px 45px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .premium-button:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        /* Secondary button */
+        .secondary-button {
+            background: rgba(236, 72, 153, 0.15);
+            border: 1.5px solid rgba(236, 72, 153, 0.4);
+            color: #EC4899;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .secondary-button:hover {
+            background: rgba(236, 72, 153, 0.25);
+            border-color: rgba(236, 72, 153, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* Accent button */
+        .accent-button {
+            background: rgba(20, 184, 166, 0.15);
+            border: 1.5px solid rgba(20, 184, 166, 0.4);
+            color: #14B8A6;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .accent-button:hover {
+            background: rgba(20, 184, 166, 0.25);
+            border-color: rgba(20, 184, 166, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #6366F1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Layout utilities */
+        .mt-4 { margin-top: 1rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .text-center { text-align: center; }
+        .w-full { width: 100%; }
+
+        /* Content area */
+        .content {
+            padding-top: 5rem;
+            min-height: calc(100vh - 4rem);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(99, 102, 241, 0.2);
+            border-top-color: #6366F1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error messages */
+        .error-message {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1.5px solid rgba(239, 68, 68, 0.4);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            color: #FCA5A5;
+        }
+
+        /* Success messages */
+        .success-message {
+            background: rgba(20, 184, 166, 0.15);
+            border: 1.5px solid rgba(20, 184, 166, 0.4);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            color: #5EEAD4;
+        }
+
+        /* Warning messages */
+        .warning-message {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1.5px solid rgba(245, 158, 11, 0.4);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            color: #FCD34D;
+        }
+
+        /* Card styling */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.15);
+            transform: translateY(-5px);
+        }
+
+        /* Badge styling */
+        .badge {
+            display: inline-block;
+            padding: 0.375rem 0.875rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .badge-primary {
+            background: rgba(99, 102, 241, 0.2);
+            color: #A5B4FC;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .badge-secondary {
+            background: rgba(236, 72, 153, 0.2);
+            color: #F472B6;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+
+        .badge-accent {
+            background: rgba(20, 184, 166, 0.2);
+            color: #5EEAD4;
+            border: 1px solid rgba(20, 184, 166, 0.3);
+        }
+
+        .badge-success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86EFAC;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #FCD34D;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #FCA5A5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Animation classes */
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .glow {
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        /* Table styling */
+        table {
+            border-collapse: collapse;
+        }
+
+        th {
+            background: rgba(99, 102, 241, 0.1);
+            border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+        }
+
+        tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        /* Link styling */
+        a {
+            color: #A5B4FC;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #E0E7FF;
+        }
+
+        /* Status colors */
+        .status-success { color: #10B981; }
+        .status-warning { color: #F59E0B; }
+        .status-error { color: #EF4444; }
+    </style>
+</head>
+<body class="gradient-background min-h-screen">
+    <!-- Premium Navigation -->
+    <nav class="fixed w-full z-50 top-0 backdrop-blur-xl border-b border-slate-500/20">
+        <div class="bg-slate-900/80 backdrop-filter">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <!-- Logo with School Name -->
+                <a href="/" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-400 to-teal-400 flex items-center justify-center text-white font-bold text-lg group-hover:shadow-lg group-hover:shadow-blue-500/50 transition-all">
+                        A
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xl font-bold bg-gradient-to-r from-blue-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent">AcademiaFlow</span>
+                        {% load custom_tags %}
+                        {% school_name_tag as school_name %}
+                        {% if school_name %}
+                        <span class="text-sm text-slate-300 font-medium">{{ school_name }}</span>
+                        {% endif %}
+                    </div>
+                </a>
+
+                <!-- Navigation Links -->
+                <div class="hidden lg:flex items-center gap-1">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'admin_dashboard' %}" class="nav-link">Dashboard</a>
+                        <a href="{% url 'class_list' %}" class="nav-link">Classes</a>
+                        <a href="{% url 'teacher_list' %}" class="nav-link">Teachers</a>
+                        <a href="{% url 'student_list' %}" class="nav-link">Students</a>
+                        
+                        <!-- Finance Dropdown -->
+                        <div class="relative group">
+                            <button class="nav-link flex items-center gap-1">
+                                <span>Finance</span>
+                                <svg class="w-4 h-4 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div class="absolute left-0 mt-0 w-56 rounded-xl shadow-2xl bg-slate-800 ring-1 ring-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
+                                <a href="{% url 'fee_dashboard' %}" class="dropdown-link">Fee Dashboard</a>
+                                <a href="{% url 'payment_list' %}" class="dropdown-link">Payment History</a>
+                                <a href="{% url 'payment_create' %}" class="dropdown-link">Record Payment</a>
+                            </div>
+                        </div>
+
+                        <!-- Settings Dropdown -->
+                        <div class="relative group">
+                            <button class="nav-link flex items-center gap-1">
+                                <span>Settings</span>
+                                <svg class="w-4 h-4 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div class="absolute right-0 mt-0 w-56 rounded-xl shadow-2xl bg-slate-800 ring-1 ring-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
+                                <a href="{% url 'school_details' %}" class="dropdown-link">School Details</a>
+                                <a href="{% url 'admin_settings' %}" class="dropdown-link">School Settings</a>
+                                <a href="{% url 'admin_profile' %}" class="dropdown-link">Profile</a>
+                            </div>
+                        </div>
+
+                        <div class="w-px h-6 bg-slate-600/50 mx-2"></div>
+                        <a href="{% url 'logout' %}" class="nav-link text-red-400 hover:text-red-300">Logout</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="login-nav-btn">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <style>
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: rgba(226, 232, 240, 0.8);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 1rem;
+            right: 1rem;
+            height: 2px;
+            background: linear-gradient(90deg, #60a5fa, #14b8a6);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #e0f2fe;
+            background: rgba(96, 165, 250, 0.1);
+        }
+
+        .nav-link:hover::after {
+            transform: scaleX(1);
+        }
+
+        .dropdown-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: rgba(226, 232, 240, 0.8);
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .dropdown-link:hover {
+            background: rgba(96, 165, 250, 0.2);
+            color: #e0f2fe;
+            border-left-color: #60a5fa;
+            padding-left: 1.25rem;
+        }
+    </style>
+
+    <!-- Main Content -->
+    <div class="container mx-auto pt-24 px-6">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <script>
+        // Ensure form controls use the modern classes at runtime (no Tailwind build required)
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('form input, form select, form textarea').forEach(function(el) {
+                var tag = el.tagName.toLowerCase();
+                if (tag === 'select') {
+                    if (!el.classList.contains('form-select')) el.classList.add('form-select');
+                } else if (tag === 'textarea') {
+                    if (!el.classList.contains('form-textarea')) el.classList.add('form-textarea');
+                } else {
+                    // avoid adding to checkboxes/radios
+                    if (el.type !== 'checkbox' && el.type !== 'radio' && !el.classList.contains('form-input')) {
+                        el.classList.add('form-input');
+                    }
+                }
+            });
+            document.querySelectorAll('button[type=submit]').forEach(function(btn){
+                if (!btn.classList.contains('premium-button')) btn.classList.add('premium-button');
+            });
+        });
+    </script>
+    {% block javascript %}{% endblock %}
+</body>
+</html>

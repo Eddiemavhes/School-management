@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}School Details - School Management System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-4xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="mb-8 animate-slideInUp">
+            <a href="/settings/" class="inline-flex items-center text-blue-400 hover:text-blue-300 mb-4 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Settings
+            </a>
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent mb-2">School Details</h1>
+            <p class="text-gray-300">Configure your school information that will be displayed in the system</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp">
+            <form method="POST" action="{% url 'school_details' %}" class="space-y-8">
+                {% csrf_token %}
+                
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="p-4 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Errors -->
+                {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors %}
+                    <div class="p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Section 1: Basic Information -->
+                <div class="border-b border-slate-600/50 pb-6">
+                    <h2 class="text-2xl font-bold text-white mb-6">Basic Information</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- School Name -->
+                        <div class="md:col-span-2">
+                            <label for="{{ form.school_name.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                                School Name *
+                            </label>
+                            <input type="text" name="school_name" value="{{ form.instance.school_name }}" required 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="e.g., Green Valley International School">
+                            {% if form.school_name.errors %}
+                                <p class="text-red-400 text-sm mt-1">{{ form.school_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- School Type -->
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                School Type
+                            </label>
+                            <select name="school_type" class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                <option value="PRIMARY" {% if form.instance.school_type == 'PRIMARY' %}selected{% endif %}>Primary School</option>
+                                <option value="SECONDARY" {% if form.instance.school_type == 'SECONDARY' %}selected{% endif %}>Secondary School</option>
+                                <option value="HIGHER_SECONDARY" {% if form.instance.school_type == 'HIGHER_SECONDARY' %}selected{% endif %}>Higher Secondary School</option>
+                                <option value="COMBINED" {% if form.instance.school_type == 'COMBINED' %}selected{% endif %}>Combined School</option>
+                            </select>
+                        </div>
+
+                        <!-- Established Year -->
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                Established Year
+                            </label>
+                            <input type="number" name="established_year" value="{{ form.instance.established_year|default:'' }}" 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="e.g., 2010" min="1950" max="2099">
+                        </div>
+
+                        <!-- School Motto -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-white mb-2">
+                                School Motto
+                            </label>
+                            <input type="text" name="school_motto" value="{{ form.instance.school_motto }}" 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="e.g., Quality Education for All">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Contact Information -->
+                <div class="border-b border-slate-600/50 pb-6">
+                    <h2 class="text-2xl font-bold text-white mb-6">Contact Information</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Principal Name -->
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                Principal Name
+                            </label>
+                            <input type="text" name="principal_name" value="{{ form.instance.principal_name }}" 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="e.g., Dr. John Smith">
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                Email Address
+                            </label>
+                            <input type="email" name="email" value="{{ form.instance.email }}" 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="school@example.com">
+                        </div>
+
+                        <!-- Phone -->
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                Primary Phone
+                            </label>
+                            <input type="tel" name="phone" value="{{ form.instance.phone }}" 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="+1-XXX-XXX-XXXX">
+                        </div>
+
+                        <!-- Alternate Phone -->
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                Alternate Phone
+                            </label>
+                            <input type="tel" name="alternate_phone" value="{{ form.instance.alternate_phone }}" 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="+1-XXX-XXX-XXXX">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Address Information -->
+                <div class="border-b border-slate-600/50 pb-6">
+                    <h2 class="text-2xl font-bold text-white mb-6">Address Information</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Street Address -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-white mb-2">
+                                Street Address
+                            </label>
+                            <input type="text" name="street_address" value="{{ form.instance.street_address }}" 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="123 School Street">
+                        </div>
+
+                        <!-- City -->
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                City
+                            </label>
+                            <input type="text" name="city" value="{{ form.instance.city }}" 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="New York">
+                        </div>
+
+                        <!-- State -->
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                State/Province
+                            </label>
+                            <input type="text" name="state" value="{{ form.instance.state }}" 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="NY">
+                        </div>
+
+                        <!-- Country -->
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                Country
+                            </label>
+                            <input type="text" name="country" value="{{ form.instance.country }}" 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="United States">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Registration & Affiliation -->
+                <div class="pb-6">
+                    <h2 class="text-2xl font-bold text-white mb-6">Registration & Affiliation</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Board Affiliation -->
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                Board Affiliation
+                            </label>
+                            <input type="text" name="board_affiliation" value="{{ form.instance.board_affiliation }}" 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="e.g., CBSE">
+                        </div>
+
+                        <!-- Registration Number -->
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                Registration Number
+                            </label>
+                            <input type="text" name="registration_number" value="{{ form.instance.registration_number }}" 
+                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        </div>
+
+                        <!-- Working Days -->
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">
+                                Working Days Per Week
+                            </label>
+                            <select name="working_days_per_week" class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                <option value="5" {% if form.instance.working_days_per_week == 5 %}selected{% endif %}>5 Days</option>
+                                <option value="6" {% if form.instance.working_days_per_week == 6 %}selected{% endif %}>6 Days</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex gap-4 pt-6 border-t border-slate-600/50">
+                    <button type="submit" class="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg hover:shadow-xl">
+                        Save School Details
+                    </button>
+                    <a href="/settings/" class="flex-1 px-6 py-3 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-300 font-medium hover:bg-slate-700 transition-all text-center">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

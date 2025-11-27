@@ -1,0 +1,113 @@
+# 🎯 QUICK START - Payment Form Student Name Display
+
+## What You Need to Do
+
+### Step 1: Restart Django Server
+```bash
+# Press Ctrl+C to stop current server
+# Then run:
+python manage.py runserver
+```
+
+### Step 2: Hard Refresh Browser
+Press: **Ctrl+F5** (or Cmd+Shift+R on Mac)
+
+### Step 3: Go to Payment Form
+Navigate to: **Payments → Record New Payment**
+
+### Step 4: Open Developer Console
+Press: **F12**
+- Click on "Console" tab
+
+### Step 5: Select a Student
+- Click the "Student" dropdown
+- Choose "Noah, Buwa" or "Audrey, Buwa"
+
+### Step 6: Check What Happens
+
+#### In Console, you should see:
+```
+Student select changed to: 5
+updatePaymentDetails called with: 5
+Fetching from: /api/student-payment-details/5/
+Fetch response status: 200
+API response data: {student_name: "Noah, Buwa", term_fee: 1200, ...}
+Updating UI with: {student_name: "Noah, Buwa", term_fee: 1200, ...}
+UI updated successfully
+```
+
+#### On the Form, you should see:
+Top section changes from:
+```
+Payment Details for (select a student below)
+Current Term Fee: $0.00
+Previous Arrears: $0.00
+...
+```
+
+TO:
+```
+Payment Details for Noah, Buwa
+Current Term Fee: $1,200.00
+Previous Arrears: $70.00
+Amount Paid (This Term): $10,600.00
+Current Balance: -$9,330.00
+```
+
+## If It Doesn't Work
+
+1. **Look at Console for RED ERRORS**
+   - Any error messages?
+   - Copy and paste them
+
+2. **Check Network Tab** (F12 → Network)
+   - Select a student again
+   - Look for request to "student-payment-details"
+   - Does it show? Status 200 or error?
+
+3. **Try a Different Browser**
+   - Chrome, Firefox, Safari, or Edge
+   - Sometimes browser cache causes issues
+
+4. **Check these files are modified:**
+   - `core/models/student.py` - has `get_full_name()` method?
+   - `core/views/payment_views.py` - has improved API?
+   - `templates/payments/payment_form.html` - has new JavaScript?
+
+## What Changed
+
+✅ Student model now has `get_full_name()` method  
+✅ Payment API returns student name correctly  
+✅ Payment form JavaScript completely rewritten with logging  
+✅ Better error handling and debugging capabilities  
+
+## Expected Results
+
+**Before:**
+- Select student → Nothing happens
+- Top section still shows placeholder text
+- No way to know what went wrong
+
+**After:**
+- Select student → Name appears instantly
+- All payment details load automatically
+- Console shows exactly what happened
+- Easy to debug if something goes wrong
+
+## Console Output Legend
+
+| Message | Meaning |
+|---------|---------|
+| `=== Payment Form Initialization ===` | Page loaded successfully |
+| `Student select element found: YES` | Form is ready |
+| `Student select changed to: 5` | User selected student |
+| `Fetching from: /api/student-payment-details/5/` | Making API call |
+| `Fetch response status: 200` | API call successful |
+| `API response data: {...}` | Got data back from server |
+| `UI updated successfully` | Display updated on screen |
+
+Red error messages mean something went wrong - share them for debugging!
+
+---
+
+**That's it!** Follow the steps above and it should work. The console will show you exactly what's happening. 🎉

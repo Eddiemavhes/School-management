@@ -1,0 +1,577 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Fee Configuration - School Management System{% endblock %}
+
+{% block content %}
+<form method="post" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<div class="min-h-screen pt-24 pb-12 px-4 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-full mx-auto relative z-10 px-8">
+        <!-- Notification Container -->
+        <div id="notification-container" class="fixed top-24 right-8 z-50 space-y-3 pointer-events-none"></div>
+
+        <!-- Header with Icon -->
+        <div class="mb-12 flex items-start justify-between">
+            <div>
+                <div class="flex items-center gap-4 mb-3">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/30 to-purple-500/30 border border-indigo-500/30 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-5xl font-bold bg-gradient-to-r from-indigo-300 via-purple-300 to-blue-300 bg-clip-text text-transparent mb-1">Fee Configuration</h1>
+                        <p class="text-slate-400 text-sm">Manage and configure fees for all academic terms</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if years_with_fees %}
+            {% for year_fees in years_with_fees %}
+                {% if year_fees.year.is_active %}
+
+                <!-- Create Terms Section (if no terms exist) -->
+                {% if not year_fees.terms %}
+                <div class="glass rounded-2xl p-8 mb-12 border border-amber-500/20 bg-gradient-to-r from-amber-500/5 to-orange-500/5">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold text-slate-100 flex items-center gap-3">
+                            <div class="w-1.5 h-8 bg-gradient-to-b from-amber-400 to-orange-400 rounded-full"></div>
+                            Create Academic Terms
+                        </h3>
+                        <div class="px-4 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                            <p class="text-sm font-semibold text-amber-300">No terms yet</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-slate-400 mb-6">Academic Year {{ year_fees.year.year }} has no terms. Create the three terms to get started.</p>
+                    
+                    <button class="px-8 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 shadow-lg hover:shadow-amber-500/30 transition-all duration-300"
+                            onclick="createDefaultTerms({{ year_fees.year.year }})">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Create 3 Standard Terms
+                    </button>
+                </div>
+                {% endif %}
+
+                <!-- Terms Section -->
+                <div class="glass rounded-2xl p-8 mb-12 border border-slate-500/20">
+                    <div class="flex items-center justify-between mb-8">
+                        <h3 class="text-2xl font-bold text-slate-100 flex items-center gap-3">
+                            <div class="w-1.5 h-8 bg-gradient-to-b from-indigo-400 to-purple-400 rounded-full"></div>
+                            Term Fees - Academic Year {{ year_fees.year.year }}
+                        </h3>
+                        <div class="px-4 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/30">
+                            <p class="text-sm font-semibold text-indigo-300">{{ year_fees.terms|length }} Terms</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {% for term_info in year_fees.terms %}
+                        <div class="glass rounded-xl p-6 border border-slate-500/20 hover:border-indigo-500/40 transition-all duration-300 overflow-hidden group" data-term-id="{{ term_info.term.id }}" data-has-payments="{% if term_info.has_payments %}true{% else %}false{% endif %}">
+                            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                            
+                            <!-- Term Header with Icon -->
+                            <div class="mb-6 pb-4 border-b border-slate-600/20 flex items-start justify-between">
+                                <div>
+                                    <p class="text-slate-400 text-sm font-medium mb-1">{{ term_info.term.get_term_display }}</p>
+                                    <p class="text-indigo-300 text-xs">Academic Year {{ year_fees.year.year }}</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    {% if term_info.has_payments %}
+                                    <div class="relative group/tooltip">
+                                        <div class="w-6 h-6 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center">
+                                            <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="absolute right-0 bottom-full mb-2 hidden group-hover/tooltip:block bg-amber-900/90 text-amber-100 text-xs rounded px-2 py-1 whitespace-nowrap z-10">
+                                            Locked: Payments recorded
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+                                            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Fields -->
+                            <div class="space-y-4">
+                                <!-- Fee Amount -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wide">Fee Amount</label>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-indigo-400 font-bold text-lg">$</span>
+                                        <input type="number" 
+                                               value="{% if term_info.amount %}{{ term_info.amount }}{% endif %}" 
+                                               step="0.01" 
+                                               data-term-id="{{ term_info.term.id }}" 
+                                               data-field="fee"
+                                               placeholder="Not set"
+                                               {% if term_info.has_payments %}disabled{% endif %}
+                                               class="w-full pl-8 pr-3 py-2.5 rounded-lg bg-slate-700/50 border border-slate-600/70 text-white font-semibold placeholder-slate-400 focus:outline-none focus:border-indigo-500/70 focus:ring-2 focus:ring-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                    </div>
+                                </div>
+
+                                <!-- Start Date -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wide">Start Date</label>
+                                    <input type="date"
+                                           value="{{ term_info.term.start_date|date:'Y-m-d' }}"
+                                           data-term-id="{{ term_info.term.id }}"
+                                           data-field="start_date"
+                                           class="w-full px-3 py-2.5 rounded-lg bg-slate-700/50 border border-slate-600/70 text-white focus:outline-none focus:border-indigo-500/70 focus:ring-2 focus:ring-indigo-500/30 transition-all font-semibold">
+                                </div>
+
+                                <!-- End Date -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wide">End Date</label>
+                                    <input type="date"
+                                           value="{{ term_info.term.end_date|date:'Y-m-d' }}"
+                                           data-term-id="{{ term_info.term.id }}"
+                                           data-field="end_date"
+                                           class="w-full px-3 py-2.5 rounded-lg bg-slate-700/50 border border-slate-600/70 text-white focus:outline-none focus:border-indigo-500/70 focus:ring-2 focus:ring-indigo-500/30 transition-all font-semibold">
+                                </div>
+                            </div>
+
+                            <!-- Save Button -->
+                            <button class="save-btn w-full mt-6 px-4 py-2.5 rounded-lg font-semibold text-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 flex items-center justify-center gap-2 disabled:from-slate-600 disabled:to-slate-600 disabled:hover:from-slate-600 disabled:hover:to-slate-600 disabled:cursor-not-allowed disabled:opacity-60"
+                                    data-term-id="{{ term_info.term.id }}"
+                                    {% if term_info.has_payments %}disabled title="This term is locked because payments have been recorded"{% endif %}>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                {% if term_info.has_payments %}Locked{% else %}Save{% endif %}
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Activate First Term Section (if terms exist but none is active) -->
+                {% if year_fees.terms and not year_fees.year.get_current_term %}
+                <div class="glass rounded-2xl p-8 mb-12 border border-cyan-500/20 bg-gradient-to-r from-cyan-500/5 to-blue-500/5">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold text-slate-100 flex items-center gap-3">
+                            <div class="w-1.5 h-8 bg-gradient-to-b from-cyan-400 to-blue-400 rounded-full"></div>
+                            Activate First Term
+                        </h3>
+                        <div class="px-4 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/30">
+                            <p class="text-sm font-semibold text-cyan-300">Ready to start</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-slate-400 mb-6">All terms are created. Activate the first term to begin the academic year.</p>
+                    
+                    <button class="px-8 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
+                            onclick="activateFirstTerm({{ year_fees.year.year }})">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Activate First Term
+                    </button>
+                </div>
+                {% endif %}
+
+                <!-- Quick Stats Row -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <!-- Total Fee Amount -->
+                    <div class="glass rounded-xl p-6 border border-slate-500/20 hover:border-indigo-500/40 transition-all duration-300 overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                        
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-slate-400 text-sm font-medium mb-2">Total Fee Amount</p>
+                                <p class="text-3xl font-bold text-slate-100">${{ year_fees.total_fees|floatformat:2 }}</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500/30 to-purple-500/30 border border-indigo-500/30 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="h-1 bg-gradient-to-r from-indigo-500/40 to-purple-500/40 rounded-full mt-4"></div>
+                    </div>
+
+                    <!-- Number of Terms -->
+                    <div class="glass rounded-xl p-6 border border-slate-500/20 hover:border-purple-500/40 transition-all duration-300 overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                        
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-slate-400 text-sm font-medium mb-2">Number of Terms</p>
+                                <p class="text-3xl font-bold text-slate-100">{{ year_fees.terms|length }}</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500/30 to-blue-500/30 border border-purple-500/30 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="h-1 bg-gradient-to-r from-purple-500/40 to-blue-500/40 rounded-full mt-4"></div>
+                    </div>
+
+                    <!-- Average Term Fee -->
+                    <div class="glass rounded-xl p-6 border border-slate-500/20 hover:border-blue-500/40 transition-all duration-300 overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                        
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-slate-400 text-sm font-medium mb-2">Per Term Fee</p>
+                                {% if year_fees.terms|length > 0 %}
+                                    {% with first_term=year_fees.terms|first %}
+                                        <p class="text-3xl font-bold text-slate-100">${{ first_term.amount|floatformat:2 }}</p>
+                                    {% endwith %}
+                                {% else %}
+                                    <p class="text-3xl font-bold text-slate-100">$0.00</p>
+                                {% endif %}
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-blue-500/30 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="h-1 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 rounded-full mt-4"></div>
+                    </div>
+                </div>
+
+                <!-- Total Fees Summary -->
+                <div class="glass rounded-2xl p-8 border border-slate-500/20">
+                    <h3 class="text-2xl font-bold text-slate-100 mb-8 flex items-center gap-3">
+                        <div class="w-1.5 h-8 bg-gradient-to-b from-purple-400 to-blue-400 rounded-full"></div>
+                        Summary & Overview
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Left Column -->
+                        <div class="space-y-6">
+                            <div class="flex items-start gap-4 p-4 rounded-lg bg-gradient-to-r from-slate-700/20 to-slate-600/10 border border-slate-600/20">
+                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500/30 to-purple-500/30 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-5 h-5 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12s4.477 10 10 10 10-4.484 10-10S17.523 2 12 2zm3.707 9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-slate-300 font-semibold text-sm mb-1">Academic Year</p>
+                                    <p class="text-slate-400 text-sm">{{ year_fees.year.year }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4 p-4 rounded-lg bg-gradient-to-r from-slate-700/20 to-slate-600/10 border border-slate-600/20">
+                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500/30 to-blue-500/30 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12s4.477 10 10 10 10-4.484 10-10S17.523 2 12 2zm3.707 9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-slate-300 font-semibold text-sm mb-1">Terms Configured</p>
+                                    <p class="text-slate-400 text-sm">{{ year_fees.terms|length }} of {{ year_fees.terms|length }} terms</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div>
+                            <div class="flex items-end justify-between mb-4">
+                                <div>
+                                    <p class="text-slate-400 text-sm font-medium mb-2">Total Revenue Expected</p>
+                                    <p class="text-4xl font-bold text-slate-100">${{ year_fees.total_fees|floatformat:2 }}</p>
+                                </div>
+                            </div>
+                            <div class="h-2 bg-gradient-to-r from-purple-500/40 to-blue-500/40 rounded-full"></div>
+                            <p class="text-slate-400 text-xs mt-3">Based on {{ year_fees.terms|length }} configured terms</p>
+                        </div>
+                    </div>
+                </div>
+
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="glass rounded-2xl p-12 border border-slate-500/20 text-center">
+                <svg class="w-16 h-16 mx-auto mb-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <p class="text-slate-300 text-lg font-semibold">No fee data available</p>
+                <p class="text-slate-400 text-sm mt-2">Please create academic terms first.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .glass {
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(10px);
+    }
+
+    .save-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .save-btn:active {
+        transform: translateY(0);
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(0.8) brightness(1.2);
+        cursor: pointer;
+    }
+
+    input[type="date"]::-webkit-outer-spin-button,
+    input[type="date"]::-webkit-inner-spin-button {
+        display: none;
+    }
+</style>
+
+<script>
+// Professional Toast Notification System
+function showNotification(message, type = 'info', duration = 4000) {
+    const container = document.getElementById('notification-container');
+    
+    const toast = document.createElement('div');
+    toast.className = `notification-toast notification-${type}`;
+    
+    const icons = {
+        success: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>',
+        error: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>',
+        warning: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>',
+        info: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>'
+    };
+    
+    const colors = {
+        success: 'from-emerald-600/20 to-teal-600/20 border-emerald-500/40 text-emerald-100',
+        error: 'from-red-600/20 to-rose-600/20 border-red-500/40 text-red-100',
+        warning: 'from-amber-600/20 to-orange-600/20 border-amber-500/40 text-amber-100',
+        info: 'from-blue-600/20 to-indigo-600/20 border-blue-500/40 text-blue-100'
+    };
+    
+    const iconColors = {
+        success: 'text-emerald-400',
+        error: 'text-red-400',
+        warning: 'text-amber-400',
+        info: 'text-blue-400'
+    };
+    
+    toast.innerHTML = `
+        <div class="flex items-start gap-3 w-full">
+            <div class="${iconColors[type]} mt-0.5 flex-shrink-0">
+                ${icons[type]}
+            </div>
+            <div class="flex-1">
+                <p class="text-sm font-medium">${message}</p>
+            </div>
+            <button class="close-btn text-current hover:opacity-70 flex-shrink-0" onclick="this.closest('.notification-toast').remove()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    `;
+    
+    toast.style.cssText = `
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    toast.className += ` glass rounded-lg p-4 border backdrop-blur-sm ${colors[type]} shadow-lg flex items-center justify-between`;
+    
+    container.appendChild(toast);
+    
+    if (duration > 0) {
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+}
+
+// Add animations to document head
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// Handle Save Button Clicks
+document.querySelectorAll(".save-btn").forEach(button => {
+    button.addEventListener("click", async function() {
+        // Don't proceed if button is disabled
+        if (this.disabled) {
+            showNotification("This term is locked because payments have been recorded", 'warning');
+            return;
+        }
+        
+        const termId = this.getAttribute("data-term-id");
+        const card = this.closest(".glass");
+        
+        const feeInput = card.querySelector('input[data-field="fee"]');
+        const startDateInput = card.querySelector('input[data-field="start_date"]');
+        const endDateInput = card.querySelector('input[data-field="end_date"]');
+        
+        const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]")?.value;
+        
+        if (!csrfToken) {
+            showNotification("Error: CSRF token not found. Please refresh the page.", 'error');
+            return;
+        }
+        
+        // Show loading state
+        const originalText = this.textContent;
+        this.disabled = true;
+        this.textContent = "Saving...";
+        
+        try {
+            // Save fee information
+            if (feeInput.value !== "") {
+                const feeResponse = await fetch(`/admin/api/term/${termId}/update-fee/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: JSON.stringify({
+                        amount: feeInput.value || 0
+                    })
+                });
+                
+                const feeData = await feeResponse.json();
+                
+                if (!feeResponse.ok) {
+                    throw new Error(feeData.message || "Failed to update fee");
+                }
+            }
+            
+            // Save date information
+            if (startDateInput.value !== "" || endDateInput.value !== "") {
+                const datesResponse = await fetch(`/admin/api/term/${termId}/update-dates/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: JSON.stringify({
+                        start_date: startDateInput.value || null,
+                        end_date: endDateInput.value || null
+                    })
+                });
+                
+                const datesData = await datesResponse.json();
+                
+                if (!datesResponse.ok) {
+                    throw new Error(datesData.message || "Failed to update dates");
+                }
+            }
+            
+            showNotification("Changes saved successfully!", 'success', 3000);
+            setTimeout(() => location.reload(), 1500);
+        } catch (error) {
+            this.disabled = false;
+            this.textContent = originalText;
+            
+            let errorMessage = error.message;
+            
+            // Parse error message for better display
+            if (errorMessage.includes("Cannot modify term fee")) {
+                showNotification("This term is locked. Payments have been recorded for it.", 'warning', 5000);
+            } else {
+                showNotification(`Error: ${errorMessage}`, 'error', 5000);
+            }
+        }
+    });
+});
+
+// Function to create default terms for the year
+async function createDefaultTerms(academicYear) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    try {
+        const response = await fetch('/admin/api/create-terms/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                academic_year: academicYear
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showNotification('Terms created successfully! Refresh the page to see them.', 'success', 3000);
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification(`Error: ${data.message || 'Failed to create terms'}`, 'error', 5000);
+        }
+    } catch (error) {
+        showNotification(`Error: ${error.message}`, 'error', 5000);
+    }
+}
+
+// Function to activate the first term of the year
+async function activateFirstTerm(academicYear) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    try {
+        const response = await fetch('/admin/api/activate-first-term/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                academic_year: academicYear
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showNotification('First Term activated successfully! Refresh the page.', 'success', 3000);
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification(`Error: ${data.message || 'Failed to activate term'}`, 'error', 5000);
+        }
+    } catch (error) {
+        showNotification(`Error: ${error.message}`, 'error', 5000);
+    }
+}
+</script>
+
+{% endblock %}

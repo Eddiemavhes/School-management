@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Alumni / Archived Students{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .glass {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="mb-12 animate-slideInUp">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h1 class="text-5xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-300 bg-clip-text text-transparent mb-2">Alumni / Archived Students</h1>
+                    <p class="text-slate-400 text-lg">Celebrating graduates who have completed their financial obligations</p>
+                </div>
+                <a href="{% url 'student_list' %}" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold text-slate-300 bg-slate-700/40 hover:bg-slate-700/60 border border-slate-600/50 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    Back to Students
+                </a>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="glass rounded-2xl p-6 border border-cyan-500/30 mb-8 animate-slideInUp overflow-hidden" style="animation-delay: 0.1s;">
+            <form method="get" class="flex gap-4">
+                <div class="flex-1">
+                    <input type="text" name="search" placeholder="Search by name or birth entry..." 
+                           class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                           value="{{ request.GET.search }}">
+                </div>
+                <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 transition-all hover:shadow-lg hover:shadow-cyan-500/40">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    Search
+                </button>
+            </form>
+        </div>
+
+        <!-- Students Grid -->
+        {% if archived_students %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for student in archived_students %}
+                    <div class="glass rounded-2xl p-6 border border-emerald-500/30 animate-slideInUp overflow-hidden group hover:border-emerald-500/60 transition-all" style="animation-delay: {{ forloop.counter|add:'0.1'|stringformat:'0.1f' }}s;">
+                        <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                        
+                        <!-- Badge -->
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/></svg>
+                                Alumni
+                            </span>
+                            <span class="text-emerald-400 text-xs font-bold">ID: {{ student.id }}</span>
+                        </div>
+                        
+                        <!-- Student Info -->
+                        <div class="mb-4 pb-4 border-b border-slate-700/50">
+                            <h3 class="text-xl font-bold text-slate-100 mb-1">{{ student.full_name }}</h3>
+                            <p class="text-slate-400 text-sm mb-2">Birth Entry #: <span class="text-slate-300 font-mono">{{ student.birth_entry_number }}</span></p>
+                            
+                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                {% if student.current_class %}
+                                    <div>
+                                        <p class="text-slate-500 text-xs uppercase tracking-wide">Last Class</p>
+                                        <p class="text-slate-200 font-semibold">{{ student.current_class }}</p>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <p class="text-slate-500 text-xs uppercase tracking-wide">Enrolled</p>
+                                    <p class="text-slate-200 font-semibold">{{ student.date_enrolled|date:"M Y" }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status Badge -->
+                        <div class="bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 rounded-lg p-3 mb-4 border border-emerald-500/30">
+                            <div class="text-center">
+                                <p class="text-emerald-400 text-xs uppercase tracking-wider font-bold mb-1">✓ Fully Paid</p>
+                                <p class="text-slate-300 text-sm">All financial obligations cleared</p>
+                                <p class="text-slate-500 text-xs mt-2">Final Balance: <span class="text-emerald-400 font-bold">${{ student.overall_balance|floatformat:2 }}</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex gap-3">
+                            <a href="{% url 'student_detail' student.id %}" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-cyan-300 bg-cyan-500/20 border border-cyan-500/30 hover:bg-cyan-500/30 transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                View Profile
+                            </a>
+                            <a href="{% url 'archived_student_delete' student.id %}" class="inline-flex items-center justify-center px-3 py-2 rounded-lg text-sm font-semibold text-red-300 bg-red-500/20 border border-red-500/30 hover:bg-red-500/30 transition-all" onclick="return confirm('Permanently delete this student record? This cannot be undone.');">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <div class="mt-8 flex justify-center items-center gap-2">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 bg-slate-700/40 hover:bg-slate-700/60 border border-slate-600/50 transition-all">First</a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 bg-slate-700/40 hover:bg-slate-700/60 border border-slate-600/50 transition-all">Previous</a>
+                    {% endif %}
+
+                    <span class="text-slate-400 font-semibold">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 bg-slate-700/40 hover:bg-slate-700/60 border border-slate-600/50 transition-all">Next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 bg-slate-700/40 hover:bg-slate-700/60 border border-slate-600/50 transition-all">Last</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="glass rounded-2xl p-12 border border-slate-500/20 text-center animate-slideInUp">
+                <svg class="w-20 h-20 text-slate-600 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <h3 class="text-2xl font-bold text-slate-300 mb-3">No Alumni Yet</h3>
+                <p class="text-slate-400 text-lg mb-2">Students who graduate with all arrears paid will appear here</p>
+                <p class="text-slate-500 text-sm">Once students complete their studies and clear their balances, they will be automatically archived and celebrated here.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

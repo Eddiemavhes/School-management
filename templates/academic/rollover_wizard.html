@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Year Rollover Wizard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .wizard-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .glass-box {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+    }
+
+    .wizard-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .wizard-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 8px;
+    }
+
+    .wizard-subtitle {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .step {
+        margin-bottom: 24px;
+        padding: 16px;
+        background: rgba(102, 126, 234, 0.05);
+        border-left: 4px solid #667eea;
+        border-radius: 8px;
+    }
+
+    .step-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .step-number {
+        display: inline-block;
+        width: 28px;
+        height: 28px;
+        background: #667eea;
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 28px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .step-content {
+        margin-left: 36px;
+    }
+
+    .info-box {
+        background: white;
+        padding: 12px;
+        border-radius: 6px;
+        margin: 8px 0;
+        border-left: 3px solid #667eea;
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-size: 16px;
+        font-weight: bold;
+        color: #1f2937;
+    }
+
+    .info-value.positive {
+        color: #38ef7d;
+    }
+
+    .info-value.warning {
+        color: #f59e0b;
+    }
+
+    .info-value.danger {
+        color: #ef4444;
+    }
+
+    .check-list {
+        list-style: none;
+        padding: 0;
+        margin: 8px 0;
+    }
+
+    .check-list li {
+        padding: 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .check-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .check-icon.success {
+        background: #38ef7d;
+        color: white;
+    }
+
+    .check-icon.error {
+        background: #ef4444;
+        color: white;
+    }
+
+    .check-icon.warning {
+        background: #f59e0b;
+        color: white;
+    }
+
+    .rollover-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 32px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .warning-banner {
+        background: rgba(239, 68, 68, 0.1);
+        border-left: 4px solid #ef4444;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+    }
+
+    .warning-banner strong {
+        color: #dc2626;
+    }
+
+    .success-banner {
+        background: rgba(56, 239, 125, 0.1);
+        border-left: 4px solid #38ef7d;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+    }
+
+    h1 {
+        color: #1f2937;
+    }
+
+    .rollover-disabled {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .disabled-reason {
+        background: #fff3cd;
+        border: 1px solid #ffecb5;
+        padding: 12px;
+        border-radius: 6px;
+        margin-top: 12px;
+        color: #856404;
+        font-size: 13px;
+    }
+
+    .class-missing {
+        background: #f8d7da;
+        padding: 8px 12px;
+        border-radius: 4px;
+        color: #721c24;
+        font-size: 12px;
+        margin: 4px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="wizard-container">
+        <div class="wizard-header">
+            <div class="wizard-title">📊 Year Rollover Wizard</div>
+            <div class="wizard-subtitle">Seamless transition to academic year {{ rollover_info.new_year }}</div>
+        </div>
+
+        {% if current_year %}
+            {% if rollover_info.new_year_exists %}
+            <div class="warning-banner">
+                <strong>⚠️ Cannot Rollover</strong> - Academic year {{ rollover_info.new_year }} already exists. Please select a different year or delete the existing year first.
+            </div>
+            {% else %}
+
+            <!-- Verification Section -->
+            <div class="glass-box">
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">1</span>
+                        Current Year Status
+                    </div>
+                    <div class="step-content">
+                        <div class="info-box">
+                            <div class="info-label">Rollover From</div>
+                            <div class="info-value">Academic Year {{ current_year.year }}</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-label">Rollover To</div>
+                            <div class="info-value positive">Academic Year {{ rollover_info.new_year }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">2</span>
+                        Student Promotions
+                    </div>
+                    <div class="step-content">
+                        <ul class="check-list">
+                            <li>
+                                <span class="check-icon success">✓</span>
+                                <span><strong>{{ rollover_info.students_to_promote }}</strong> students will be promoted to next grade</span>
+                            </li>
+                            <li>
+                                <span class="check-icon success">✓</span>
+                                <span><strong>{{ rollover_info.students_graduating }}</strong> students will graduate (Grade 7)</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">3</span>
+                        Arrears Preservation
+                    </div>
+                    <div class="step-content">
+                        <div class="info-box" style="border-left-color: #f093fb;">
+                            <div class="info-label">Total System Arrears</div>
+                            <div class="info-value">{{ rollover_info.total_arrears|floatformat:2 }} USD</div>
+                        </div>
+                        <p style="font-size: 13px; color: #666; margin-top: 8px;">
+                            ✓ All unpaid balances from {{ current_year.year }} will automatically move to {{ rollover_info.new_year }} as previous arrears
+                        </p>
+                        <p style="font-size: 13px; color: #666; margin: 8px 0 0 0;">
+                            ✓ Financial continuity maintained across all {{ rollover_info.balances_count }} student balances
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">4</span>
+                        Required Classes for {{ rollover_info.new_year }}
+                    </div>
+                    <div class="step-content">
+                        {% if rollover_info.all_classes_ready %}
+                        <div style="color: #38ef7d; font-weight: 600; margin-bottom: 8px;">
+                            ✓ All required classes exist in Academic Year {{ rollover_info.new_year }}
+                        </div>
+                        {% else %}
+                        <div style="color: #ef4444; font-weight: 600; margin-bottom: 8px;">
+                            ⚠️ Missing classes - please create these before rollover:
+                        </div>
+                        {% endif %}
+
+                        {% for req_class in rollover_info.required_classes %}
+                        <div style="background: white; padding: 8px; border-radius: 4px; margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Grade {{ req_class.grade }}, Section {{ req_class.section }} ({{ req_class.count }} students)</span>
+                            {% if req_class.exists %}
+                            <span style="color: #38ef7d; font-weight: 600;">✓ Ready</span>
+                            {% else %}
+                            <span class="class-missing">✗ Missing</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">5</span>
+                        Fee Structure Preservation
+                    </div>
+                    <div class="step-content">
+                        <p style="font-size: 13px; color: #666; margin-bottom: 8px;">
+                            ✓ Current fee structure will be copied to {{ rollover_info.new_year }}:
+                        </p>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr style="background: rgba(0,0,0,0.02);">
+                                <td style="padding: 8px; border: 1px solid #e5e7eb;">Term</td>
+                                <td style="padding: 8px; border: 1px solid #e5e7eb;">Fee Amount</td>
+                            </tr>
+                            {% for fee in rollover_info.fee_structure %}
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #e5e7eb;">Term {{ fee.term }}</td>
+                                <td style="padding: 8px; border: 1px solid #e5e7eb; font-weight: bold; color: #38ef7d;">${{ fee.fee|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="rollover-actions">
+                <button class="btn btn-secondary" onclick="history.back()">
+                    Cancel
+                </button>
+                <button class="btn btn-primary" 
+                        id="verify-btn"
+                        onclick="verifyArrears({{ current_year.id }})"
+                        {% if not rollover_info.all_classes_ready %}disabled{% endif %}>
+                    Verify Arrears
+                </button>
+                <button class="btn btn-primary" 
+                        id="execute-btn"
+                        onclick="executeRollover({{ current_year.id }})"
+                        style="display: none;">
+                    Execute Rollover
+                </button>
+            </div>
+
+            {% endif %}
+        {% else %}
+        <div class="warning-banner">
+            <strong>⚠️ No Active Year</strong> - Please set an active academic year before attempting rollover.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function verifyArrears(yearId) {
+        document.getElementById('verify-btn').disabled = true;
+        document.getElementById('verify-btn').textContent = 'Verifying...';
+
+        fetch(`/admin/api/year/${yearId}/verify-arrears/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(`✓ Verified\n\nTotal Arrears: $${data.total_arrears.toFixed(2)}\nStudents with Arrears: ${data.students_with_arrears}/${data.total_students}`);
+                document.getElementById('verify-btn').style.display = 'none';
+                document.getElementById('execute-btn').style.display = 'inline-block';
+            } else {
+                alert('Error: ' + data.message);
+                document.getElementById('verify-btn').disabled = false;
+                document.getElementById('verify-btn').textContent = 'Verify Arrears';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
+            document.getElementById('verify-btn').disabled = false;
+            document.getElementById('verify-btn').textContent = 'Verify Arrears';
+        });
+    }
+
+    function executeRollover(yearId) {
+        if (confirm('Execute rollover? This will:\n\n✓ Create Academic Year {{ rollover_info.new_year }}\n✓ Promote {{ rollover_info.students_to_promote }} students\n✓ Move ${{ rollover_info.total_arrears|floatformat:0 }} in arrears\n\nThis cannot be undone!')) {
+            document.getElementById('execute-btn').disabled = true;
+            document.getElementById('execute-btn').textContent = 'Processing...';
+
+            fetch(`/admin/api/year/${yearId}/execute-rollover/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('✓ Rollover Successful!\n\n' + data.message);
+                    window.location.href = '/admin/academic/';
+                } else {
+                    alert('Error: ' + data.message);
+                    document.getElementById('execute-btn').disabled = false;
+                    document.getElementById('execute-btn').textContent = 'Execute Rollover';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during rollover');
+                document.getElementById('execute-btn').disabled = false;
+                document.getElementById('execute-btn').textContent = 'Execute Rollover';
+            });
+        }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

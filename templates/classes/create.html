@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Class - School Management System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-2xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="mb-8 animate-slideInUp">
+            <a href="/classes/" class="inline-flex items-center text-blue-400 hover:text-blue-300 mb-4 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Classes
+            </a>
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent mb-2">Create New Class</h1>
+            <p class="text-slate-400">Add a new class to your school</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp">
+            <form id="classForm" method="POST" action="/classes/create/">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <!-- Grade -->
+                    <div>
+                        <label for="grade" class="block text-sm font-bold text-slate-200 mb-3">Grade *</label>
+                        <select id="grade" name="grade" required class="w-full px-5 py-3.5 rounded-lg bg-white/95 border-2 border-slate-400 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all focus:bg-white cursor-pointer hover:bg-white/98">
+                            <option value="" class="text-slate-600">Select Grade</option>
+                            <option value="1">Grade 1</option>
+                            <option value="2">Grade 2</option>
+                            <option value="3">Grade 3</option>
+                            <option value="4">Grade 4</option>
+                            <option value="5">Grade 5</option>
+                            <option value="6">Grade 6</option>
+                            <option value="7">Grade 7</option>
+                        </select>
+                    </div>
+
+                    <!-- Section -->
+                    <div>
+                        <label for="section" class="block text-sm font-bold text-slate-200 mb-3">Section *</label>
+                        <select id="section" name="section" required class="w-full px-5 py-3.5 rounded-lg bg-white/95 border-2 border-slate-400 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all focus:bg-white cursor-pointer hover:bg-white/98">
+                            <option value="" class="text-slate-600">Select Section</option>
+                            <option value="A">Section A</option>
+                            <option value="B">Section B</option>
+                            <option value="C">Section C</option>
+                            <option value="D">Section D</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Teacher -->
+                <div class="mb-8">
+                    <label for="teacher" class="block text-sm font-bold text-slate-200 mb-3">Teacher (Optional)</label>
+                    <select id="teacher" name="teacher" class="w-full px-5 py-3.5 rounded-lg bg-white/95 border-2 border-slate-400 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all focus:bg-white cursor-pointer hover:bg-white/98">
+                        <option value="" class="text-slate-600">-- No Teacher Assigned --</option>
+                        {% for teacher in available_teachers %}
+                        <option value="{{ teacher.id }}">{{ teacher.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Hidden Academic Year Field -->
+                <input type="hidden" name="academic_year" value="{{ active_year }}"
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hidden">
+                    <div id="errorText"></div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg hover:shadow-xl">
+                        Create Class
+                    </button>
+                    <a href="/classes/" class="flex-1 px-6 py-3 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-300 font-medium hover:bg-slate-700 transition-all text-center">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('classForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch('/classes/create/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            window.location.href = '/classes/';
+        } else {
+            document.getElementById('errorMessage').classList.remove('hidden');
+            document.getElementById('errorText').textContent = data.error || 'An error occurred';
+        }
+    } catch (error) {
+        document.getElementById('errorMessage').classList.remove('hidden');
+        document.getElementById('errorText').textContent = 'Failed to create class: ' + error.message;
+    }
+});
+</script>
+{% endblock %}

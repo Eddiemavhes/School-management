@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superuser Control Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); }
+        }
+        
+        .animate-slide-down {
+            animation: slideDown 0.6s ease-out;
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+
+<!-- Animated Background -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-20 left-10 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style="animation-duration: 4s;"></div>
+    <div class="absolute bottom-32 right-20 w-40 h-40 bg-slate-400/5 rounded-full blur-3xl animate-pulse" style="animation-duration: 5s; animation-delay: 1s;"></div>
+</div>
+
+<div class="min-h-screen py-16 px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-20 animate-slide-down">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-500/20 border border-purple-500/40 mb-6 pulse-glow">
+                <svg class="w-8 h-8 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.343a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM15.657 14.657a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM11 17a1 1 0 102 0v-1a1 1 0 10-2 0v1zM4.343 15.657a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM2 10a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM4.343 4.343a1 1 0 000-1.414L3.636 3.636a1 1 0 00-1.414 1.414l.707.707z"></path>
+                </svg>
+            </div>
+            <h1 class="text-5xl font-bold text-white mb-2">Superuser Panel</h1>
+            <p class="text-slate-400 text-lg">Master Control Center</p>
+        </div>
+
+        <!-- Main Controls -->
+        <div class="space-y-8">
+            
+            <!-- Reset Admin Password -->
+            <div class="bg-gradient-to-br from-slate-800/60 to-slate-900/60 rounded-2xl p-10 border border-slate-700/50 backdrop-blur-xl hover:border-slate-600/80 transition-all duration-300 animate-slide-down" style="animation-delay: 0.1s;">
+                <div class="flex items-start gap-4 mb-8">
+                    <div class="p-4 rounded-xl bg-blue-500/15 border border-blue-500/30">
+                        <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-semibold text-white">Reset Admin Password</h2>
+                        <p class="text-slate-400 text-sm mt-2">Change administrator account credentials safely</p>
+                    </div>
+                </div>
+                <a href="{% url 'reset_admin_password' %}" class="block w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-semibold rounded-xl transition-all duration-200 text-center shadow-lg hover:shadow-blue-500/50">
+                    ↓ Reset Admin Password
+                </a>
+            </div>
+
+            <!-- Full System Reset -->
+            <div class="bg-gradient-to-br from-red-900/40 to-red-950/40 rounded-2xl p-10 border border-red-800/50 backdrop-blur-xl hover:border-red-700/80 transition-all duration-300 animate-slide-down" style="animation-delay: 0.2s;">
+                <div class="flex items-start gap-4 mb-8">
+                    <div class="p-4 rounded-xl bg-red-500/15 border border-red-500/30">
+                        <svg class="w-7 h-7 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-semibold text-red-300">Full System Reset</h2>
+                        <p class="text-red-400/80 text-sm mt-2">Permanently delete all data except admin accounts (irreversible)</p>
+                    </div>
+                </div>
+                <button onclick="initiateSystemReset()" class="block w-full px-6 py-4 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white font-semibold rounded-xl transition-all duration-200 text-center shadow-lg hover:shadow-red-500/50">
+                    ⚠ PROCEED WITH FULL SYSTEM RESET
+                </button>
+            </div>
+
+            <!-- Logout -->
+            <div class="text-center mt-12 animate-slide-down" style="animation-delay: 0.3s;">
+                <a href="{% url 'logout' %}" class="text-slate-400 hover:text-slate-300 transition font-medium text-lg">← Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Reset Modal -->
+<div id="resetModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md">
+    <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 max-w-lg w-full border border-slate-700/50 shadow-2xl">
+        <h3 class="text-2xl font-bold text-white text-center mb-4">⚠ WARNING</h3>
+        <p class="text-slate-300 text-center mb-6">This action will permanently delete ALL system data except admin accounts:</p>
+        
+        <ul class="bg-slate-700/30 border border-red-600/30 rounded-lg p-4 mb-6 space-y-2 text-sm">
+            <li class="text-red-300">✕ All students</li>
+            <li class="text-red-300">✕ All teachers</li>
+            <li class="text-red-300">✕ All payments</li>
+            <li class="text-red-300">✕ All balances</li>
+            <li class="text-red-300">✕ All academic terms</li>
+            <li class="text-red-300">✕ All academic years</li>
+        </ul>
+
+        <p class="text-slate-400 text-sm mb-4 text-center">Type <span class="font-mono font-bold text-cyan-400">CONFIRM_SYSTEM_RESET_2025</span> to proceed:</p>
+
+        <input type="text" id="resetConfirmation" placeholder="Enter confirmation code..." class="w-full px-4 py-3 rounded-lg bg-slate-700/50 border border-slate-600/50 text-white placeholder-slate-500 mb-6 focus:outline-none focus:ring-2 focus:ring-red-600" />
+
+        <div class="flex gap-3">
+            <button onclick="closeResetModal()" class="flex-1 px-4 py-3 bg-slate-700/50 hover:bg-slate-600/50 text-white font-medium rounded-lg transition">
+                Cancel
+            </button>
+            <button onclick="executeSystemReset()" class="flex-1 px-4 py-3 bg-red-700 hover:bg-red-600 text-white font-medium rounded-lg transition">
+                Confirm Reset
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function initiateSystemReset() {
+    document.getElementById('resetModal').classList.remove('hidden');
+    document.getElementById('resetConfirmation').focus();
+}
+
+function closeResetModal() {
+    document.getElementById('resetModal').classList.add('hidden');
+    document.getElementById('resetConfirmation').value = '';
+}
+
+function executeSystemReset() {
+    const confirmCode = document.getElementById('resetConfirmation').value;
+    
+    if (confirmCode !== 'CONFIRM_SYSTEM_RESET_2025') {
+        alert('❌ Invalid confirmation code');
+        return;
+    }
+
+    const btn = event.target;
+    btn.textContent = 'Resetting...';
+    btn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('reset_token', 'CONFIRM_SYSTEM_RESET_2025');
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    fetch('{% url "reset_system_api" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeResetModal();
+            // Show success message
+            showSuccessMessage(data.stats);
+        } else {
+            alert('❌ Error: ' + (data.error || 'Unknown error'));
+            btn.textContent = 'Confirm Reset';
+            btn.disabled = false;
+        }
+    })
+    .catch(error => {
+        alert('❌ Error: ' + error);
+        btn.textContent = 'Confirm Reset';
+        btn.disabled = false;
+    });
+}
+
+document.getElementById('resetModal').addEventListener('click', function(e) {
+    if (e.target === this) closeResetModal();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeResetModal();
+});
+
+// Allow Enter key in confirmation field
+document.getElementById('resetConfirmation')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') executeSystemReset();
+});
+
+function showSuccessMessage(stats) {
+    const successHtml = `
+        <div id="successOverlay" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md">
+            <div class="bg-gradient-to-br from-green-900/60 to-emerald-950/60 rounded-2xl p-12 max-w-lg w-full border border-green-700/50 shadow-2xl text-center">
+                <div class="mb-6">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-500/20 border-2 border-green-500 mb-4">
+                        <svg class="w-10 h-10 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <h2 class="text-3xl font-bold text-green-300 mb-2">✅ Success!</h2>
+                <p class="text-green-200 text-lg mb-8">System has been completely reset</p>
+                
+                <div class="bg-slate-800/50 rounded-lg p-6 mb-8 text-left space-y-2">
+                    <p class="text-sm"><span class="text-green-400 font-semibold">Students:</span> <span class="text-green-200">${stats.students} deleted</span></p>
+                    <p class="text-sm"><span class="text-green-400 font-semibold">Teachers:</span> <span class="text-green-200">${stats.teachers} deleted</span></p>
+                    <p class="text-sm"><span class="text-green-400 font-semibold">Classes:</span> <span class="text-green-200">${stats.classes} deleted</span></p>
+                    <p class="text-sm"><span class="text-green-400 font-semibold">Payments:</span> <span class="text-green-200">${stats.payments} deleted</span></p>
+                    <p class="text-sm"><span class="text-green-400 font-semibold">Balances:</span> <span class="text-green-200">${stats.balances} deleted</span></p>
+                    <p class="text-sm"><span class="text-green-400 font-semibold">Term Fees:</span> <span class="text-green-200">${stats.term_fees} deleted</span></p>
+                    <p class="text-sm"><span class="text-green-400 font-semibold">Terms:</span> <span class="text-green-200">${stats.terms} deleted</span></p>
+                    <p class="text-sm"><span class="text-green-400 font-semibold">Years:</span> <span class="text-green-200">${stats.years} deleted</span></p>
+                </div>
+                
+                <p class="text-green-300 text-sm mb-6">Admin accounts preserved ✓</p>
+                <p class="text-slate-400 text-xs mb-6">Reloading in 3 seconds...</p>
+                
+                <button onclick="location.reload()" class="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold rounded-lg transition">
+                    Reload Now
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', successHtml);
+    setTimeout(() => location.reload(), 3000);
+}
+</script>
+
+</body>
+</html>

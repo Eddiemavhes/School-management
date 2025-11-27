@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Class{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-teal-50 via-white to-teal-100">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <!-- Header with modern styling -->
+            <div class="mb-8 text-center">
+                <h1 class="text-4xl font-extrabold bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent">
+                    {% if form.instance.pk %}Edit{% else %}Add New{% endif %} Class
+                </h1>
+                <p class="text-gray-600 mt-2 text-lg">Enter the class details below</p>
+            </div>
+
+            <!-- Form Card with enhanced glassmorphism -->
+            <div class="bg-white bg-opacity-20 backdrop-filter backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white border-opacity-20 relative overflow-hidden">
+                <!-- Decorative elements -->
+                <div class="absolute top-0 right-0 w-40 h-40 bg-teal-400 rounded-full filter blur-3xl opacity-10 -mr-20 -mt-20"></div>
+                <div class="absolute bottom-0 left-0 w-40 h-40 bg-cyan-400 rounded-full filter blur-3xl opacity-10 -ml-20 -mb-20"></div>
+
+                <form method="post" class="space-y-6 relative">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Class Information -->
+                    <div class="space-y-6">
+                        <!-- Name -->
+                        <div class="group">
+                            <label for="{{ form.name.id_for_label }}" class="block text-sm font-semibold text-teal-700 group-hover:text-teal-600 transition-colors duration-200">Class Name</label>
+                            <div class="mt-1 relative">
+                                {{ form.name }}
+                                <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 opacity-0 group-hover:opacity-10 transition-opacity duration-200 pointer-events-none"></div>
+                                {% if form.name.errors %}
+                                <p class="mt-2 text-sm text-red-600 font-medium">{{ form.name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Teacher -->
+                        <div class="group">
+                            <label for="{{ form.teacher.id_for_label }}" class="block text-sm font-semibold text-teal-700 group-hover:text-teal-600 transition-colors duration-200">Class Teacher</label>
+                            <div class="mt-1 relative">
+                                {{ form.teacher }}
+                                <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 opacity-0 group-hover:opacity-10 transition-opacity duration-200 pointer-events-none"></div>
+                                {% if form.teacher.errors %}
+                                <p class="mt-2 text-sm text-red-600 font-medium">{{ form.teacher.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="group">
+                            <label for="{{ form.description.id_for_label }}" class="block text-sm font-semibold text-teal-700 group-hover:text-teal-600 transition-colors duration-200">Description</label>
+                            <div class="mt-1 relative">
+                                {{ form.description }}
+                                <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 opacity-0 group-hover:opacity-10 transition-opacity duration-200 pointer-events-none"></div>
+                                {% if form.description.errors %}
+                                <p class="mt-2 text-sm text-red-600 font-medium">{{ form.description.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions with modern styling -->
+                    <div class="flex justify-end space-x-4 pt-8 border-t border-white border-opacity-20">
+                        <a href="{% url 'class_list' %}" class="px-6 py-3 rounded-xl text-sm font-semibold text-teal-600 bg-white bg-opacity-50 hover:bg-opacity-70 transition-all duration-200 shadow-lg hover:shadow-xl backdrop-blur-sm">
+                            Cancel
+                        </a>
+                        <button type="submit" class="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                            {% if form.instance.pk %}Update{% else %}Create{% endif %} Class
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add modern form styling -->
+<style>
+    /* Style form inputs with modern look */
+    form input[type="text"],
+    form input[type="email"],
+    form select,
+    form textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        border: none;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(4px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
+
+    /* Style form textareas */
+    form textarea {
+        height: 8rem;
+        resize: none;
+    }
+
+    /* Add smooth hover effects */
+    form input:hover,
+    form select:hover,
+    form textarea:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        background: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Add focus effects */
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
+        outline: none;
+        ring: 2px;
+        ring-color: rgba(13, 148, 136, 0.5);
+        background: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Custom select styling */
+    form select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230F766E'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1.5rem;
+        padding-right: 2.5rem;
+    }
+</style>
+{% endblock %}

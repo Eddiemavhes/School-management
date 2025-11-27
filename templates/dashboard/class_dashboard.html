@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Class Dashboard - {{ class_obj.grade }} {{ class_obj.section }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-box {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+    }
+
+    .stat-card.success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .stat-card.warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .stat-card.info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .stat-card h3 {
+        font-size: 14px;
+        font-weight: 600;
+        opacity: 0.9;
+        margin: 0 0 8px 0;
+    }
+
+    .stat-card .value {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 24px;
+    }
+
+    .student-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-paid {
+        background-color: #11998e;
+        color: white;
+    }
+
+    .badge-partial {
+        background-color: #f59e0b;
+        color: white;
+    }
+
+    .badge-unpaid {
+        background-color: #ef4444;
+        color: white;
+    }
+
+    .progress-bar {
+        height: 24px;
+        background-color: #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+        margin: 8px 0;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #11998e, #38ef7d);
+        transition: width 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .arrears-warning {
+        background: rgba(239, 68, 68, 0.1);
+        border-left: 4px solid #ef4444;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+    }
+
+    h1, h2 {
+        color: #1f2937;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% else %}
+    
+    <!-- Header -->
+    <div class="mb-4">
+        <h1>Class Dashboard</h1>
+        <p class="text-muted">{{ class_obj.grade }} - {{ class_obj.section }}</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h3>Total Students</h3>
+                <p class="value">{{ total_students }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card success">
+                <h3>Fee Collected (Current)</h3>
+                <p class="value">${{ class_fee_collected }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card info">
+                <h3>Collection Rate</h3>
+                <p class="value">{{ class_collection_rate|floatformat:1 }}%</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card warning">
+                <h3>Outstanding Balance</h3>
+                <p class="value">${{ class_fee_outstanding }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Overview -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="glass-box">
+                <h3>Financial Summary (Current Term)</h3>
+                <table class="table table-sm mt-3">
+                    <tr>
+                        <td>Total Fees Due:</td>
+                        <td class="text-end"><strong>${{ class_fee_due }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Total Arrears:</td>
+                        <td class="text-end"><strong class="text-danger">${{ class_total_arrears }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Total Collected:</td>
+                        <td class="text-end"><strong class="text-success">${{ class_fee_collected }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Outstanding:</td>
+                        <td class="text-end"><strong>${{ class_fee_outstanding }}</strong></td>
+                    </tr>
+                </table>
+                
+                <div class="mt-3">
+                    <p class="text-muted" style="font-size: 12px;">Average per Student</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ class_collection_rate }}%">
+                            {{ class_collection_rate|floatformat:0 }}%
+                        </div>
+                    </div>
+                    <p class="text-muted mt-2" style="font-size: 12px;">
+                        Avg Outstanding: ${{ avg_balance_per_student|floatformat:2 }} | 
+                        Avg Arrears: ${{ avg_arrears_per_student|floatformat:2 }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="glass-box">
+                <h3>Payment Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="paymentStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demographics -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="glass-box">
+                <h3>Gender Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="glass-box">
+                <h3>Age Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="ageChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Students Needing Attention -->
+    {% if students_needing_attention %}
+    <div class="glass-box mb-4">
+        <div class="arrears-warning">
+            <strong>⚠️ Students Needing Attention</strong>
+            <p style="margin: 8px 0 0 0; font-size: 12px;">Students with no payment or significant arrears</p>
+        </div>
+        
+        <div class="row">
+            {% for balance in students_needing_attention %}
+            <div class="col-md-6 mb-3">
+                <div style="background: rgba(255, 255, 255, 0.5); padding: 12px; border-radius: 8px; border-left: 4px solid #ef4444;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>{{ balance.student.get_full_name }}</strong>
+                            <p style="margin: 4px 0; font-size: 12px; color: #666;">
+                                Arrears: <span class="text-danger">${{ balance.previous_arrears }}</span> |
+                                Due: ${{ balance.current_balance }}
+                            </p>
+                        </div>
+                        <span class="status-badge {% if balance.current_balance <= 0 %}badge-paid{% elif balance.amount_paid > 0 %}badge-partial{% else %}badge-unpaid{% endif %}">
+                            {% if balance.current_balance <= 0 %}Paid{% elif balance.amount_paid > 0 %}Partial{% else %}Unpaid{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Student List by Payment Status -->
+    <div class="glass-box">
+        <h3>Student Payment Status Summary</h3>
+        
+        <div class="mt-3">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;">
+                <div style="background: rgba(17, 153, 142, 0.1); padding: 12px; border-radius: 8px; text-align: center;">
+                    <strong style="color: #11998e;">Fully Paid</strong>
+                    <p style="margin: 8px 0 0 0; font-size: 24px; color: #11998e;">{{ fully_paid }}</p>
+                </div>
+                <div style="background: rgba(245, 158, 11, 0.1); padding: 12px; border-radius: 8px; text-align: center;">
+                    <strong style="color: #f59e0b;">Partial Payment</strong>
+                    <p style="margin: 8px 0 0 0; font-size: 24px; color: #f59e0b;">{{ partial_paid }}</p>
+                </div>
+                <div style="background: rgba(239, 68, 68, 0.1); padding: 12px; border-radius: 8px; text-align: center;">
+                    <strong style="color: #ef4444;">Unpaid</strong>
+                    <p style="margin: 8px 0 0 0; font-size: 24px; color: #ef4444;">{{ unpaid }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Payment Status Chart
+    const paymentStatusCtx = document.getElementById('paymentStatusChart');
+    if (paymentStatusCtx) {
+        new Chart(paymentStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Fully Paid', 'Partial Payment', 'Unpaid'],
+                datasets: [{
+                    data: [{{ fully_paid }}, {{ partial_paid }}, {{ unpaid }}],
+                    backgroundColor: ['#11998e', '#f59e0b', '#ef4444'],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Gender Chart
+    const genderCtx = document.getElementById('genderChart');
+    if (genderCtx) {
+        new Chart(genderCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ gender_labels|safe }},
+                datasets: [{
+                    label: 'Count',
+                    data: {{ gender_data|safe }},
+                    backgroundColor: ['#667eea', '#f093fb'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // Age Chart
+    const ageCtx = document.getElementById('ageChart');
+    if (ageCtx) {
+        new Chart(ageCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ age_labels|safe }},
+                datasets: [{
+                    label: 'Students',
+                    data: {{ age_data|safe }},
+                    backgroundColor: '#764ba2',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

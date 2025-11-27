@@ -1,0 +1,56 @@
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Sum
+from ..models.student import Student
+from ..models.class_model import Class
+from ..models.payment import Payment
+from ..models.student_movement import StudentMovement
+from django.utils import timezone
+from datetime import timedelta
+
+@login_required
+def dashboard(request):
+    # Get recent movements for the promotion widget
+    recent_movements = StudentMovement.objects.select_related(
+        'student', 'from_class', 'to_class'
+    ).order_by('-movement_date')[:5]
+
+    # Get recent transfers
+    recent_transfers = StudentMovement.objects.select_related(
+        'student', 'old_class', 'new_class'
+    ).filter(
+        movement_type='TRANSFER'
+    ).order_by('-date')[:5]
+
+    # Get general stats
+    total_students = Student.objects.filter(status='ACTIVE').count()
+    total_classes = Class.objects.count()
+    
+    # Get recent payments
+    recent_payments = Payment.objects.select_related('student').order_by('-payment_date')[:5]
+    
+    # Get class distribution
+    class_distribution = Class.objects.annotate(
+        student_count=Count('students')
+    ).values('grade', 'section', 'student_count')
+
+    # Get payment statistics for the last 30 days
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    payment_stats = Payment.objects.filter(
+        payment_date__gte=thirty_days_ago
+    ).aggregate(
+        total_amount=Sum('amount'),
+        total_count=Count('id')
+    )
+
+    context = {
+        'recent_movements': recent_movements,
+        'recent_transfers': recent_transfers,  # Add recent transfers to context
+        'total_students': total_students,
+        'total_classes': total_classes,
+        'recent_payments': recent_payments,
+        'class_distribution': class_distribution,
+        'payment_stats': payment_stats,
+    }
+    
+    return render(request, 'dashboard/dashboard.html', context)

@@ -1,0 +1,555 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Advanced Student Search{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-page-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .search-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    /* SIDEBAR FILTERS */
+    .filter-sidebar {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+    }
+
+    .filter-section {
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .filter-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .filter-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #667eea;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .filter-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .filter-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-option input[type="checkbox"],
+    .filter-option input[type="radio"] {
+        cursor: pointer;
+        accent-color: #667eea;
+    }
+
+    .filter-option label {
+        font-size: 13px;
+        cursor: pointer;
+        margin: 0;
+        flex: 1;
+        color: #555;
+    }
+
+    .filter-option input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+    .filter-count {
+        font-size: 11px;
+        color: #999;
+        margin-left: auto;
+    }
+
+    .clear-filters-btn {
+        width: 100%;
+        padding: 10px;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid #fca5a5;
+        color: #dc2626;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 12px;
+        margin-top: 16px;
+        transition: all 0.2s;
+    }
+
+    .clear-filters-btn:hover {
+        background: rgba(239, 68, 68, 0.2);
+    }
+
+    /* MAIN CONTENT */
+    .search-main {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .search-bar-advanced {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(102, 126, 234, 0.3);
+        border-radius: 12px;
+        padding: 16px 20px;
+        display: flex;
+        gap: 12px;
+    }
+
+    .search-bar-advanced input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        font-size: 14px;
+        outline: none;
+        color: #333;
+    }
+
+    .search-bar-advanced input::placeholder {
+        color: #999;
+    }
+
+    .search-bar-advanced button {
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+    }
+
+    .results-info {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .results-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .results-actions button {
+        padding: 8px 16px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        color: #667eea;
+        transition: all 0.2s;
+    }
+
+    .results-actions button:hover {
+        background: #f3f4f6;
+        border-color: #667eea;
+    }
+
+    .results-table {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .results-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .results-table thead {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    }
+
+    .results-table th {
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        color: #667eea;
+        border-bottom: 2px solid #667eea;
+    }
+
+    .results-table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 13px;
+    }
+
+    .results-table tbody tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .student-name {
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .student-id {
+        color: #667eea;
+        font-weight: 500;
+    }
+
+    .class-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .balance-positive {
+        color: #38ef7d;
+        font-weight: 600;
+    }
+
+    .balance-negative {
+        color: #ef4444;
+        font-weight: 600;
+    }
+
+    .action-icons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(102, 126, 234, 0.1);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        color: #667eea;
+        font-size: 14px;
+    }
+
+    .action-icon:hover {
+        background: rgba(102, 126, 234, 0.2);
+    }
+
+    .no-results-message {
+        text-align: center;
+        padding: 48px 24px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        color: #999;
+    }
+
+    .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .filter-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: rgba(102, 126, 234, 0.1);
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        border-radius: 20px;
+        font-size: 12px;
+        color: #667eea;
+    }
+
+    .filter-tag button {
+        background: none;
+        border: none;
+        color: #667eea;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 0;
+        line-height: 1;
+    }
+
+    @media (max-width: 1024px) {
+        .search-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-sidebar {
+            position: static;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .search-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .search-bar-advanced {
+            flex-direction: column;
+        }
+
+        .results-table {
+            overflow-x: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="search-page-container">
+        <!-- Page Title -->
+        <div style="margin-bottom: 24px;">
+            <h1 style="font-size: 28px; margin: 0 0 8px 0; color: #1f2937;">🔍 Advanced Student Search</h1>
+            <p style="margin: 0; color: #666; font-size: 14px;">Find students using multiple criteria and filters</p>
+        </div>
+
+        <div class="search-layout">
+            <!-- FILTER SIDEBAR -->
+            <div class="filter-sidebar">
+                <form method="get" id="filterForm">
+                    <!-- Search Input -->
+                    <div class="filter-section">
+                        <input type="text" name="q" placeholder="Student name or ID..." value="{{ query }}" 
+                               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;">
+                    </div>
+
+                    <!-- Class Filter -->
+                    <div class="filter-section">
+                        <div class="filter-title">Class</div>
+                        <div class="filter-options">
+                            {% for class in classes %}
+                            <label class="filter-option">
+                                <input type="radio" name="class_id" value="{{ class.id }}" 
+                                       {% if selected_class.id == class.id %}checked{% endif %}>
+                                <span>{{ class.grade }}-{{ class.section }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Grade Filter -->
+                    <div class="filter-section">
+                        <div class="filter-title">Grade</div>
+                        <div class="filter-options">
+                            {% for grade in grades %}
+                            <label class="filter-option">
+                                <input type="radio" name="grade" value="{{ grade }}" 
+                                       {% if selected_grade == grade %}checked{% endif %}>
+                                <span>Grade {{ grade }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Gender Filter -->
+                    <div class="filter-section">
+                        <div class="filter-title">Gender</div>
+                        <div class="filter-options">
+                            {% for value, label in genders %}
+                            <label class="filter-option">
+                                <input type="radio" name="gender" value="{{ value }}" 
+                                       {% if selected_gender == value %}checked{% endif %}>
+                                <span>{{ label }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Payment Status Filter -->
+                    <div class="filter-section">
+                        <div class="filter-title">Payment Status</div>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="radio" name="payment_status" value="paid" 
+                                       {% if selected_payment_status == "paid" %}checked{% endif %}>
+                                <span>Paid</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="payment_status" value="partial" 
+                                       {% if selected_payment_status == "partial" %}checked{% endif %}>
+                                <span>Partial Payment</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="payment_status" value="unpaid" 
+                                       {% if selected_payment_status == "unpaid" %}checked{% endif %}>
+                                <span>Unpaid</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Arrears Filter -->
+                    <div class="filter-section">
+                        <div class="filter-title">Arrears Status</div>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="radio" name="arrears_status" value="has_arrears" 
+                                       {% if selected_arrears_status == "has_arrears" %}checked{% endif %}>
+                                <span>Has Arrears</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="arrears_status" value="no_arrears" 
+                                       {% if selected_arrears_status == "no_arrears" %}checked{% endif %}>
+                                <span>No Arrears</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Clear Filters -->
+                    <button type="button" class="clear-filters-btn" onclick="clearFilters()">
+                        Clear All Filters
+                    </button>
+                </form>
+            </div>
+
+            <!-- MAIN CONTENT -->
+            <div class="search-main">
+                <!-- Search Bar -->
+                <div class="search-bar-advanced">
+                    <input type="text" placeholder="Quick search by student name or ID..." 
+                           id="quickSearch" value="{{ query }}">
+                    <button onclick="document.getElementById('filterForm').submit()">Search</button>
+                </div>
+
+                <!-- Results Header -->
+                <div class="results-header">
+                    <div class="results-info">
+                        Found <strong>{{ total_count }}</strong> student(s)
+                    </div>
+                    <div class="results-actions">
+                        <button onclick="exportResults()">📥 Export</button>
+                        <button onclick="printResults()">🖨️ Print</button>
+                    </div>
+                </div>
+
+                <!-- Results Table -->
+                {% if students %}
+                <div class="results-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>ID</th>
+                                <th>Class</th>
+                                <th>Gender</th>
+                                <th>DOB</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td class="student-name">{{ student.name }}</td>
+                                <td class="student-id">{{ student.student_id }}</td>
+                                <td>
+                                    {% if student.student_class__grade %}
+                                    <span class="class-badge">Grade {{ student.student_class__grade }} - {{ student.student_class__section }}</span>
+                                    {% else %}
+                                    <span style="color: #999;">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ student.gender|default:"—" }}</td>
+                                <td>{{ student.date_of_birth|default:"—" }}</td>
+                                <td>
+                                    <div class="action-icons">
+                                        <button class="action-icon" title="View Profile" 
+                                                onclick="window.location.href='/admin/students/{{ student.id }}/'">
+                                            👁️
+                                        </button>
+                                        <button class="action-icon" title="View Payments" 
+                                                onclick="window.location.href='/admin/student/{{ student.id }}/payments/'">
+                                            💰
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="no-results-message">
+                    <div style="font-size: 48px; margin-bottom: 16px;">🔎</div>
+                    <h3 style="color: #666;">No students found</h3>
+                    <p>Try adjusting your filters or search terms</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function clearFilters() {
+        document.getElementById('filterForm').reset();
+        document.getElementById('filterForm').submit();
+    }
+
+    function exportResults() {
+        alert('Export feature coming soon!');
+    }
+
+    function printResults() {
+        window.print();
+    }
+
+    // Auto-submit on filter change
+    document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
+        input.addEventListener('change', function() {
+            document.getElementById('filterForm').submit();
+        });
+    });
+</script>
+{% endblock %}

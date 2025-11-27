@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment History - {{ student.full_name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h1 class="text-4xl font-black text-white mb-2">Complete Payment History</h1>
+                    <p class="text-lg text-indigo-200">{{ student.full_name }}</p>
+                    <p class="text-sm text-indigo-300 mt-1">Enrolled: {{ enrollment_date|date:"F j, Y" }} • {{ years_count }} year(s) of records</p>
+                </div>
+                <div class="flex gap-3 flex-wrap">
+                    <a href="{% url 'student_detail' student.id %}" class="px-4 py-2 bg-slate-700/60 hover:bg-slate-600 text-white rounded-lg transition">Back</a>
+                    <a href="{% url 'export_student_payment_history' student.id %}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                        Export PDF
+                    </a>
+                    <a href="{% url 'payment_create' %}?student={{ student.id }}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition">Record Payment</a>
+                </div>
+            </div>
+            <div class="h-1 w-20 bg-gradient-to-r from-blue-400 to-purple-500 rounded"></div>
+        </div>
+
+        <!-- Overall Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-blue-900/50 to-blue-800/50 border border-blue-500/30 backdrop-blur-sm rounded-2xl p-6 shadow-2xl">
+                <p class="text-sm text-blue-300 font-semibold uppercase tracking-wider">Total Ever Due</p>
+                <p class="text-3xl font-black text-white mt-2">${{ total_ever_due|floatformat:2 }}</p>
+                <p class="text-xs text-blue-200 mt-2">All years and terms combined</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-emerald-900/50 to-emerald-800/50 border border-emerald-500/30 backdrop-blur-sm rounded-2xl p-6 shadow-2xl">
+                <p class="text-sm text-emerald-300 font-semibold uppercase tracking-wider">Total Paid</p>
+                <p class="text-3xl font-black text-emerald-300 mt-2">${{ total_ever_paid|floatformat:2 }}</p>
+                <p class="text-xs text-emerald-200 mt-2">From day one</p>
+            </div>
+
+            <div class="bg-gradient-to-br {% if overall_balance > 0 %}from-red-900/50 to-red-800/50 border border-red-500/30{% else %}from-green-900/50 to-green-800/50 border border-green-500/30{% endif %} backdrop-blur-sm rounded-2xl p-6 shadow-2xl">
+                <p class="text-sm {% if overall_balance > 0 %}text-red-300{% else %}text-green-300{% endif %} font-semibold uppercase tracking-wider">Overall Balance</p>
+                <p class="text-3xl font-black {% if overall_balance > 0 %}text-red-300{% else %}text-green-300{% endif %} mt-2">${{ overall_balance|floatformat:2 }}</p>
+                <p class="text-xs {% if overall_balance > 0 %}text-red-200{% else %}text-green-200{% endif %} mt-2">Lifetime outstanding</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-purple-900/50 to-purple-800/50 border border-purple-500/30 backdrop-blur-sm rounded-2xl p-6 shadow-2xl">
+                <p class="text-sm text-purple-300 font-semibold uppercase tracking-wider">Collection Rate</p>
+                <p class="text-3xl font-black text-purple-300 mt-2">{{ collection_rate|floatformat:1 }}%</p>
+                <p class="text-xs text-purple-200 mt-2">Paid vs total due</p>
+            </div>
+        </div>
+
+
+
+        <!-- Detailed Payment History by Term -->
+        <div class="bg-gradient-to-br from-slate-800/60 to-slate-900/60 border border-purple-500/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
+            <h2 class="text-2xl font-bold text-white mb-8 flex items-center gap-2">
+                <span class="w-1 h-8 bg-blue-500 rounded-full"></span>
+                Payment Records by Term
+            </h2>
+
+            {% if payment_history %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-white/10">
+                            <th class="text-left py-4 px-4 text-sm font-semibold text-white/70">Term</th>
+                            <th class="text-left py-4 px-4 text-sm font-semibold text-white/70">Term Fee</th>
+                            <th class="text-left py-4 px-4 text-sm font-semibold text-white/70">Arrears</th>
+                            <th class="text-left py-4 px-4 text-sm font-semibold text-white/70">Total Due</th>
+                            <th class="text-left py-4 px-4 text-sm font-semibold text-white/70">Payments</th>
+                            <th class="text-left py-4 px-4 text-sm font-semibold text-white/70">Credit</th>
+                            <th class="text-left py-4 px-4 text-sm font-semibold text-white/70">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/10">
+                        {% for entry in payment_history %}
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="py-4 px-4">
+                                <span class="font-semibold text-white">{{ entry.term }}</span>
+                            </td>
+                            <td class="py-4 px-4 text-white/90">${{ entry.term_fee|floatformat:2 }}</td>
+                            <td class="py-4 px-4 {% if entry.previous_arrears > 0 %}text-red-400{% else %}text-white/90{% endif %}">
+                                {% if entry.previous_arrears > 0 %}<strong>${{ entry.previous_arrears|floatformat:2 }}</strong>{% else %}$0.00{% endif %}
+                            </td>
+                            <td class="py-4 px-4 font-semibold text-white">${{ entry.total_due|floatformat:2 }}</td>
+                            <td class="py-4 px-4 text-emerald-300 font-semibold">${{ entry.amount_paid|floatformat:2 }}</td>
+                            <td class="py-4 px-4 font-semibold {% if entry.credit > 0 %}text-amber-400{% else %}text-white/50{% endif %}">
+                                {% if entry.credit > 0 %}<span class="bg-amber-500/20 px-2 py-1 rounded">${{ entry.credit|floatformat:2 }}</span>{% else %}-{% endif %}
+                            </td>
+                            <td class="py-4 px-4 font-semibold {% if entry.balance > 0 %}text-red-400{% else %}text-green-400{% endif %}">
+                                ${{ entry.balance|floatformat:2 }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-gray-400 py-8">No payment history found</p>
+            {% endif %}
+        </div>
+
+        <!-- All Payments List -->
+        {% if all_payments %}
+        <div class="bg-gradient-to-br from-slate-800/60 to-slate-900/60 border border-purple-500/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl mt-8">
+            <h2 class="text-2xl font-bold text-white mb-8 flex items-center gap-2">
+                <span class="w-1 h-8 bg-emerald-500 rounded-full"></span>
+                Individual Payment Transactions
+            </h2>
+
+            <div class="space-y-4 max-h-96 overflow-y-auto">
+                {% for payment in all_payments %}
+                <div class="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-white font-semibold">{{ payment.term }}</p>
+                            <p class="text-sm text-gray-400 mt-1">
+                                <strong>Date:</strong> {{ payment.payment_date|date:"F j, Y" }}
+                            </p>
+                            {% if payment.reference_number %}
+                            <p class="text-sm text-gray-400">
+                                <strong>Reference:</strong> {{ payment.reference_number }}
+                            </p>
+                            {% endif %}
+                            {% if payment.receipt_number %}
+                            <p class="text-sm text-gray-400">
+                                <strong>Receipt:</strong> {{ payment.receipt_number }}
+                            </p>
+                            {% endif %}
+                            {% if payment.notes %}
+                            <p class="text-sm text-gray-400 mt-1">
+                                <strong>Notes:</strong> {{ payment.notes }}
+                            </p>
+                            {% endif %}
+                        </div>
+                        <div class="text-right">
+                            <p class="text-emerald-300 text-2xl font-bold">${{ payment.amount|floatformat:2 }}</p>
+                            <p class="text-xs text-gray-400 mt-1">{{ payment.get_payment_method_display }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Key Insights -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div class="bg-gradient-to-br from-amber-900/40 to-orange-900/40 border border-amber-500/30 backdrop-blur-sm rounded-2xl p-6 shadow-2xl">
+                <h3 class="text-lg font-bold text-white mb-4">📊 Summary</h3>
+                <ul class="space-y-2 text-sm text-gray-300">
+                    <li><strong>Student:</strong> {{ student.full_name }}</li>
+                    <li><strong>Class:</strong> {% if student.current_class %}{{ student.current_class}}{% else %}Not assigned{% endif %}</li>
+                    <li><strong>Enrolled:</strong> {{ enrollment_date|date:"F j, Y" }}</li>
+                    <li><strong>Years:</strong> {{ years_count }}</li>
+                </ul>
+            </div>
+
+            <div class="bg-gradient-to-br from-blue-900/40 to-cyan-900/40 border border-blue-500/30 backdrop-blur-sm rounded-2xl p-6 shadow-2xl">
+                <h3 class="text-lg font-bold text-white mb-4">💰 Payment Status</h3>
+                <ul class="space-y-2 text-sm text-gray-300">
+                    <li><strong>Total Due:</strong> ${{ total_ever_due|floatformat:2 }}</li>
+                    <li><strong>Total Paid:</strong> ${{ total_ever_paid|floatformat:2 }}</li>
+                    <li><strong>Outstanding:</strong> <span class="{% if overall_balance > 0 %}text-red-400 font-bold{% else %}text-green-400 font-bold{% endif %}">${{ overall_balance|floatformat:2 }}</span></li>
+                    <li><strong>Collection:</strong> {{ collection_rate|floatformat:1 }}%</li>
+                </ul>
+            </div>
+
+            <div class="bg-gradient-to-br from-purple-900/40 to-pink-900/40 border border-purple-500/30 backdrop-blur-sm rounded-2xl p-6 shadow-2xl">
+                <h3 class="text-lg font-bold text-white mb-4">🎓 Account History</h3>
+                <ul class="space-y-2 text-sm text-gray-300">
+                    <li><strong>Total Transactions:</strong> {{ all_payments|length }}</li>
+                    <li><strong>Enrollment Age:</strong> Long-term</li>
+                    <li><strong>Payment Reliability:</strong> {% if collection_rate >= 80 %}Excellent{% elif collection_rate >= 60 %}Good{% elif collection_rate >= 40 %}Fair{% else %}Poor{% endif %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .max-h-96 {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(168, 85, 247, 0.3) transparent;
+    }
+    
+    .max-h-96::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .max-h-96::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .max-h-96::-webkit-scrollbar-thumb {
+        background: rgba(168, 85, 247, 0.3);
+        border-radius: 3px;
+    }
+    
+    .max-h-96::-webkit-scrollbar-thumb:hover {
+        background: rgba(168, 85, 247, 0.5);
+    }
+</style>
+{% endblock %}

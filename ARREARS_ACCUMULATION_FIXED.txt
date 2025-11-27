@@ -1,0 +1,176 @@
+═══════════════════════════════════════════════════════════════════════════════
+                  ARREARS ACCUMULATION ACROSS TERMS - FIXED
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ ISSUE RESOLVED
+───────────────────────────────────────────────────────────────────────────────
+
+PROBLEM: Balances were resetting between terms
+  - Term 1 arrears not showing in Term 2
+  - Term 2 arrears not showing in Term 3
+
+FIX: Updated calculate_arrears() method in StudentBalance model
+  - Now looks at ALL previous terms (not just previous years)
+  - Includes both previous academic years AND earlier terms in current year
+  - Arrears accumulate and carry forward
+
+
+HOW IT WORKS NOW:
+───────────────────────────────────────────────────────────────────────────────
+
+SCENARIO: Noah's payment across 3 terms
+
+TERM 1 (Jan-Mar):
+  Fee: $120
+  Paid: $50
+  Balance: $70 (UNPAID ARREAR)
+
+TERM 2 (Apr-Jun):
+  Fee: $1,200
+  Previous Arrears: $70 (from Term 1) ✓
+  Paid: $600
+  Balance: $670 (still owes $70 from Term 1 + $600 from Term 2)
+
+TERM 3 (Jul-Sep):
+  Fee: $950
+  Previous Arrears: $740 (from Term 1 + Term 2) ✓
+  Paid: $0
+  Balance: $1,690 (must pay all arrears PLUS new term fee)
+
+Total owed at end of year: $1,690
+- $70 from Term 1
+- $670 from Term 2
+- $950 from Term 3
+
+
+THE FIX IN CODE:
+───────────────────────────────────────────────────────────────────────────────
+
+BEFORE (BROKEN):
+    def calculate_arrears(cls, student, term):
+        previous_balances = cls.objects.filter(
+            student=student,
+            term__academic_year__lt=term.academic_year  ← ONLY PREVIOUS YEARS!
+        ).exclude(term=term)
+
+AFTER (FIXED):
+    def calculate_arrears(cls, student, term):
+        previous_balances = cls.objects.filter(
+            student=student
+        ).exclude(term=term).filter(
+            Q(term__academic_year__lt=term.academic_year) |  ← Previous years
+            Q(term__academic_year=term.academic_year, 
+              term__term__lt=term.term)  ← Earlier terms THIS year ✓
+        )
+
+
+WHEN PAYMENTS ARE MADE:
+───────────────────────────────────────────────────────────────────────────────
+
+Payment Priority: ARREARS FIRST, THEN CURRENT TERM
+
+Example: Noah pays $300 in Term 3
+
+1. Current balance: $1,690
+   - $70 from Term 1
+   - $670 from Term 2  
+   - $950 from Term 3
+
+2. Payment of $300 applied:
+   - First $70 covers Term 1 arrear ✓
+   - Next $230 covers part of Term 2 arrear
+   - Term 2 arrear reduced to $440
+   - Term 1 fully paid! 🎉
+
+3. New balance: $1,390
+   - Term 1: $0 (fully paid)
+   - Term 2: $440 (partial)
+   - Term 3: $950 (not touched yet)
+
+4. Next payment of $500 in Term 3:
+   - Covers remaining Term 2: $440
+   - Remaining $60 goes to Term 3
+   - Term 3 balance reduced to $890
+
+5. Final balance: $890 owed in Term 3 fee
+
+
+FILE CHANGED:
+───────────────────────────────────────────────────────────────────────────────
+
+core/models/fee.py
+  - Added: from django.db.models import Sum, Q
+  - Updated: calculate_arrears() method
+  - Now uses Q objects for complex query
+  - Looks at all previous terms in same year
+
+
+HOW TO USE:
+───────────────────────────────────────────────────────────────────────────────
+
+When creating StudentBalance for any term:
+
+    balance = StudentBalance.initialize_term_balance(student, term)
+    
+This automatically:
+    ✓ Looks up all previous terms (same year and prior years)
+    ✓ Calculates any unpaid balances
+    ✓ Sets previous_arrears correctly
+    ✓ Includes arrears in current_balance calculation
+
+The balance.current_balance will show TOTAL OWED including all arrears
+
+
+PAYMENT EXAMPLE - COMPLETE FLOW:
+───────────────────────────────────────────────────────────────────────────────
+
+Year 2026, Noah Buwa:
+
+TERM 1: 
+  Balance created: Fee $120, Paid $0, Balance: $120
+  Payment: $50
+  New balance: $70 (ARREAR)
+
+TERM 2 (system now shows):
+  Balance created: Fee $1,200, Previous Arrears $70, Paid $0, Balance: $1,270
+  Payment: $600
+  - First $70 covers Term 1 ✓
+  - Next $530 toward Term 2 new fee
+  - New balance: $670
+
+TERM 3 (system now shows):
+  Balance created: Fee $950, Previous Arrears $740, Paid $0, Balance: $1,690
+  Payment: $300
+  - All goes toward arrears
+  - Reduces arrears to $440
+  - Term 3 not touched yet
+  New balance: $1,390
+
+
+DATABASE RECORDS PRESERVED:
+───────────────────────────────────────────────────────────────────────────────
+
+StudentBalance records:
+  ✓ Term 1: Fee $120, Paid $50, Balance $70
+  ✓ Term 2: Fee $1,200, Arrears $70, Paid $600, Balance $670
+  ✓ Term 3: Fee $950, Arrears $740, Paid $300, Balance $1,390
+
+Payment records:
+  ✓ Term 1: $50 payment
+  ✓ Term 2: $600 payment
+  ✓ Term 3: $300 payment
+  
+All history maintained for audit and reporting
+
+
+SUMMARY:
+───────────────────────────────────────────────────────────────────────────────
+
+✓ Arrears accumulate within the year
+✓ Each term carries forward unpaid balances
+✓ Payment priority: Arrears first, then current
+✓ Complete payment history preserved
+✓ Balance shows TOTAL owed including all arrears
+✓ System now accurately tracks multi-term debt
+
+BALANCES NO LONGER RESET - THEY ACCUMULATE! ✓

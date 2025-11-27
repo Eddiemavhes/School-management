@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen p-6">
+    <!-- Back Button -->
+    <a href="{% url 'teacher_list' %}" class="inline-flex items-center text-indigo-300 hover:text-indigo-200 mb-6 font-semibold">
+        <span class="mr-2">←</span> Back to Teachers
+    </a>
+
+    <!-- Form Container -->
+    <div class="max-w-2xl mx-auto">
+        <div class="glass rounded-2xl p-8 border-t-4 border-indigo-500 shadow-2xl">
+            <!-- Header -->
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-400 via-pink-400 to-teal-400 bg-clip-text text-transparent mb-2">
+                {% if form.instance.pk %}✏️ Edit Teacher{% else %}➕ Add New Teacher{% endif %}
+            </h1>
+            <p class="text-gray-400 mb-8">{% if form.instance.pk %}Update teacher information{% else %}Create a new faculty member{% endif %}</p>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Name Fields -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-bold mb-2 text-white">
+                            👤 First Name
+                        </label>
+                        <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}"
+                               value="{{ form.first_name.value|default:'' }}"
+                               class="w-full px-4 py-3 rounded-lg bg-white/10 border {% if form.first_name.errors %}border-red-500/50{% else %}border-indigo-500/30{% endif %} text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all hover:border-indigo-500/50">
+                        {% for error in form.first_name.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-bold mb-2 text-white">
+                            👤 Last Name
+                        </label>
+                        <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}"
+                               value="{{ form.last_name.value|default:'' }}"
+                               class="w-full px-4 py-3 rounded-lg bg-white/10 border {% if form.last_name.errors %}border-red-500/50{% else %}border-indigo-500/30{% endif %} text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all hover:border-indigo-500/50">
+                        {% for error in form.last_name.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.email.id_for_label }}" class="block text-sm font-bold mb-2 text-white">
+                            📧 Email
+                        </label>
+                        <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}"
+                               value="{{ form.email.value|default:'' }}"
+                               class="w-full px-4 py-3 rounded-lg bg-white/10 border {% if form.email.errors %}border-red-500/50{% else %}border-indigo-500/30{% endif %} text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all hover:border-indigo-500/50">
+                        {% for error in form.email.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.phone_number.id_for_label }}" class="block text-sm font-bold mb-2 text-white">
+                            📱 Phone Number
+                        </label>
+                        <input type="tel" name="{{ form.phone_number.name }}" id="{{ form.phone_number.id_for_label }}"
+                               value="{{ form.phone_number.value|default:'' }}"
+                               class="w-full px-4 py-3 rounded-lg bg-white/10 border {% if form.phone_number.errors %}border-red-500/50{% else %}border-indigo-500/30{% endif %} text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all hover:border-indigo-500/50">
+                        {% for error in form.phone_number.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Professional Information -->
+                <div>
+                    <label for="{{ form.specialization.id_for_label }}" class="block text-sm font-bold mb-2 text-white">
+                        🎓 Specialization
+                    </label>
+                    <input type="text" name="{{ form.specialization.name }}" id="{{ form.specialization.id_for_label }}"
+                           placeholder="e.g., Mathematics, English, Science"
+                           value="{{ form.specialization.value|default:'' }}"
+                           class="w-full px-4 py-3 rounded-lg bg-white/10 border {% if form.specialization.errors %}border-red-500/50{% else %}border-indigo-500/30{% endif %} text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all hover:border-indigo-500/50">
+                    {% for error in form.specialization.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div>
+                    <label for="{{ form.qualification.id_for_label }}" class="block text-sm font-bold mb-2 text-white">
+                        📚 Qualification
+                    </label>
+                    <input type="text" name="{{ form.qualification.name }}" id="{{ form.qualification.id_for_label }}"
+                           placeholder="e.g., Bachelor's, Master's, PhD"
+                           value="{{ form.qualification.value|default:'' }}"
+                           class="w-full px-4 py-3 rounded-lg bg-white/10 border {% if form.qualification.errors %}border-red-500/50{% else %}border-indigo-500/30{% endif %} text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all hover:border-indigo-500/50">
+                    {% for error in form.qualification.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Status -->
+                <div class="flex items-center p-4 bg-white/5 rounded-lg border border-indigo-500/20">
+                    <input type="checkbox" name="{{ form.is_active.name }}" id="{{ form.is_active.id_for_label }}"
+                           {% if form.is_active.value %}checked{% endif %}
+                           class="h-5 w-5 rounded bg-indigo-500/30 border border-indigo-500/50 text-indigo-500 focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                    <label for="{{ form.is_active.id_for_label }}" class="ml-3 block text-sm font-semibold text-white cursor-pointer">
+                        ✓ Active Status
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-end gap-4 mt-8 pt-6 border-t border-white/20">
+                    <a href="{% url 'teacher_list' %}" 
+                       class="px-6 py-3 rounded-lg border border-white/20 hover:bg-white/10 transition-colors font-semibold text-white">
+                        ✕ Cancel
+                    </a>
+                    <button type="submit" class="premium-button px-6 py-3 flex items-center gap-2">
+                        <span>💾</span> {% if form.instance.pk %}Update{% else %}Create{% endif %} Teacher
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .search-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 32px 24px;
+        border-radius: 12px;
+        margin-bottom: 32px;
+    }
+
+    .search-header h1 {
+        font-size: 28px;
+        margin: 0 0 8px 0;
+    }
+
+    .search-stats {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    .results-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .result-section {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #667eea;
+        margin: 0 0 16px 0;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #667eea;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-icon {
+        font-size: 18px;
+    }
+
+    .result-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 16px;
+        align-items: center;
+        padding: 16px;
+        margin-bottom: 12px;
+        background: white;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .result-item:hover {
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        transform: translateX(4px);
+    }
+
+    .result-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .result-content h3 {
+        margin: 0 0 4px 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .result-content p {
+        margin: 0;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .result-action {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btn {
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 48px 24px;
+        color: #999;
+    }
+
+    .no-results-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    .no-results h3 {
+        margin: 0 0 8px 0;
+        color: #666;
+    }
+
+    .no-results p {
+        margin: 0;
+        font-size: 13px;
+    }
+
+    .search-suggestion {
+        background: rgba(56, 239, 125, 0.1);
+        border-left: 4px solid #38ef7d;
+        padding: 16px;
+        border-radius: 8px;
+        margin-top: 12px;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    @media (max-width: 768px) {
+        .search-header {
+            padding: 24px 16px;
+        }
+
+        .search-header h1 {
+            font-size: 20px;
+        }
+
+        .result-item {
+            grid-template-columns: 1fr;
+        }
+
+        .result-avatar {
+            width: 40px;
+            height: 40px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="search-container">
+        <!-- Search Header -->
+        <div class="search-header">
+            <h1>🔍 Search Results</h1>
+            <div class="search-stats">
+                {% if query %}
+                    Showing results for: <strong>"{{ query }}"</strong> 
+                    ({{ total_results }} results found)
+                {% else %}
+                    Enter a search term above
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Results Layout -->
+        {% if query %}
+        <div class="results-layout">
+            <!-- Students Results -->
+            {% if students %}
+            <div class="result-section">
+                <div class="section-title">
+                    <span class="section-icon">👤</span>
+                    Students 
+                    <span class="badge">{{ students|length }}</span>
+                </div>
+                
+                {% for student in students %}
+                <div class="result-item" onclick="window.location.href='/admin/students/{{ student.id }}/'">
+                    <div class="result-avatar">{{ student.name|first }}</div>
+                    <div class="result-content">
+                        <h3>{{ student.name }}</h3>
+                        <p>ID: {{ student.student_id }} • Grade {{ student.student_class__grade }}, {{ student.student_class__section }}</p>
+                    </div>
+                    <div class="result-action">
+                        <button class="action-btn" onclick="event.stopPropagation()">
+                            View Profile →
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Teachers Results -->
+            {% if teachers %}
+            <div class="result-section">
+                <div class="section-title">
+                    <span class="section-icon">👨‍🏫</span>
+                    Teachers 
+                    <span class="badge">{{ teachers|length }}</span>
+                </div>
+                
+                {% for teacher in teachers %}
+                <div class="result-item" onclick="window.location.href='/admin/teachers/{{ teacher.id }}/'">
+                    <div class="result-avatar">{{ teacher.full_name|first }}</div>
+                    <div class="result-content">
+                        <h3>{{ teacher.full_name }}</h3>
+                        <p>{{ teacher.email }}</p>
+                    </div>
+                    <div class="result-action">
+                        <button class="action-btn" onclick="event.stopPropagation()">
+                            View Profile →
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Classes Results -->
+            {% if classes %}
+            <div class="result-section">
+                <div class="section-title">
+                    <span class="section-icon">🏛️</span>
+                    Classes 
+                    <span class="badge">{{ classes|length }}</span>
+                </div>
+                
+                {% for class in classes %}
+                <div class="result-item" onclick="window.location.href='/admin/classes/{{ class.id }}/'">
+                    <div class="result-avatar">{{ class.grade|slice:":1" }}</div>
+                    <div class="result-content">
+                        <h3>Grade {{ class.grade }}, {{ class.section }}</h3>
+                        <p>Teacher: {{ class.class_teacher__full_name }}</p>
+                    </div>
+                    <div class="result-action">
+                        <button class="action-btn" onclick="event.stopPropagation()">
+                            View Class →
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- No Results -->
+            {% if not students and not teachers and not classes %}
+            <div class="result-section">
+                <div class="no-results">
+                    <div class="no-results-icon">🔎</div>
+                    <h3>No results found</h3>
+                    <p>We couldn't find any students, teachers, or classes matching "{{ query }}"</p>
+                    <div class="search-suggestion">
+                        <strong>Try:</strong>
+                        <ul style="margin: 8px 0 0 0; padding: 0 0 0 16px;">
+                            <li>Using different keywords</li>
+                            <li>Checking spelling</li>
+                            <li>Trying a shorter search term</li>
+                            <li>Using advanced filters for more options</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="result-section">
+            <div class="no-results">
+                <div class="no-results-icon">🔍</div>
+                <h3>Search to get started</h3>
+                <p>Use the search bar above to find students, teachers, or classes</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Add real-time search as user types
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('input[name="q"]');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                if (this.value.length >= 2) {
+                    // Auto-submit after brief delay
+                    clearTimeout(window.searchTimeout);
+                    window.searchTimeout = setTimeout(() => {
+                        this.form.submit();
+                    }, 500);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

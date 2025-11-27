@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Fee Dashboard - School Management System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="mb-12 animate-slideInUp">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h1 class="text-5xl font-bold bg-gradient-to-r from-amber-300 via-orange-300 to-red-300 bg-clip-text text-transparent mb-3">Fee Dashboard</h1>
+                    <p class="text-slate-400 text-lg">{{ current_term }}</p>
+                </div>
+                <a href="{% url 'export_fee_dashboard' %}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                    Export PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Overview Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-slideInUp" style="animation-delay: 0.1s;">
+            <!-- Total Expected Card -->
+            <div class="glass rounded-2xl p-8 border border-slate-500/20 hover:border-blue-500/40 transition-all duration-300 overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">Total Expected</p>
+                        <p class="text-4xl font-bold text-slate-100">${{ total_expected|floatformat:2 }}</p>
+                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-blue-500/30 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-blue-500/20 transition-all">
+                        <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="h-1.5 w-full bg-gradient-to-r from-blue-500/40 to-cyan-500/40 rounded-full"></div>
+            </div>
+
+            <!-- Total Collected Card -->
+            <div class="glass rounded-2xl p-8 border border-slate-500/20 hover:border-emerald-500/40 transition-all duration-300 overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">Total Collected</p>
+                        <p class="text-4xl font-bold text-slate-100">${{ total_collected|floatformat:2 }}</p>
+                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/30 to-teal-500/30 border border-emerald-500/30 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-emerald-500/20 transition-all">
+                        <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="h-1.5 w-full bg-gradient-to-r from-emerald-500/40 to-teal-500/40 rounded-full"></div>
+            </div>
+
+            <!-- Total Outstanding Card -->
+            <div class="glass rounded-2xl p-8 border border-slate-500/20 hover:border-red-500/40 transition-all duration-300 overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-red-500/10 to-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">Total Outstanding</p>
+                        <p class="text-4xl font-bold text-slate-100">${{ total_arrears|floatformat:2 }}</p>
+                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-red-500/30 to-rose-500/30 border border-red-500/30 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-red-500/20 transition-all">
+                        <svg class="w-7 h-7 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0-6v2m6 0v2m0-6v2m0-6v2m-6-6v2m6 0v2m-6-6v2m6 0v2m0-14a3 3 0 00-3 3v10a3 3 0 003 3h4a3 3 0 003-3V5a3 3 0 00-3-3h-4z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="h-1.5 w-full bg-gradient-to-r from-red-500/40 to-rose-500/40 rounded-full"></div>
+            </div>
+        </div>
+
+        <!-- Collection Progress -->
+        <div class="glass rounded-2xl p-8 mb-12 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.2s;">
+            <h3 class="text-2xl font-bold text-slate-100 mb-8 flex items-center gap-3">
+                <div class="w-1.5 h-8 bg-gradient-to-b from-amber-400 to-orange-400 rounded-full"></div>
+                Collection Progress
+            </h3>
+            <div class="space-y-4">
+                <div class="relative">
+                    <div class="h-4 bg-slate-700/30 rounded-full overflow-hidden border border-slate-600/20">
+                        <div style="width:{{ collection_rate }}%"
+                             class="h-full bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 rounded-full transition-all duration-700 shadow-lg shadow-orange-500/30">
+                        </div>
+                    </div>
+                    <div class="flex justify-between mt-3 text-xs font-medium">
+                        <span class="text-slate-400">0%</span>
+                        <span class="text-amber-300">Collection Rate: <span class="text-amber-100">{{ collection_rate|floatformat:1 }}%</span></span>
+                        <span class="text-slate-400">100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Payment Status Table with Tabs -->
+        <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.3s;">
+            <h3 class="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-3">
+                <div class="w-1.5 h-8 bg-gradient-to-b from-blue-400 to-indigo-400 rounded-full"></div>
+                Student Payment Status
+            </h3>
+            
+            <!-- Status Tabs -->
+            <div class="flex gap-2 mb-6 border-b border-slate-600/30 pb-4 overflow-x-auto">
+                <button class="tab-btn active px-4 py-2 text-sm font-bold text-slate-300 border-b-2 border-amber-500 transition" data-filter="all">
+                    All Students <span class="ml-2 text-xs bg-slate-700/50 px-2 py-1 rounded">{{ balances|length }}</span>
+                </button>
+                <button class="tab-btn px-4 py-2 text-sm font-bold text-slate-300 hover:text-slate-100 transition" data-filter="PAID">
+                    <span class="text-emerald-400">●</span> Fully Paid <span class="ml-2 text-xs bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded">0</span>
+                </button>
+                <button class="tab-btn px-4 py-2 text-sm font-bold text-slate-300 hover:text-slate-100 transition" data-filter="PARTIAL">
+                    <span class="text-amber-400">●</span> Partial <span class="ml-2 text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded">0</span>
+                </button>
+                <button class="tab-btn px-4 py-2 text-sm font-bold text-slate-300 hover:text-slate-100 transition" data-filter="UNPAID">
+                    <span class="text-red-400">●</span> Unpaid <span class="ml-2 text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded">0</span>
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-slate-600/30">
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Student</th>
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Term Fee</th>
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Arrears</th>
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Amount Paid</th>
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Balance</th>
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Status</th>
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700/30" id="student-list">
+                        {% for balance in balances %}
+                        <tr class="hover:bg-slate-700/20 transition-all duration-200 student-row" data-status="{{ balance.payment_status }}">
+                            <td class="py-4 px-4">
+                                <div class="text-slate-100 font-semibold">{{ balance.student.get_full_name }}</div>
+                                <div class="text-xs text-slate-400">{{ balance.student.current_class }}</div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-200 font-medium">${{ balance.term_fee|floatformat:2 }}</td>
+                            <td class="py-4 px-4">
+                                {% if balance.previous_arrears > 0 %}
+                                    <span class="text-red-300 font-bold">${{ balance.previous_arrears|floatformat:2 }}</span>
+                                {% else %}
+                                    <span class="text-slate-400">$0.00</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-4 text-emerald-300 font-bold">${{ balance.amount_paid|floatformat:2 }}</td>
+                            <td class="py-4 px-4 font-bold">
+                                <span class="{% if balance.current_balance > 0 %}text-red-300{% else %}text-emerald-300{% endif %}">
+                                    ${{ balance.current_balance|floatformat:2 }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-4">
+                                <span class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide
+                                    {% if balance.payment_status == 'PAID' %}
+                                        bg-emerald-500/20 text-emerald-300 border border-emerald-500/30
+                                    {% elif balance.payment_status == 'PARTIAL' %}
+                                        bg-amber-500/20 text-amber-300 border border-amber-500/30
+                                    {% else %}
+                                        bg-red-500/20 text-red-300 border border-red-500/30
+                                    {% endif %}">
+                                    {{ balance.payment_status }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-4">
+                                <a href="{% url 'payment_create' %}?student={{ balance.student.id }}" class="text-blue-400 hover:text-blue-300 text-sm font-bold transition">
+                                    Pay →
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="py-12 px-4 text-center">
+                                <div class="text-slate-400">No student balances found</div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bulk Actions Section -->
+        <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp mt-8" style="animation-delay: 0.4s;">
+            <h3 class="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-3">
+                <div class="w-1.5 h-8 bg-gradient-to-b from-purple-400 to-indigo-400 rounded-full"></div>
+                Bulk Actions
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-1 gap-4 max-w-md">
+                <a href="{% url 'arrears_report_pdf' %}" class="px-6 py-3 rounded-lg bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold transition text-center">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Export Arrears Report PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- Record Payment Button -->
+        <div class="mt-12 animate-slideInUp text-center" style="animation-delay: 0.5s;">
+            <a href="{% url 'payment_create' %}" class="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 hover:shadow-2xl hover:shadow-orange-500/40 transition-all transform hover:scale-105 active:scale-95">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Record Payment
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-slideInUp {
+        animation: slideInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(20px);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const studentRows = document.querySelectorAll('.student-row');
+    
+    // Calculate status counts
+    const statuses = {};
+    studentRows.forEach(row => {
+        const status = row.getAttribute('data-status');
+        statuses[status] = (statuses[status] || 0) + 1;
+    });
+    
+    // Update tab counts
+    tabButtons.forEach(btn => {
+        const filter = btn.getAttribute('data-filter');
+        const countSpan = btn.querySelector('span');
+        if (filter === 'all') {
+            countSpan.textContent = `All Students (${studentRows.length})`;
+        } else if (statuses[filter]) {
+            // Update count in span element
+            const parts = btn.innerHTML.split('</span>');
+            btn.innerHTML = parts[0] + '</span><span class="ml-2 text-xs bg-slate-700/50 px-2 py-1 rounded">' + statuses[filter] + '</span>';
+        }
+    });
+    
+    // Tab filtering
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filter = this.getAttribute('data-filter');
+            
+            // Update active tab styling
+            tabButtons.forEach(b => b.classList.remove('border-b-2', 'border-amber-500'));
+            tabButtons.forEach(b => b.classList.add('border-transparent', 'hover:text-slate-100'));
+            this.classList.add('border-b-2', 'border-amber-500');
+            this.classList.remove('hover:text-slate-100');
+            
+            // Filter rows
+            studentRows.forEach(row => {
+                if (filter === 'all' || row.getAttribute('data-status') === filter) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Records - School Management System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="mb-12 flex justify-between items-start animate-slideInUp">
+            <div>
+                <h1 class="text-5xl font-bold bg-gradient-to-r from-purple-300 via-violet-300 to-blue-300 bg-clip-text text-transparent mb-3">Payment Records</h1>
+                <p class="text-slate-400 text-lg">Track and manage all payment transactions</p>
+            </div>
+            <a href="{% url 'payment_create' %}" class="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 hover:shadow-2xl hover:shadow-purple-500/40 transition-all transform hover:scale-105 active:scale-95">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Record New Payment
+            </a>
+        </div>
+
+        <!-- Stats Overview Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 animate-slideInUp" style="animation-delay: 0.1s;">
+            <!-- Total Collected Card -->
+            <div class="glass rounded-2xl p-8 border border-slate-500/20 hover:border-emerald-500/40 transition-all duration-300 overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">Total Collected (Current Term)</p>
+                        <p class="text-4xl font-bold text-slate-100">${{ term_total|floatformat:2 }}</p>
+                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/30 to-teal-500/30 border border-emerald-500/30 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-emerald-500/20 transition-all">
+                        <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="h-1.5 w-full bg-gradient-to-r from-emerald-500/40 to-teal-500/40 rounded-full"></div>
+            </div>
+
+            <!-- Fully Paid Card -->
+            <div class="glass rounded-2xl p-8 border border-slate-500/20 hover:border-green-500/40 transition-all duration-300 overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">Fully Paid Students</p>
+                        <p class="text-4xl font-bold text-slate-100">{{ fully_paid }}</p>
+                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500/30 to-emerald-500/30 border border-green-500/30 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-green-500/20 transition-all">
+                        <svg class="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="h-1.5 w-full bg-gradient-to-r from-green-500/40 to-emerald-500/40 rounded-full"></div>
+            </div>
+
+            <!-- Partial Payment Card -->
+            <div class="glass rounded-2xl p-8 border border-slate-500/20 hover:border-amber-500/40 transition-all duration-300 overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">Partial Payment</p>
+                        <p class="text-4xl font-bold text-slate-100">{{ partial_paid }}</p>
+                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500/30 to-orange-500/30 border border-amber-500/30 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-amber-500/20 transition-all">
+                        <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="h-1.5 w-full bg-gradient-to-r from-amber-500/40 to-orange-500/40 rounded-full"></div>
+            </div>
+
+            <!-- No Payment Card -->
+            <div class="glass rounded-2xl p-8 border border-slate-500/20 hover:border-red-500/40 transition-all duration-300 overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-red-500/10 to-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">No Payment</p>
+                        <p class="text-4xl font-bold text-slate-100">{{ no_payment }}</p>
+                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-red-500/30 to-rose-500/30 border border-red-500/30 flex items-center justify-center group-hover:shadow-lg group-hover:shadow-red-500/20 transition-all">
+                        <svg class="w-7 h-7 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="h-1.5 w-full bg-gradient-to-r from-red-500/40 to-rose-500/40 rounded-full"></div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="glass rounded-2xl p-6 mb-12 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.2s;">
+            <h3 class="text-lg font-bold text-slate-100 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                </svg>
+                Filter Records
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Select Term</label>
+                    <select id="term-filter" class="w-full bg-slate-700/40 border border-slate-600/50 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 transition-all">
+                        <option value="">All Terms</option>
+                        {% for term in terms %}
+                        <option value="{{ term.id }}" {% if term == current_term %}selected{% endif %}>
+                            {{ term }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Search Student</label>
+                    <input type="text" id="student-search" placeholder="Search by name..." class="w-full bg-slate-700/40 border border-slate-600/50 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 transition-all">
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Records Table -->
+        <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.3s;">
+            <h3 class="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-3">
+                <div class="w-1.5 h-8 bg-gradient-to-b from-purple-400 to-violet-400 rounded-full"></div>
+                Transaction History
+            </h3>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-slate-600/30">
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Receipt #</th>
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Student</th>
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Amount</th>
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Date</th>
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Method</th>
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700/30">
+                        {% for payment in payments %}
+                        <tr class="hover:bg-slate-700/20 transition-all duration-200">
+                            <td class="py-4 px-4 text-slate-200 font-mono text-sm">{{ payment.receipt_number }}</td>
+                            <td class="py-4 px-4">
+                                <div class="text-slate-100 font-semibold">{{ payment.student.full_name }}</div>
+                                <div class="text-xs text-slate-400">{{ payment.student.current_class }}</div>
+                            </td>
+                            <td class="py-4 px-4">
+                                <span class="text-emerald-300 font-bold text-lg">${{ payment.amount|floatformat:2 }}</span>
+                            </td>
+                            <td class="py-4 px-4 text-slate-300">{{ payment.payment_date }}</td>
+                            <td class="py-4 px-4">
+                                <span class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                    {{ payment.get_payment_method_display }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-4">
+                                <a href="{% url 'student_payment_history' payment.student.id %}" 
+                                   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-purple-300 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 hover:border-purple-500/50 transition-all hover:shadow-lg hover:shadow-purple-500/20">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                    </svg>
+                                    View History
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="py-12 px-4 text-center">
+                                <div class="text-slate-400 flex flex-col items-center gap-2">
+                                    <svg class="w-12 h-12 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    No payments found
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <div class="mt-8 pt-6 border-t border-slate-600/30 flex justify-between items-center">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" 
+                   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-purple-300 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Previous
+                </a>
+                {% else %}
+                <span></span>
+                {% endif %}
+                
+                <span class="text-slate-400 font-medium">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" 
+                   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-purple-300 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 transition-all">
+                    Next
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                {% else %}
+                <span></span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-slideInUp {
+        animation: slideInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(20px);
+    }
+</style>
+
+{% block extra_js %}
+<script>
+    // Handle term filter changes
+    document.getElementById('term-filter').addEventListener('change', function() {
+        const url = new URL(window.location);
+        if (this.value) {
+            url.searchParams.set('term', this.value);
+        } else {
+            url.searchParams.delete('term');
+        }
+        window.location = url;
+    });
+</script>
+{% endblock %}
+{% endblock %}

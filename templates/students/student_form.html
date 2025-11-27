@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Student{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl md:text-5xl font-black text-white mb-3 tracking-tight">{% if form.instance.pk %}Edit{% else %}Add New{% endif %} Student</h1>
+            <p class="text-lg text-indigo-200">Enter the student information below</p>
+            <div class="h-1 w-20 bg-gradient-to-r from-blue-400 to-purple-500 rounded mt-4"></div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="bg-gradient-to-br from-slate-800/60 to-slate-900/60 border border-purple-500/20 backdrop-blur-sm rounded-2xl p-10 shadow-2xl">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 gap-8 sm:grid-cols-2">
+                    {% for field in form %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-indigo-200 mb-3">
+                            {{ field.label }}
+                        </label>
+                        <div class="mt-1">
+                            {% if field.field.widget.input_type == 'select' %}
+                                {{ field }}
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
+                        </div>
+                        {% if field.errors %}
+                        <p class="mt-2 text-sm text-red-300 font-semibold">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Form Buttons -->
+                <div class="flex justify-end gap-4 pt-8 border-t border-purple-500/20">
+                    <a href="{% url "student_list" %}" class="px-6 py-3 bg-slate-700/60 hover:bg-slate-600 text-white font-bold rounded-lg transition-all duration-300 shadow-md">
+                        Cancel
+                    </a>
+                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-lg transition-all duration-300 shadow-lg">
+                        Save Student
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Ensure all form inputs and selects have proper styling */
+    input,
+    select,
+    textarea {
+        color: #0f172a !important;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        background: rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #0f172a !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.25) !important;
+        border-color: rgba(59, 130, 246, 0.8);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        color: #0f172a !important;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="email"]::placeholder,
+    input[type="number"]::placeholder {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    /* Select dropdown styling */
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+
+    /* Label styling - ensure visibility */
+    label {
+        color: #e0e7ff !important;
+        display: block;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+        color: #0f172a !important;
+        background: rgba(255, 255, 255, 0.15) !important;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".datepicker").forEach(function(el) {
+            flatpickr(el, {
+                dateFormat: "Y-m-d",
+                enableTime: false,
+                clickOpens: true
+            });
+        });
+    });
+</script>
+{% endblock %}

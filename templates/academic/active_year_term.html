@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Active Year & Term Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-box {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+    }
+
+    .status-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+    }
+
+    .status-card.active {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .status-card h3 {
+        font-size: 14px;
+        opacity: 0.9;
+        margin: 0 0 8px 0;
+    }
+
+    .status-card .value {
+        font-size: 28px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .status-card .meta {
+        font-size: 12px;
+        opacity: 0.8;
+        margin-top: 8px;
+    }
+
+    .year-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .year-option {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+    }
+
+    .year-option:hover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .year-option.active {
+        background: rgba(56, 239, 125, 0.1);
+        border-color: #38ef7d;
+    }
+
+    .year-option-year {
+        font-size: 24px;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 8px;
+    }
+
+    .year-option.active .year-option-year {
+        color: #38ef7d;
+    }
+
+    .year-option-dates {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .year-option-button {
+        display: inline-block;
+        background: #667eea;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        margin-top: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .year-option-button:hover {
+        background: #764ba2;
+    }
+
+    .year-option.active .year-option-button {
+        background: #38ef7d;
+        color: white;
+    }
+
+    .term-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .term-table thead {
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    .term-table th {
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #667eea;
+    }
+
+    .term-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .term-table tbody tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .current-badge {
+        background: #38ef7d;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .set-current-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .set-current-btn:hover {
+        background: #764ba2;
+    }
+
+    .collection-rate {
+        font-weight: bold;
+        color: #38ef7d;
+    }
+
+    .collection-rate.warning {
+        color: #f59e0b;
+    }
+
+    .collection-rate.danger {
+        color: #ef4444;
+    }
+
+    h1 {
+        color: #1f2937;
+        margin-bottom: 24px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #1f2937;
+        margin-top: 24px;
+        margin-bottom: 16px;
+    }
+
+    .two-column {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+        .two-column {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1>⚙️ Active Year & Term Management</h1>
+
+    <div class="two-column">
+        <!-- Current Status -->
+        <div>
+            <div class="glass-box">
+                <h2 style="font-size: 16px; margin-top: 0;">Current Active Status</h2>
+                
+                {% if current_year %}
+                <div class="status-card active">
+                    <h3>Active Academic Year</h3>
+                    <p class="value">{{ current_year.year }}</p>
+                    <p class="meta">
+                        {{ current_year.start_date|date:"M d, Y" }} – {{ current_year.end_date|date:"M d, Y" }}
+                    </p>
+                </div>
+                {% else %}
+                <div class="status-card">
+                    <h3>No Active Academic Year</h3>
+                    <p class="value" style="font-size: 16px;">-</p>
+                </div>
+                {% endif %}
+
+                {% if current_term %}
+                <div class="status-card active">
+                    <h3>Current Academic Term</h3>
+                    <p class="value">Term {{ current_term.term }}</p>
+                    <p class="meta">
+                        {{ current_term.academic_year }} • 
+                        {{ current_term.start_date|date:"M d" }} – {{ current_term.end_date|date:"M d" }}
+                    </p>
+                </div>
+                {% else %}
+                <div class="status-card">
+                    <h3>No Current Term</h3>
+                    <p class="value" style="font-size: 16px;">-</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div>
+            <div class="glass-box">
+                <h2 style="font-size: 16px; margin-top: 0;">Key Metrics</h2>
+                
+                {% for status in year_status|slice:":1" %}
+                {% with summary=status.financial_summary %}
+                <div class="status-card">
+                    <h3>Collection Rate</h3>
+                    <p class="value">{{ summary.collection_rate|floatformat:1 }}%</p>
+                    <p class="meta">
+                        ${{ summary.total_collected|floatformat:0 }} / ${{ summary.total_expected|floatformat:0 }}
+                    </p>
+                </div>
+
+                <div class="status-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <h3>Total Arrears</h3>
+                    <p class="value">${{ summary.total_arrears|floatformat:0 }}</p>
+                    <p class="meta">
+                        Across all students in active year
+                    </p>
+                </div>
+                {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Select Active Year -->
+    <div class="glass-box">
+        <h2 class="section-title">Select Active Academic Year</h2>
+        
+        <div class="year-selector">
+            {% for year_stat in year_status %}
+            <div class="year-option {% if year_stat.year.is_active %}active{% endif %}" 
+                 id="year-{{ year_stat.year.id }}">
+                <div class="year-option-year">{{ year_stat.year.year }}</div>
+                <div class="year-option-dates">
+                    {{ year_stat.year.start_date|date:"M d" }} – {{ year_stat.year.end_date|date:"M d" }}
+                </div>
+                {% if not year_stat.year.is_active %}
+                <button class="year-option-button" 
+                        onclick="setActiveYear({{ year_stat.year.id }})">
+                    Set Active
+                </button>
+                {% else %}
+                <div style="padding: 6px 12px; color: #38ef7d; font-size: 12px; font-weight: 600;">
+                    ✓ Active
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Manage Current Terms -->
+    <div class="glass-box">
+        <h2 class="section-title">Manage Current Terms</h2>
+
+        {% if year_status %}
+        {% with summary=year_status.0.financial_summary %}
+        <table class="term-table">
+            <thead>
+                <tr>
+                    <th>Term</th>
+                    <th>Date Range</th>
+                    <th>Fee</th>
+                    <th>Students</th>
+                    <th>Collection Rate</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for term_stat in term_status|slice:":12" %}
+                <tr>
+                    <td>
+                        <strong>{{ term_stat.term.academic_year }} T{{ term_stat.term.term }}</strong>
+                        {% if term_stat.is_current %}
+                        <span class="current-badge">CURRENT</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-size: 13px; color: #666;">
+                        {{ term_stat.term.start_date|date:"M d" }} – {{ term_stat.term.end_date|date:"M d" }}
+                    </td>
+                    <td>${{ term_stat.fee|floatformat:2 }}</td>
+                    <td>{{ term_stat.student_count }}</td>
+                    <td>
+                        <span class="collection-rate {% if term_stat.collection_rate < 50 %}danger{% elif term_stat.collection_rate < 80 %}warning{% endif %}">
+                            {{ term_stat.collection_rate|floatformat:1 }}%
+                        </span>
+                    </td>
+                    <td>
+                        {% if not term_stat.is_current %}
+                        <button class="set-current-btn"
+                                onclick="setCurrentTerm({{ term_stat.term.id }})">
+                            Set Current
+                        </button>
+                        {% else %}
+                        <span style="color: #38ef7d; font-weight: 600;">Active</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endwith %}
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function setActiveYear(yearId) {
+        if (confirm('Set this as the active academic year?')) {
+            fetch(`/admin/api/year/${yearId}/set-active/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred');
+            });
+        }
+    }
+
+    function setCurrentTerm(termId) {
+        if (confirm('Set this as the current term?')) {
+            fetch(`/admin/api/term/${termId}/set-current/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred');
+            });
+        }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

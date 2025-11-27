@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Class - School Management System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-2xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="mb-8 animate-slideInUp">
+            <a href="{% url 'class_list' %}" class="text-blue-400 hover:text-blue-300 flex items-center gap-2 mb-4 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Classes
+            </a>
+            <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent mb-2">Edit Class</h1>
+            <p class="text-slate-400 text-lg">Grade {{ class.grade }}{{ class.section }} - {{ class.academic_year }} Academic Year</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.1s;">
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Grade -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-200 mb-3">Grade</label>
+                    <select name="grade" required class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-600/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        {% for i in "1234567" %}
+                        <option value="{{ i }}" {% if class.grade == i|add:0 %}selected{% endif %}>Grade {{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Section -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-200 mb-3">Section</label>
+                    <select name="section" required class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-600/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <option value="A" {% if class.section == 'A' %}selected{% endif %}>Section A</option>
+                        <option value="B" {% if class.section == 'B' %}selected{% endif %}>Section B</option>
+                    </select>
+                </div>
+
+                <!-- Academic Year -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-200 mb-3">Academic Year</label>
+                    <input type="number" name="academic_year" required value="{{ class.academic_year }}" min="2020" class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-600/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+
+                <!-- Teacher -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-200 mb-3">Teacher (Optional)</label>
+                    <select name="teacher" class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-600/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <option value="">Select Teacher</option>
+                        {% for teacher in available_teachers %}
+                        <option value="{{ teacher.id }}" {% if class.teacher.id == teacher.id %}selected{% endif %}>{{ teacher.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-3 pt-6 border-t border-slate-700/50">
+                    <a href="{% url 'class_list' %}" class="flex-1 px-6 py-3 rounded-lg border border-slate-600/50 hover:bg-slate-700/50 transition-colors font-semibold text-slate-200 text-center">
+                        Cancel
+                    </a>
+                    <button type="submit" class="flex-1 px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600 hover:shadow-xl hover:shadow-blue-500/30 transition-all transform hover:scale-105 active:scale-95">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-slideInUp {
+        animation: slideInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(20px);
+    }
+</style>
+
+{% endblock %}

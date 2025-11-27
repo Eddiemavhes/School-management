@@ -1,0 +1,59 @@
+<!-- Activity Widget -->
+<div class="glass rounded-2xl p-8 border border-slate-500/20 hover:border-slate-400/30 transition-all duration-300 widget-card" style="animation-delay: 0.3s">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h2 class="text-2xl font-bold text-white mb-1">Activity Feed</h2>
+            <p class="text-slate-400 text-sm">Recent movements</p>
+        </div>
+    </div>
+    
+    {% if recent_movements %}
+    <div class="space-y-4">
+        {% for movement in recent_movements %}
+        <div class="group flex gap-4 p-3 rounded-lg hover:bg-slate-500/10 transition-all duration-300">
+            <!-- Timeline dot -->
+            <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center {% if movement.movement_type == 'PROMOTION' %}bg-gradient-to-br from-emerald-500 to-teal-500{% elif movement.movement_type == 'DEMOTION' %}bg-gradient-to-br from-amber-500 to-orange-500{% else %}bg-gradient-to-br from-blue-500 to-cyan-500{% endif %}">
+                    {% if movement.movement_type == 'PROMOTION' %}
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                    </svg>
+                    {% elif movement.movement_type == 'DEMOTION' %}
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                    </svg>
+                    {% else %}
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m0 0l4 4m10-4v12m0 0l4-4m0 0l-4-4"/>
+                    </svg>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Content -->
+            <div class="flex-1 pt-1">
+                <p class="text-white font-semibold text-sm">
+                    <a href="{% url 'student_movement_history' movement.student.id %}" class="hover:text-cyan-300 transition-colors">
+                        {{ movement.student.full_name }}
+                    </a>
+                    <span class="text-slate-400"> {{ movement.get_movement_type_display }}</span>
+                </p>
+                <p class="text-slate-400 text-xs mt-1">
+                    {{ movement.from_class }} 
+                    <span class="text-cyan-300 font-semibold mx-1">→</span> 
+                    {{ movement.to_class }}
+                </p>
+                <p class="text-slate-500 text-xs mt-2">{{ movement.movement_date|timesince }} ago</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <svg class="w-12 h-12 text-slate-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="text-slate-400 font-medium">No recent activity</p>
+    </div>
+    {% endif %}
+</div>

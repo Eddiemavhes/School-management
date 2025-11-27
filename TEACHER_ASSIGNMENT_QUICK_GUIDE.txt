@@ -1,0 +1,96 @@
+# Quick Reference: Teacher Assignment Feature
+
+## What Changed?
+
+A teacher can now only be assigned to **ONE class per academic year**. Attempting to assign a teacher who is already teaching another class will be rejected with a clear error message.
+
+## For Administrators
+
+### Creating a Class with Teacher
+1. Go to Classes → Create
+2. Select Grade and Section
+3. Click "Select Teacher" dropdown
+4. **Only available teachers are shown** (those not yet assigned to a class this year)
+5. Click "Create Class"
+
+### Assigning/Changing a Teacher
+1. Go to Classes → Edit Class
+2. Click "Select Teacher" dropdown
+3. **Only available teachers shown** (plus option to remove teacher)
+4. Save changes
+
+### If You See an Error
+```
+❌ "Teacher [Name] is already assigned to [Class] in [Year]. 
+    A teacher can only teach one class per academic year."
+```
+
+**Solution**: 
+- That teacher is already assigned elsewhere
+- Reassign them from the other class first, OR
+- Assign a different teacher
+
+## Key Rules
+
+| Scenario | Result |
+|----------|--------|
+| Assign Teacher A to Class 1 | ✅ Success |
+| Assign same Teacher A to Class 2 (same year) | ❌ Error - Already assigned |
+| Assign Teacher A to Class 1 in Year 2026 | ✓ OK |
+| Assign Teacher A to Class 1 in Year 2027 | ✓ OK (different year) |
+| Reassign Teacher A from Class 1 → Class 2 | ✓ OK (unassigns first, then assigns) |
+| Create class without teacher | ✅ Always OK |
+
+## Database Changes
+
+None - uses existing `teacher` field in Class model with new validation logic.
+
+## API Changes
+
+### GET `/classes/<id>/edit/`
+Now returns:
+```json
+{
+    "grade": 1,
+    "section": "A",
+    "academic_year": 2026,
+    "teacher": 5,
+    "available_teachers": [
+        {"id": 1, "name": "James Jones"},
+        {"id": 3, "name": "Sarah Smith"}
+    ]
+}
+```
+
+### POST `/classes/create/` or `/classes/<id>/edit/`
+Error response if teacher already assigned:
+```
+Status: 409 Conflict
+{
+    "error": "Teacher [Name] is already assigned to [Class]. A teacher can only teach one class per academic year."
+}
+```
+
+## Implementation Files
+
+- `core/models/class_model.py` - Added validation
+- `core/views/class_views.py` - Updated views for filtering
+- `test_teacher_assignment.py` - Test suite (can be deleted)
+
+## Testing
+
+Run: `python test_teacher_assignment.py`
+
+Expected output:
+```
+✅ ALL TESTS PASSED!
+
+Summary:
+  ✓ One teacher can only teach one class per academic year
+  ✓ Attempting to assign a teacher already teaching is rejected
+  ✓ get_available_teachers() correctly filters assigned teachers
+```
+
+---
+
+That's it! The system now prevents double-assigning teachers. 🎓
