@@ -220,16 +220,9 @@ class StudentBalance(models.Model):
                 # Don't create new balance for graduated students in current term
                 return None
         
-        # IMPORTANT: Grade 7 students should NOT be charged a new term fee
-        # They should only pay their arrears and then graduate
-        if student.current_class and int(student.current_class.grade) >= 7:
-            # Try to get existing balance (for arrears only)
-            try:
-                return cls.objects.get(student=student, term=term)
-            except cls.DoesNotExist:
-                # Don't create new balance for Grade 7+ students
-                # They are not enrolled in new terms, only need to clear arrears
-                return None
+        # Note: Grade 7 ENROLLED students should still be charged fees
+        # The Grade 7 check applies ONLY to archived/graduated students (is_active=False check above)
+        # If a Grade 7 student is still ENROLLED and ACTIVE, they continue paying until graduation
         
         try:
             term_fee = TermFee.objects.get(term=term)
