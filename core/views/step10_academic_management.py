@@ -313,9 +313,26 @@ def set_current_term_api(request, term_id):
         term.is_current = True
         term.save()
         
+        # IMPORTANT: Initialize StudentBalance for all active students in this term
+        # This ensures they have their arrears carried forward when a new term becomes current
+        from core.models.fee import StudentBalance
+        from core.models import Student
+        
+        active_students = Student.objects.filter(is_active=True, is_deleted=False)
+        balances_initialized = 0
+        
+        for student in active_students:
+            try:
+                balance = StudentBalance.initialize_term_balance(student, term)
+                if balance:
+                    balances_initialized += 1
+            except Exception as e:
+                print(f"Warning: Could not initialize balance for {student.full_name} in {term}: {e}")
+        
         return JsonResponse({
             'status': 'success',
-            'message': f'{term.academic_year} Term {term.term} is now current'
+            'message': f'{term.academic_year} Term {term.term} is now current. Initialized {balances_initialized} student balances.',
+            'balances_initialized': balances_initialized
         })
     except Exception as e:
         return JsonResponse({
