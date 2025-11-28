@@ -28,13 +28,9 @@ def update_student_balance_on_payment(sender, instance, created, **kwargs):
             balance.amount_paid = total_paid
             balance.save(update_fields=['amount_paid'])
         
-        # IMPORTANT: Check for auto-graduation FIRST before cascading to next terms
-        # If Grade 7 student reached $0 balance, they should graduate and NOT get future term fees
-        student.refresh_from_db()
-        if student.auto_graduate_if_eligible():
-            print(f"Auto-graduated {student.full_name} (Grade 7, balance $0)")
-            # Student is now archived - don't cascade to next terms
-            return
+        # NOTE: Auto-graduation for Grade 7 is handled during year-end rollover
+        # NOT during payment processing. Grade 7 students remain active throughout
+        # their entire Grade 7 academic year (all 3 terms).
         
         # ONLY cascade to next terms if student is NOT graduating
         # When a payment changes the balance for the current term,

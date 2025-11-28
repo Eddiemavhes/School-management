@@ -414,9 +414,18 @@ class Student(models.Model):
 
     def auto_graduate_if_eligible(self):
         """
-        Automatically graduate Grade 7 students who have paid all fees.
-        This allows students to transition to Alumni status automatically
-        when they complete Grade 7 and pay all fees.
+        Automatically graduate Grade 7 students who have completed their year.
+        
+        IMPORTANT: This should ONLY be called during year-end rollover processing,
+        NOT during payment processing. Grade 7 students must remain active throughout
+        their entire Grade 7 academic year (all 3 terms) before graduating to Alumni.
+        
+        Eligibility criteria:
+        - Must be Grade 7 student
+        - Must have completed their full Grade 7 year (all 3 terms done)
+        - Must have all fees paid ($0 or negative balance)
+        
+        Called by: Year-end rollover process (e.g., when moving to next academic year)
         """
         # Only process if student is active and enrolled
         if not self.is_active or self.status != 'ENROLLED':
