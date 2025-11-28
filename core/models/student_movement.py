@@ -15,11 +15,11 @@ class StudentMovement(models.Model):
 
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='movements')
     from_class = models.ForeignKey(Class, on_delete=models.SET_NULL, null=True, related_name='student_departures')
-    to_class = models.ForeignKey(Class, on_delete=models.SET_NULL, null=True, related_name='student_arrivals')
+    to_class = models.ForeignKey(Class, on_delete=models.SET_NULL, null=True, blank=True, related_name='student_arrivals')
     movement_type = models.CharField(max_length=10, choices=MOVEMENT_TYPES)
     movement_date = models.DateTimeField(default=timezone.now)
     reason = models.TextField(blank=True, null=True)
-    moved_by = models.ForeignKey(Administrator, on_delete=models.SET_NULL, null=True)
+    moved_by = models.ForeignKey(Administrator, on_delete=models.SET_NULL, null=True, blank=True)
     previous_arrears = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     preserved_arrears = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     is_bulk_operation = models.BooleanField(default=False)
@@ -38,6 +38,10 @@ class StudentMovement(models.Model):
     
     def clean(self):
         """Validate student movement based on movement type"""
+        # GRADUATION doesn't need the same validations
+        if self.movement_type == 'GRADUATION':
+            return  # Skip other validations for graduation
+        
         # Validation 1: Student prerequisites - must be active, not graduated, have class
         self._validate_student_prerequisites()
         

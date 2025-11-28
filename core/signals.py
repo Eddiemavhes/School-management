@@ -48,6 +48,11 @@ def update_student_balance_on_payment(sender, instance, created, **kwargs):
             
             for next_year_term in next_year_terms:
                 StudentBalance.initialize_term_balance(student, next_year_term)
+        
+        # Check if Grade 7 student with $0 balance should be auto-graduated
+        student.refresh_from_db()
+        if student.auto_graduate_if_eligible():
+            print(f"Auto-graduated {student.full_name} (Grade 7, balance $0)")
                 
     except Exception as e:
         print(f"Error updating StudentBalance for payment {instance.id}: {e}")

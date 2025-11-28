@@ -225,7 +225,7 @@ class Student(models.Model):
         
         # Validate allowed transitions
         allowed_transitions = {
-            'ENROLLED': ['ACTIVE', 'EXPELLED'],
+            'ENROLLED': ['ACTIVE', 'GRADUATED', 'EXPELLED'],  # Allow direct ENROLLED->GRADUATED for Grade 7 auto-graduation
             'ACTIVE': ['GRADUATED', 'EXPELLED'],
             'GRADUATED': [],
             'EXPELLED': [],
@@ -398,6 +398,55 @@ class Student(models.Model):
     def transfer_to_class(self, new_class):
         """Transfer student to a new class"""
         self.current_class = new_class
+
+    def auto_graduate_if_eligible(self):
+        """
+        Automatically graduate Grade 7 students who have paid all fees.
+        This allows students to transition to Alumni status automatically
+        when they complete Grade 7 and pay all fees.
+        """
+        # Only process if student is active and enrolled
+        if not self.is_active or self.status != 'ENROLLED':
+            return False
+        
+        # Check if in Grade 7 (highest grade)
+        if not self.current_class or int(self.current_class.grade) < 7:
+            return False
+        
+        # Check if all fees are paid ($0 or negative balance)
+        if self.overall_balance > 0:
+            return False  # Still owes money
+        
+        # All conditions met - graduate the student
+        from .student_movement import StudentMovement
+        
+        try:
+            # Create graduation movement record
+            movement = StudentMovement(
+                student=self,
+                from_class=self.current_class,
+                to_class=None,
+                movement_type='GRADUATION',
+                moved_by=None,  # System automatic
+                previous_arrears=self.previous_term_arrears + self.current_term_balance,
+                preserved_arrears=self.previous_term_arrears + self.current_term_balance,
+                reason='Auto-graduated: Grade 7 completed with fees paid'
+            )
+            # Save without full_clean 
+            movement.save()
+            
+            # Mark as graduated
+            self.is_active = False
+            self.status = 'GRADUATED'
+            self.is_archived = True
+            self.save()
+            
+            return True
+        except Exception as e:
+            print(f"Error auto-graduating {self.full_name}: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
 
     def check_and_archive(self):
         """
