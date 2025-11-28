@@ -676,9 +676,11 @@ def create_terms_api(request):
         
         return JsonResponse({
             'status': 'success',
-            'message': f'Created {len(created_terms)} terms and {balances_created} student balances',
+            'message': f'Created {len(created_terms)} terms and {balances_created} student balances. Ready for bulk promotion!',
             'terms_created': len(created_terms),
-            'balances_created': balances_created
+            'balances_created': balances_created,
+            'redirect_url': '/academic-management/bulk-promotion/',
+            'next_action': 'Please proceed to Bulk Promotion to move students to their new grades'
         })
     except AcademicYear.DoesNotExist:
         return JsonResponse({

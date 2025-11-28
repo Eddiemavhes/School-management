@@ -43,7 +43,7 @@ def update_student_balance_on_payment(sender, instance, created, **kwargs):
             
             # Also check if there are terms in the next year
             next_year_terms = AcademicTerm.objects.filter(
-                academic_year__year=term.academic_year.year + 1
+                academic_year=term.academic_year + 1
             ).order_by('term')
             
             for next_year_term in next_year_terms:
