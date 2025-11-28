@@ -220,9 +220,31 @@ class StudentBalance(models.Model):
                 # Don't create new balance for graduated students in current term
                 return None
         
-        # Note: Grade 7 ENROLLED students should still be charged fees
-        # The Grade 7 check applies ONLY to archived/graduated students (is_active=False check above)
-        # If a Grade 7 student is still ENROLLED and ACTIVE, they continue paying until graduation
+        # GRADE 7 CHECK FOR NEW ACADEMIC YEAR:
+        # Grade 7 students who enter a new academic year without paying their previous year's balance
+        # should NOT get new term fees. They only carry forward their arrears.
+        # This is to prevent Grade 7 students from accumulating unlimited fees if they don't pay.
+        if term.term == 1 and student.current_class:  # First term of new year
+            if int(student.current_class.grade) >= 7:  # Grade 7 or higher
+                # Check if there's a balance from the previous academic year
+                previous_year_last_balance = cls.objects.filter(
+                    student=student,
+                    term__academic_year=term.academic_year - 1
+                ).order_by('-term__term').first()
+                
+                if previous_year_last_balance and previous_year_last_balance.current_balance > 0:
+                    # Grade 7 student with outstanding balance from previous year
+                    # Do NOT charge new fee - only carry forward the arrears
+                    balance, created = cls.objects.get_or_create(
+                        student=student,
+                        term=term,
+                        defaults={
+                            'term_fee': Decimal('0'),  # NO new fee for Grade 7 with arrears
+                            'previous_arrears': previous_year_last_balance.current_balance,
+                            'amount_paid': Decimal('0')
+                        }
+                    )
+                    return balance
         
         try:
             term_fee = TermFee.objects.get(term=term)
