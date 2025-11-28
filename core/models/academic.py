@@ -164,9 +164,10 @@ class Payment(models.Model):
         if not self.term_id:
             raise ValidationError("Academic term must be set before recording a payment")
         
-        # Validation 1: Current term only
-        if self.term_id and not self.term.is_current:
-            raise ValidationError("Payments can only be recorded for the current term")
+        # Validation 1: Allow payments for current term or past terms (for arrears clearing)
+        # We used to restrict to only current term, but Grade 7 students need to pay arrears
+        # from past terms before graduating, so this check is now removed/relaxed
+        # Note: recorded_by can be None for system-generated payments
         
         # Validation 2: Amount >= 0 (can be zero for placeholder payments, but typically > 0)
         if self.amount is not None and self.amount < 0:

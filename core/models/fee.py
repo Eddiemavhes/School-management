@@ -220,6 +220,17 @@ class StudentBalance(models.Model):
                 # Don't create new balance for graduated students in current term
                 return None
         
+        # IMPORTANT: Grade 7 students should NOT be charged a new term fee
+        # They should only pay their arrears and then graduate
+        if student.current_class and int(student.current_class.grade) >= 7:
+            # Try to get existing balance (for arrears only)
+            try:
+                return cls.objects.get(student=student, term=term)
+            except cls.DoesNotExist:
+                # Don't create new balance for Grade 7+ students
+                # They are not enrolled in new terms, only need to clear arrears
+                return None
+        
         try:
             term_fee = TermFee.objects.get(term=term)
         except TermFee.DoesNotExist:

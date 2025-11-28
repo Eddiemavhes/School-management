@@ -321,22 +321,23 @@ class Student(models.Model):
 
     @property
     def overall_balance(self):
-        """Get total lifetime outstanding balance across ALL terms"""
+        """Get total outstanding balance - only the LATEST term's balance matters
+        
+        Since arrears flow forward through each term, the only debt that matters
+        is the outstanding balance from the most recent term. That balance already
+        includes any unpaid amounts from previous terms.
+        """
         from .fee import StudentBalance
         
-        # Sum all positive balances across all terms
-        # This shows what the student actually owes in total
-        all_balances = StudentBalance.objects.filter(student=self)
+        # Get the most recent term with a balance for this student
+        latest_balance = StudentBalance.objects.filter(
+            student=self
+        ).order_by('-term__academic_year', '-term__term').first()
         
-        total_balance = 0
-        for balance in all_balances:
-            current_balance = balance.current_balance
-            # Only count positive balances (amounts owed)
-            # Negative balances (credits) are handled separately
-            if current_balance > 0:
-                total_balance += current_balance
+        if latest_balance:
+            return float(latest_balance.current_balance)
         
-        return float(total_balance)
+        return 0
 
     @property
     def total_due(self):
