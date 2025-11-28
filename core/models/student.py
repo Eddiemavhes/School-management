@@ -321,25 +321,22 @@ class Student(models.Model):
 
     @property
     def overall_balance(self):
-        """Get total outstanding balance for CURRENT TERM ONLY (including credits as negative values)"""
+        """Get total lifetime outstanding balance across ALL terms"""
         from .fee import StudentBalance
-        from .academic import AcademicTerm
         
-        # Get current term
-        current_term = AcademicTerm.get_current_term()
-        if not current_term:
-            return 0
+        # Sum all positive balances across all terms
+        # This shows what the student actually owes in total
+        all_balances = StudentBalance.objects.filter(student=self)
         
-        # Get ONLY the current term balance
-        current_balance = StudentBalance.objects.filter(
-            student=self,
-            term=current_term
-        ).first()
+        total_balance = 0
+        for balance in all_balances:
+            current_balance = balance.current_balance
+            # Only count positive balances (amounts owed)
+            # Negative balances (credits) are handled separately
+            if current_balance > 0:
+                total_balance += current_balance
         
-        if current_balance:
-            return float(current_balance.current_balance)
-        
-        return 0
+        return float(total_balance)
 
     @property
     def total_due(self):
