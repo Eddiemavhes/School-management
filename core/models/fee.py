@@ -254,17 +254,18 @@ class StudentBalance(models.Model):
         previous_arrears = cls.calculate_arrears(student, term)
         
         # CREDIT HANDLING: If student has overpaid (negative balance/credit)
-        # and the credit is >= the new term fee, don't charge new fee
+        # Only skip charging if credit >= new term fee
         if previous_arrears < 0:  # Student has credit (overpaid)
             credit_amount = abs(previous_arrears)
             if credit_amount >= term_fee.amount:
                 # Credit covers the full new fee - no new charge
-                # The credit will reduce the total due
+                # The credit will reduce the total due to $0
                 new_term_fee = Decimal('0')
             else:
-                # Credit only partially covers - no new term fee yet
-                # Student can use credit against the previous arrears
-                new_term_fee = Decimal('0')
+                # Credit only partially covers - still charge full fee
+                # Credit will be applied in the balance calculation
+                # Example: Fee=$100, Credit=$20 → Balance shows $80 due
+                new_term_fee = term_fee.amount
         else:
             new_term_fee = term_fee.amount
 
