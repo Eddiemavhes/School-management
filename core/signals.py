@@ -38,25 +38,29 @@ def update_student_balance_on_payment(sender, instance, created, **kwargs):
         
         # ONLY cascade to next terms if student is NOT graduating
         # When a payment changes the balance for the current term,
-        # we need to recalculate arrears for NEXT term(s) since they depend on
-        # the current term's balance
+        # we need to recalculate arrears for NEXT term(s) ONLY IF THEY ALREADY EXIST
+        # This prevents creating future term fees prematurely
         if term and balance:
-            # Get all subsequent terms in the same year
+            # Get all subsequent terms in the same year that ALREADY HAVE balances for this student
             next_terms = AcademicTerm.objects.filter(
                 academic_year=term.academic_year,
                 term__gt=term.term
             ).order_by('term')
             
             for next_term in next_terms:
-                StudentBalance.initialize_term_balance(student, next_term)
+                # Only update if balance already exists - don't create new ones
+                if StudentBalance.objects.filter(student=student, term=next_term).exists():
+                    StudentBalance.initialize_term_balance(student, next_term)
             
-            # Also check if there are terms in the next year
+            # Also check if there are terms in the next year (but only if they have balances)
             next_year_terms = AcademicTerm.objects.filter(
                 academic_year=term.academic_year + 1
             ).order_by('term')
             
             for next_year_term in next_year_terms:
-                StudentBalance.initialize_term_balance(student, next_year_term)
+                # Only update if balance already exists - don't create new ones
+                if StudentBalance.objects.filter(student=student, term=next_year_term).exists():
+                    StudentBalance.initialize_term_balance(student, next_year_term)
                 
     except Exception as e:
         print(f"Error updating StudentBalance for payment {instance.id}: {e}")
