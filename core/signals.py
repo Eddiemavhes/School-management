@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from .models import TeacherAssignmentHistory, Class, Student
-from .models.academic import Payment
+from .models.academic import Payment, AcademicTerm
 
 @receiver(post_save, sender=Payment)
 def update_student_balance_on_payment(sender, instance, created, **kwargs):
@@ -56,6 +56,21 @@ def update_student_balance_on_payment(sender, instance, created, **kwargs):
                 
     except Exception as e:
         print(f"Error updating StudentBalance for payment {instance.id}: {e}")
+
+@receiver(post_save, sender=AcademicTerm)
+def initialize_balances_on_term_activation(sender, instance, **kwargs):
+    """Initialize StudentBalance for all active students when a term becomes current"""
+    if instance.is_current:
+        from .models.fee import StudentBalance
+        
+        # Get all active students
+        active_students = Student.objects.filter(is_active=True, is_deleted=False)
+        
+        for student in active_students:
+            try:
+                StudentBalance.initialize_term_balance(student, instance)
+            except Exception as e:
+                print(f"Warning: Could not initialize balance for {student.full_name} in {instance}: {e}")
 
 @receiver(post_save, sender=Student)
 def create_student_balance_on_enrollment(sender, instance, created, **kwargs):
