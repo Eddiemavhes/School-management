@@ -321,17 +321,32 @@ class Student(models.Model):
 
     @property
     def overall_balance(self):
-        """Get total outstanding balance - only the LATEST term's balance matters
+        """Get total outstanding balance - only the CURRENT or LATEST PAST term
         
-        Since arrears flow forward through each term, the only debt that matters
-        is the outstanding balance from the most recent term. That balance already
-        includes any unpaid amounts from previous terms.
+        Returns the balance from the most recent term that is either:
+        1. The current active term, OR
+        2. A past term (if no current term balance exists)
+        
+        Does NOT include future terms that haven't become current yet.
+        This ensures students aren't charged for terms they haven't reached.
         """
         from .fee import StudentBalance
+        from .academic import AcademicTerm
         
-        # Get the most recent term with a balance for this student
+        # Try to get current term first
+        current_term = AcademicTerm.get_current_term()
+        if current_term:
+            current_balance = StudentBalance.objects.filter(
+                student=self,
+                term=current_term
+            ).first()
+            if current_balance:
+                return float(current_balance.current_balance)
+        
+        # If no current term balance, get the most recent term balance from past terms
         latest_balance = StudentBalance.objects.filter(
-            student=self
+            student=self,
+            term__is_current=False  # Only past terms
         ).order_by('-term__academic_year', '-term__term').first()
         
         if latest_balance:
