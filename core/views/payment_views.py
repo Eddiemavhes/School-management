@@ -44,26 +44,30 @@ def student_payment_details_api(request, student_id):
         
         # Handle graduated students - they don't have current term balance
         if balance is None:
-            # Graduated student - return total owed from all previous terms
-            # current_balance = (term_fee + previous_arrears) - amount_paid
-            balances = StudentBalance.objects.filter(student=student)
-            total_arrears = sum([(b.term_fee + b.previous_arrears - b.amount_paid) for b in balances])
-            total_outstanding = sum([b.current_balance for b in balances]) if balances.exists() else Decimal('0')
+            # Graduated student - show ONLY their latest balance (which includes all arrears)
+            # NOT sum of all balances (that would double-count)
+            latest_balance = StudentBalance.objects.filter(student=student).order_by('-term__academic_year', '-term__term').first()
+            
+            if latest_balance:
+                # Use the latest balance - this represents all money owed
+                total_outstanding = float(latest_balance.current_balance)
+            else:
+                total_outstanding = Decimal('0')
             
             response_data = {
                 'student_name': student.get_full_name(),
                 'is_graduated': True,
                 'is_archived': False,
                 'message': 'Student has graduated. Can only pay ARREARS from previous terms.',
-                'total_arrears': float(total_arrears),
+                'total_arrears': total_outstanding,
                 'term_fee': 0.0,
-                'previous_arrears': float(total_arrears),
-                'arrears_remaining': float(total_arrears),
+                'previous_arrears': total_outstanding,
+                'arrears_remaining': total_outstanding,
                 'term_fee_remaining': 0.0,
                 'amount_paid': 0.0,
-                'current_balance': float(total_arrears),
-                'total_outstanding': float(total_outstanding),
-                'payment_priority': f'GRADUATED - Must pay ${float(total_arrears):.2f} in ARREARS first'
+                'current_balance': total_outstanding,
+                'total_outstanding': total_outstanding,
+                'payment_priority': f'GRADUATED - Must pay ${total_outstanding:.2f} in ARREARS'
             }
             return JsonResponse(response_data)
         
@@ -131,6 +135,20 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
                 f"No further payments can be recorded for this student.")
             return self.form_invalid(form)
         
+        # For graduated students, find their LATEST balance term to record payment against
+        if not student.is_active:
+            # Graduated student - find their most recent balance
+            latest_balance = StudentBalance.objects.filter(student=student).order_by('-term__academic_year', '-term__term').first()
+            if latest_balance:
+                payment_term = latest_balance.term
+            else:
+                form.add_error('student',
+                    f"❌ {student.full_name} has no balance records. Cannot record payment.")
+                return self.form_invalid(form)
+        else:
+            # Active student - use current term
+            payment_term = current_term
+        
         # Graduated (but not archived) students CAN pay their remaining arrears
         # The system will apply it to their previous term balances via the signal
         
@@ -142,7 +160,7 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
                 payment_method=form.cleaned_data.get('payment_method', 'CASH'),
                 reference_number=form.cleaned_data.get('reference_number', ''),
                 notes=form.cleaned_data.get('notes', ''),
-                term=current_term,
+                term=payment_term,
                 recorded_by=self.request.user
             )
             
@@ -202,9 +220,13 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
                 student = Student.objects.get(id=student_id)
                 balance = StudentBalance.initialize_term_balance(student, current_term) if current_term else None
                 
-                # Calculate TOTAL outstanding - sum all UNPAID balances from ALL past and current years
-                all_student_balances = StudentBalance.objects.filter(student=student)
-                total_outstanding = sum([float(b.current_balance) for b in all_student_balances if b.current_balance > 0])
+                # Calculate TOTAL outstanding - ONLY current term balance (or latest if no current term)
+                # Do NOT sum all balances from all terms - that would show accumulated fees incorrectly
+                # Previous terms are already included as "previous_arrears" in the current term balance
+                if balance and balance.current_balance > 0:
+                    total_outstanding = float(balance.current_balance)
+                else:
+                    total_outstanding = 0.0
                 
                 # Determine payment priority - show total outstanding
                 if total_outstanding > 0:

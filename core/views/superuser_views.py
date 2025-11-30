@@ -21,6 +21,7 @@ from core.models.academic import Payment, AcademicTerm
 from core.models.academic_year import AcademicYear
 from core.models.fee import StudentBalance, TermFee
 from core.models.class_model import Class
+from core.models.school_details import SchoolDetails
 from core.forms.admin_forms import ResetAdminPasswordForm
 
 
@@ -94,6 +95,7 @@ def reset_system_api(request):
             'terms': AcademicTerm.objects.count(),
             'classes': Class.objects.count(),
             'years': AcademicYear.objects.count(),
+            'school_details': SchoolDetails.objects.count(),
         }
         
         # Delete in optimized order to avoid cascade issues
@@ -111,8 +113,10 @@ def reset_system_api(request):
         TermFee.objects.all().delete()
         # Delete academic terms (reference years)
         AcademicTerm.objects.all().delete()
-        # Finally delete years
+        # Delete academic years
         AcademicYear.objects.all().delete()
+        # Delete school details
+        SchoolDetails.objects.all().delete()
         
         return JsonResponse({
             'success': True,

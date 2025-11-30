@@ -63,11 +63,92 @@ def update_student_balance_on_payment(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=AcademicTerm)
 def initialize_balances_on_term_activation(sender, instance, **kwargs):
-    """Initialize StudentBalance for all active students when a term becomes current"""
+    """Initialize StudentBalance for all active students when a term becomes current
+    
+    Also handles auto-graduation of Grade 7 students when they complete all 3 terms
+    """
     if instance.is_current:
         from .models.fee import StudentBalance
+        from .models.student_movement import StudentMovement
         
-        # Get all active students
+        # GRADUATION: When ANY term is marked current, check if Grade 7 students have completed all 3 terms
+        # Grade 7 students graduate ONLY AFTER completing Term 3, not on year activation
+        
+        # Check if this is Term 3 (the final term) being marked as current
+        if instance.term == 3:
+            # This is Term 3 - students who complete this term should graduate
+            current_year = instance.academic_year
+            
+            # Find all ENROLLED students who have completed ALL 3 TERMS of this year
+            # A student completes a term when a balance record exists for that term
+            for term_num in [1, 2, 3]:
+                completed_term = AcademicTerm.objects.filter(
+                    academic_year=current_year,
+                    term=term_num
+                ).first()
+                
+                if not completed_term:
+                    # Can't graduate yet - not all terms exist
+                    return
+            
+            # Get students who have balance records for ALL 3 terms of this year
+            from .models.academic_year import AcademicYear
+            
+            # Students with Term 1 balance
+            term1_students = StudentBalance.objects.filter(
+                term__academic_year=current_year,
+                term__term=1
+            ).values_list('student_id', flat=True).distinct()
+            
+            # Students with Term 2 balance
+            term2_students = StudentBalance.objects.filter(
+                term__academic_year=current_year,
+                term__term=2
+            ).values_list('student_id', flat=True).distinct()
+            
+            # Students with Term 3 balance
+            term3_students = StudentBalance.objects.filter(
+                term__academic_year=current_year,
+                term__term=3
+            ).values_list('student_id', flat=True).distinct()
+            
+            # Get students who have completed ALL 3 TERMS (intersection of all three)
+            completed_all_terms = set(term1_students) & set(term2_students) & set(term3_students)
+            
+            # Get these students and graduate them
+            students_to_graduate = Student.objects.filter(
+                pk__in=completed_all_terms,
+                status='ENROLLED',  # Not yet graduated
+                is_active=True,
+                is_deleted=False
+            )
+            
+            for student in students_to_graduate:
+                # Get their final balance from Term 3 of this year
+                final_balance = StudentBalance.objects.filter(
+                    student=student,
+                    term__academic_year=current_year,
+                    term__term=3
+                ).first()
+                
+                if final_balance:
+                    # Mark as GRADUATED and determine Alumni status based on payment
+                    # Alumni = student who graduated with zero or negative balance (fully paid or credit)
+                    student.status = 'GRADUATED'
+                    student.is_active = False
+                    student.is_archived = final_balance.current_balance <= 0
+                    student.save()
+                    
+                    # Create graduation movement record
+                    StudentMovement.objects.create(
+                        student=student,
+                        from_class=student.current_class,
+                        to_class=None,
+                        movement_type='GRADUATION',
+                        reason=f'Completed Grade 7 ({current_year}). Final balance: ${final_balance.current_balance:.2f}. {"Alumni (Fully Paid)" if student.is_archived else "Graduated (Arrears Outstanding)"}'
+                    )
+        
+        # Initialize balances for remaining active students in the current term
         active_students = Student.objects.filter(is_active=True, is_deleted=False)
         
         for student in active_students:
