@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from .models import TeacherAssignmentHistory, Class, Student
 from .models.academic import Payment, AcademicTerm
@@ -59,6 +59,33 @@ def update_student_balance_on_payment(sender, instance, created, **kwargs):
                     StudentBalance.initialize_term_balance(student, next_year_term)
                 
     except Exception as e:
+        print(f"Error updating StudentBalance for payment {instance.id}: {e}")
+
+@receiver(post_delete, sender=Payment)
+def recalculate_balance_on_payment_delete(sender, instance, **kwargs):
+    """Recalculate StudentBalance.amount_paid when a payment is deleted"""
+    from .models.fee import StudentBalance
+    from django.db.models import Sum
+    
+    student = instance.student
+    term = instance.term
+    
+    try:
+        # Get the student's balance for this term
+        balance = StudentBalance.objects.filter(student=student, term=term).first()
+        
+        if balance:
+            # Recalculate total paid from remaining Payment records
+            total_paid = Payment.objects.filter(
+                student=student,
+                term=term
+            ).aggregate(Sum('amount'))['amount__sum'] or 0
+            
+            balance.amount_paid = total_paid
+            balance.save(update_fields=['amount_paid'])
+            
+    except Exception as e:
+        print(f"Error recalculating balance after payment delete: {e}")
         print(f"Error updating StudentBalance for payment {instance.id}: {e}")
 
 @receiver(post_save, sender=AcademicTerm)

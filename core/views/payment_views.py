@@ -40,10 +40,8 @@ def student_payment_details_api(request, student_id):
                 'message': f'{student.full_name} is archived (graduated with all fees paid). No further payments can be recorded.'
             }, status=403)
         
-        balance = StudentBalance.initialize_term_balance(student, current_term)
-        
-        # Handle graduated students - they don't have current term balance
-        if balance is None:
+        # Check if student is graduated (not active) - they can only pay arrears
+        if not student.is_active:
             # Graduated student - show ONLY their latest balance (which includes all arrears)
             # NOT sum of all balances (that would double-count)
             latest_balance = StudentBalance.objects.filter(student=student).order_by('-term__academic_year', '-term__term').first()
@@ -71,6 +69,12 @@ def student_payment_details_api(request, student_id):
             }
             return JsonResponse(response_data)
         
+        # Active student - get their current term balance
+        balance = StudentBalance.initialize_term_balance(student, current_term)
+        
+        if balance is None:
+            # Active student but no balance - shouldn't happen, but handle gracefully
+            return JsonResponse({'error': 'No balance record for this student in current term'}, status=400)
         
         # Calculate TOTAL outstanding - use CURRENT TERM balance only
         # (Previous terms' balances are already included as arrears in current term)
@@ -138,6 +142,7 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
         # For graduated students, find their LATEST balance term to record payment against
         if not student.is_active:
             # Graduated student - find their most recent balance
+            # This will be their latest balance record (usually from the current term or last term they have a balance for)
             latest_balance = StudentBalance.objects.filter(student=student).order_by('-term__academic_year', '-term__term').first()
             if latest_balance:
                 payment_term = latest_balance.term
@@ -149,8 +154,10 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
             # Active student - use current term
             payment_term = current_term
         
-        # Graduated (but not archived) students CAN pay their remaining arrears
-        # The system will apply it to their previous term balances via the signal
+        # Both active AND graduated (but not archived) students can make payments
+        # - Active students pay their current term fees/arrears
+        # - Graduated students can pay any remaining arrears
+        # The system will apply it correctly via the signal
         
         try:
             # Create a new Payment instance with all required fields
