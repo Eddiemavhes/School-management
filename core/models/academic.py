@@ -287,12 +287,18 @@ class Payment(models.Model):
             # Get or create next term balance so the system knows excess credit exists
             next_term = self._get_next_term()
             if next_term:
+                try:
+                    term_fee = TermFee.objects.get(term=next_term)
+                except TermFee.DoesNotExist:
+                    # No term fee set for next term - don't create balance yet
+                    return
+                
                 # Get or create balance for next term
                 next_balance, _ = StudentBalance.objects.get_or_create(
                     student=self.student,
                     term=next_term,
                     defaults={
-                        'term_fee': TermFee.objects.get(term=next_term).amount,
+                        'term_fee': term_fee.amount,
                         'previous_arrears': Decimal('0')
                     }
                 )
