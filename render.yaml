@@ -6,8 +6,7 @@ services:
     region: ohio
     plan: free
     startCommand: "gunicorn school_management.wsgi --log-file -"
-    buildCommand: "pip install -r requirements.txt"
-    postBuildCommand: "python manage.py migrate && python manage.py collectstatic --noinput"
+    buildCommand: "bash build.sh"
     envVars:
       - key: DEBUG
         value: "False"

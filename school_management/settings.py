@@ -125,8 +125,13 @@ if os.getenv('DATABASE_URL'):
             default=os.getenv('DATABASE_URL'),
             conn_max_age=600,
             conn_health_checks=True,
+            engine='django.db.backends.postgresql',
         )
     }
+    # Ensure psycopg is used for PostgreSQL
+    if 'OPTIONS' not in DATABASES['default']:
+        DATABASES['default']['OPTIONS'] = {}
+    DATABASES['default']['OPTIONS']['sslmode'] = 'require'
 elif USE_MYSQL:
     DATABASES = {
         'default': {
