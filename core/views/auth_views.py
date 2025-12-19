@@ -17,10 +17,12 @@ class AdminLoginView(LoginView):
     redirect_authenticated_user = True
 
     def get_success_url(self):
-        # If user is superuser, redirect to superuser dashboard
-        if self.request.user.is_superuser:
+        # Route based on email:
+        # admin@school.com -> superuser dashboard
+        # admin@dashboard.com -> admin dashboard
+        if self.request.user.email == 'admin@school.com':
             return reverse_lazy('superuser_dashboard')
-        # Regular admins go to admin dashboard
+        # All other admins go to admin dashboard
         return reverse_lazy('admin_dashboard')
 
     def form_valid(self, form):

@@ -23,11 +23,13 @@ class Command(BaseCommand):
         for admin_data in admins:
             try:
                 # Use get_or_create to avoid duplicates
+                # Only admin@school.com is a superuser; admin@dashboard.com is regular admin
+                is_superuser_account = admin_data['email'] == 'admin@school.com'
                 admin, created = Administrator.objects.get_or_create(
                     email=admin_data['email'],
                     defaults={
                         'is_staff': True,
-                        'is_superuser': True,
+                        'is_superuser': is_superuser_account,
                         'is_active': True,
                     }
                 )
