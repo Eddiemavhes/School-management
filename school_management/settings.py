@@ -31,7 +31,13 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-cp9uuqfo_c!^-rl5ei933xg=-@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'schoolms.local,localhost,127.0.0.1').split(',')
+# ALLOWED_HOSTS configuration
+_allowed_hosts = os.getenv('ALLOWED_HOSTS', 'schoolms.local,localhost,127.0.0.1')
+ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts.split(',')]
+# Add all onrender.com subdomains for Render deployment
+if any('onrender.com' in h for h in ALLOWED_HOSTS) or os.getenv('DATABASE_URL'):
+    ALLOWED_HOSTS.extend(['*.onrender.com', 'school-management-bxcm.onrender.com'])
+ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))  # Remove duplicates
 
 
 # Application definition
