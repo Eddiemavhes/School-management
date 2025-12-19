@@ -11,6 +11,7 @@ Core Philosophy:
 
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.utils import timezone
 from decimal import Decimal
 import uuid
@@ -62,7 +63,7 @@ class ArrearsVault(models.Model):
     fixed_balance = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        validators=[lambda x: x > 0],  # Must always be > 0 (else they'd be ALUMNI)
+        validators=[MinValueValidator(Decimal('0.01'))],  # Must always be > 0 (else they'd be ALUMNI)
         help_text="Fixed outstanding amount - NEVER CHANGES until paid"
     )
     
