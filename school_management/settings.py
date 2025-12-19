@@ -26,12 +26,12 @@ USE_MYSQL = os.getenv('USE_MYSQL', 'False').lower() == 'true'
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-cp9uuqfo_c!^-rl5ei933xg=-@*x%f9!o+9g!x3bhdmc!5vp0d'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-cp9uuqfo_c!^-rl5ei933xg=-@*x%f9!o+9g!x3bhdmc!5vp0d')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['schoolms.local', 'localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'schoolms.local,localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -80,6 +80,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -117,7 +118,16 @@ WSGI_APPLICATION = 'school_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-if USE_MYSQL:
+# For Render: Use DATABASE_URL environment variable if available
+if os.getenv('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+elif USE_MYSQL:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -239,4 +249,17 @@ LOGGING = {
         },
     },
 }
+
+# Production Security Settings
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_SECURITY_POLICY = {
+        "default-src": ("'self'",),
+    }
+
+# WhiteNoise configuration for static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

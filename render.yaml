@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: school-management
+    env: python
+    region: ohio
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+    startCommand: gunicorn school_management.wsgi --log-file -
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: USE_POSTGRESQL
+        value: "True"
+      - key: ALLOWED_HOSTS
+        value: "*.onrender.com"
+
+  - type: pserv
+    name: school-management-db
+    env: postgresql
+    region: ohio
+    plan: free
+    ipAllowList: []
