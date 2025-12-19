@@ -477,23 +477,30 @@
     <!-- Premium Navigation -->
     <nav class="fixed w-full z-50 top-0 backdrop-blur-xl border-b border-slate-500/20">
         <div class="bg-slate-900/80 backdrop-filter">
-            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <!-- Logo with School Name -->
-                <a href="/" class="flex items-center gap-3 group">
-                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-400 to-teal-400 flex items-center justify-center text-white font-bold text-lg group-hover:shadow-lg group-hover:shadow-blue-500/50 transition-all">
+                <a href="/" class="flex items-center gap-2 sm:gap-3 group min-w-0">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-blue-400 to-teal-400 flex items-center justify-center text-white font-bold text-sm sm:text-lg group-hover:shadow-lg group-hover:shadow-blue-500/50 transition-all flex-shrink-0">
                         A
                     </div>
-                    <div class="flex flex-col">
-                        <span class="text-xl font-bold bg-gradient-to-r from-blue-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent">AcademiaFlow</span>
+                    <div class="flex flex-col min-w-0 hidden sm:block">
+                        <span class="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent truncate">AcademiaFlow</span>
                         {% load custom_tags %}
                         {% school_name_tag as school_name %}
                         {% if school_name %}
-                        <span class="text-sm text-slate-300 font-medium">{{ school_name }}</span>
+                        <span class="text-xs sm:text-sm text-slate-300 font-medium truncate">{{ school_name }}</span>
                         {% endif %}
                     </div>
                 </a>
 
-                <!-- Navigation Links -->
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg hover:bg-slate-700/50 transition-colors" aria-label="Toggle menu">
+                    <svg class="w-6 h-6 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+                <!-- Desktop Navigation Links -->
                 <div class="hidden lg:flex items-center gap-1">
                     {% if user.is_authenticated %}
                         <a href="{% url 'admin_dashboard' %}" class="nav-link">Dashboard</a>
@@ -554,6 +561,67 @@
                     {% endif %}
                 </div>
             </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-700/50 bg-slate-900/95">
+                <div class="px-4 py-3 space-y-2">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'admin_dashboard' %}" class="mobile-nav-link">Dashboard</a>
+                        <a href="{% url 'class_list' %}" class="mobile-nav-link">Classes</a>
+                        <a href="{% url 'teacher_list' %}" class="mobile-nav-link">Teachers</a>
+                        <a href="{% url 'student_list' %}" class="mobile-nav-link">Students</a>
+                        
+                        <div class="border-t border-slate-700/50 mt-2 pt-2">
+                            <button class="mobile-menu-toggle w-full" data-target="finance-menu">
+                                <span>Finance</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="finance-menu" class="hidden ml-4 space-y-1 mt-2">
+                                <a href="{% url 'fee_dashboard' %}" class="mobile-nav-link text-sm">Fee Dashboard</a>
+                                <a href="{% url 'payment_list' %}" class="mobile-nav-link text-sm">Payment History</a>
+                                <a href="{% url 'payment_create' %}" class="mobile-nav-link text-sm">Record Payment</a>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-700/50 mt-2 pt-2">
+                            <button class="mobile-menu-toggle w-full" data-target="settings-menu">
+                                <span>Settings</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="settings-menu" class="hidden ml-4 space-y-1 mt-2">
+                                <a href="{% url 'school_details' %}" class="mobile-nav-link text-sm">School Details</a>
+                                <a href="{% url 'admin_settings' %}" class="mobile-nav-link text-sm">School Settings</a>
+                                <a href="{% url 'admin_profile' %}" class="mobile-nav-link text-sm">Profile</a>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-700/50 mt-2 pt-2">
+                            <button class="mobile-menu-toggle w-full" data-target="zimsec-menu">
+                                <span>ZIMSEC</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="zimsec-menu" class="hidden ml-4 space-y-1 mt-2">
+                                <a href="{% url 'zimsec_entry' %}" class="mobile-nav-link text-sm">Results Entry</a>
+                                <a href="{% url 'zimsec_results_list' %}" class="mobile-nav-link text-sm">View Results</a>
+                                <a href="{% url 'grade7_statistics' %}" class="mobile-nav-link text-sm">Statistics</a>
+                                <a href="{% url 'year_comparison' %}" class="mobile-nav-link text-sm">Compare Years</a>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-700/50 mt-2 pt-2">
+                            <a href="{% url 'logout' %}" class="mobile-nav-link text-red-400">Logout</a>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="mobile-nav-link bg-blue-600 hover:bg-blue-700">Login</a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -593,6 +661,44 @@
             transform: scaleX(1);
         }
 
+        .mobile-nav-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: rgba(226, 232, 240, 0.8);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+
+        .mobile-nav-link:hover {
+            background: rgba(96, 165, 250, 0.2);
+            color: #e0f2fe;
+            padding-left: 1.25rem;
+        }
+
+        .mobile-menu-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            color: rgba(226, 232, 240, 0.8);
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 0.5rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .mobile-menu-toggle:hover {
+            background: rgba(96, 165, 250, 0.2);
+            color: #e0f2fe;
+        }
+
         .dropdown-link {
             display: block;
             padding: 0.75rem 1rem;
@@ -611,11 +717,43 @@
     </style>
 
     <!-- Main Content -->
-    <div class="container mx-auto pt-24 px-6">
+    <div class="container mx-auto pt-20 sm:pt-24 px-4 sm:px-6">
         {% block content %}
         {% endblock %}
     </div>
     <script>
+        // Mobile menu toggle functionality
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuToggles = document.querySelectorAll('.mobile-menu-toggle');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when a link is clicked
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Handle submenu toggles
+        menuToggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = toggle.getAttribute('data-target');
+                const submenu = document.getElementById(target);
+                submenu.classList.toggle('hidden');
+                
+                // Rotate the arrow
+                const arrow = toggle.querySelector('svg');
+                if (arrow) {
+                    arrow.classList.toggle('rotate-180');
+                }
+            });
+        });
+
         // Ensure form controls use the modern classes at runtime (no Tailwind build required)
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('form input, form select, form textarea').forEach(function(el) {
