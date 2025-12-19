@@ -10,39 +10,47 @@ class Command(BaseCommand):
         admins = [
             {
                 'email': 'admin@dashboard.com',
-                'username': 'admin_dashboard',
                 'password': 'admin123',
                 'description': 'Admin Dashboard Account'
             },
             {
                 'email': 'admin@school.com',
-                'username': 'admin_school',
                 'password': 'admin123',
                 'description': 'School Admin Account'
             }
         ]
 
         for admin_data in admins:
-            if not Administrator.objects.filter(email=admin_data['email']).exists():
-                try:
-                    admin = Administrator.objects.create_user(
-                        email=admin_data['email'],
-                        username=admin_data['username'],
-                        password=admin_data['password'],
-                        is_staff=True,
-                        is_superuser=True,
-                        is_active=True
-                    )
+            try:
+                # Use get_or_create to avoid duplicates
+                admin, created = Administrator.objects.get_or_create(
+                    email=admin_data['email'],
+                    defaults={
+                        'is_staff': True,
+                        'is_superuser': True,
+                        'is_active': True,
+                    }
+                )
+                
+                if created:
+                    # Set password for new accounts
+                    admin.set_password(admin_data['password'])
+                    admin.save()
                     self.stdout.write(
                         self.style.SUCCESS(
-                            f'✓ Created admin account: {admin_data["email"]} - {admin_data["description"]}'
+                            f'✓ Created: {admin_data["email"]} ({admin_data["description"]})'
                         )
                     )
-                except Exception as e:
+                else:
+                    # Reset password for existing accounts (in case it was wrong)
+                    admin.set_password(admin_data['password'])
+                    admin.save()
                     self.stdout.write(
-                        self.style.ERROR(f'✗ Failed to create {admin_data["email"]}: {str(e)}')
+                        self.style.WARNING(
+                            f'⚠ Updated: {admin_data["email"]} ({admin_data["description"]})'
+                        )
                     )
-            else:
+            except Exception as e:
                 self.stdout.write(
-                    self.style.WARNING(f'⚠ Admin account already exists: {admin_data["email"]}')
+                    self.style.ERROR(f'✗ Error with {admin_data["email"]}: {str(e)}')
                 )
