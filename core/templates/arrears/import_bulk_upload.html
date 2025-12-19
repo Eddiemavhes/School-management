@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bulk Upload Arrears{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-black text-white">Bulk Upload Arrears</h1>
+                    <p class="text-cyan-300 text-sm font-semibold">Import multiple students at once</p>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex-1 h-2 bg-slate-700 rounded-full mx-2">
+                    <div class="h-full w-1/2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full"></div>
+                </div>
+                <span class="text-sm font-bold text-cyan-300">Step {{ step }} of {{ total_steps }}</span>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Upload Form -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Step 1: Download Template -->
+                <div class="bg-slate-800/90 backdrop-blur-xl border-2 border-green-500/30 rounded-2xl p-8 shadow-2xl">
+                    <h2 class="text-2xl font-bold text-white mb-2">📝 Step 1: Download Template</h2>
+                    <p class="text-gray-400 text-sm mb-6">Get a CSV template with all your students pre-filled</p>
+                    
+                    <a href="{% url 'arrears_import_download_template' batch_id=batch.batch_id %}" class="inline-flex items-center gap-2 py-3 px-6 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold transition-all duration-200 transform hover:scale-105 shadow-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Download CSV Template
+                    </a>
+                </div>
+                
+                <!-- Step 2: Upload File -->
+                <div class="bg-slate-800/90 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl p-8 shadow-2xl">
+                    <h2 class="text-2xl font-bold text-white mb-2">📤 Step 2: Upload Your File</h2>
+                    <p class="text-gray-400 text-sm mb-6">Fill in the amounts in Excel, then upload the CSV file</p>
+                    
+                    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <!-- File Upload -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-cyan-300 uppercase tracking-wider">Select File</label>
+                            {{ form.upload_file }}
+                            <p class="text-gray-400 text-xs">Supported: .xlsx, .xls, .csv (Max 5MB)</p>
+                            {% if form.upload_file.errors %}
+                                <div class="text-red-400 text-sm">{{ form.upload_file.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full py-3 px-6 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold transition-all duration-200 transform hover:scale-105 shadow-lg">
+                            📤 Upload & Process File
+                        </button>
+                    </form>
+                </div>
+                
+            </div>
+            
+            <!-- Help Section -->
+            <div class="lg:col-span-1">
+                <div class="bg-slate-800/90 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl p-6 shadow-2xl sticky top-6 space-y-6">
+                    
+                    <!-- File Format -->
+                    <div>
+                        <h3 class="text-lg font-bold text-cyan-300 mb-3">📋 File Format</h3>
+                        <div class="p-4 rounded-lg bg-cyan-500/10 border border-cyan-500/20 space-y-2 text-sm">
+                            <p class="text-gray-300"><strong>Required Columns:</strong></p>
+                            <ul class="space-y-1 text-gray-400 text-xs">
+                                <li>✓ Student ID</li>
+                                <li>✓ Student Name</li>
+                                <li>✓ Arrears Amount</li>
+                                <li>○ Description (Optional)</li>
+                                <li>○ Date Incurred (Optional)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Example -->
+                    <div>
+                        <h3 class="text-lg font-bold text-cyan-300 mb-3">📝 Example</h3>
+                        <div class="p-4 rounded-lg bg-slate-700/50 space-y-2 text-xs font-mono text-gray-300">
+                            <div>Student ID | Name | Amount</div>
+                            <div class="text-gray-500">─────────────────────────</div>
+                            <div>1 | Student A | 80.00</div>
+                            <div>2 | Student B | 150.00</div>
+                            <div>3 | Student C | 0.00</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tips -->
+                    <div>
+                        <h3 class="text-lg font-bold text-cyan-300 mb-3">💡 Tips</h3>
+                        <ul class="space-y-2 text-sm text-gray-300">
+                            <li>✓ Use the downloaded template</li>
+                            <li>✓ Fill in amounts in the Amount column</li>
+                            <li>✓ Save as CSV format</li>
+                            <li>✓ Students with 0 are fine (means no arrears)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

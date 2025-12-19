@@ -1,0 +1,1210 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ZIMSEC Statistics - Grade 7 Examination Results{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-20 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-950 via-purple-950/30 to-slate-950">
+    <!-- Vibrant Background -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-cyan-500/30 to-blue-600/20 rounded-full blur-3xl opacity-60 animate-pulse"></div>
+        <div class="absolute top-1/4 left-0 w-[450px] h-[450px] bg-gradient-to-tr from-purple-500/25 to-pink-500/15 rounded-full blur-3xl opacity-50 animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-0 right-1/3 w-[500px] h-[500px] bg-gradient-to-tl from-emerald-500/20 to-cyan-500/15 rounded-full blur-3xl opacity-50 animate-pulse" style="animation-delay: 2s;"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/40 to-slate-950/60"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="mb-12 text-center animate-slideInDown">
+            <div class="inline-flex items-center justify-center gap-3 mb-6">
+                <div class="h-1.5 w-20 bg-gradient-to-r from-transparent to-cyan-500 rounded-full"></div>
+                <div class="flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-600 p-0.5 shadow-2xl shadow-cyan-500/30">
+                    <div class="w-full h-full rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
+                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="h-1.5 w-20 bg-gradient-to-l from-transparent to-purple-500 rounded-full"></div>
+            </div>
+            
+            <h1 class="text-7xl font-black mb-4">
+                <span class="bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-500 bg-clip-text text-transparent drop-shadow-2xl">ZIMSEC</span>
+                <br>
+                <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-rose-400 bg-clip-text text-transparent">Statistics Dashboard</span>
+            </h1>
+            <p class="text-slate-400 text-base tracking-widest uppercase">Grade 7 Examination Analysis & Reporting</p>
+        </div>
+
+        <!-- Export Options Panel -->
+        <div class="mb-8 group relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-teal-600/20 to-cyan-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div class="relative rounded-2xl p-6 border-2 border-emerald-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl">
+                <h3 class="text-lg font-bold text-emerald-300 mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Export Data & Reports
+                </h3>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                    <!-- PowerPoint Export -->
+                    <a href="{% url 'export_powerpoint' %}?year={{ selected_year }}" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-red-500 to-orange-600 hover:shadow-lg hover:shadow-red-500/50 transition-all text-sm">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"></path>
+                        </svg>
+                        PowerPoint
+                    </a>
+                    
+                    <!-- Excel Export -->
+                    <a href="{% url 'export_excel' %}?year={{ selected_year }}" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:shadow-lg hover:shadow-green-500/50 transition-all text-sm">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"></path>
+                        </svg>
+                        Excel Data
+                    </a>
+                    
+                    <!-- PDF Export -->
+                    <a href="{% url 'export_pdf' %}?year={{ selected_year }}" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-blue-500 to-cyan-600 hover:shadow-lg hover:shadow-blue-500/50 transition-all text-sm">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"></path>
+                        </svg>
+                        PDF Report
+                    </a>
+                    
+                    <!-- Detailed Results PDF Export -->
+                    <a href="{% url 'export_detailed_results' %}?year={{ selected_year }}" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-indigo-500 to-blue-600 hover:shadow-lg hover:shadow-indigo-500/50 transition-all text-sm">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"></path>
+                        </svg>
+                        📋 Detailed Results
+                    </a>
+                    
+                    <!-- Grade 7 Completion Report -->
+                    <a href="{% url 'export_grade7_completion' %}" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-amber-500 to-orange-600 hover:shadow-lg hover:shadow-amber-500/50 transition-all text-sm">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000-2H3a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V4a1 1 0 00-1-1h-2a1 1 0 000 2h2v11H3V5z"></path>
+                        </svg>
+                        🎓 Grade 7 Report
+                    </a>
+                    
+                    <!-- HTML Export -->
+                    <a href="{% url 'export_html' %}?year={{ selected_year }}" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-purple-500 to-pink-600 hover:shadow-lg hover:shadow-purple-500/50 transition-all text-sm">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"></path>
+                        </svg>
+                        HTML Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Analytics Panel -->
+        <div class="mb-8 group relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-rose-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div class="relative rounded-2xl p-6 border-2 border-purple-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl">
+                <h3 class="text-lg font-bold text-purple-300 mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Advanced Analytics & Insights
+                </h3>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <!-- Comparison Analysis -->
+                    <a href="{% url 'comparison_advanced' %}?year={{ selected_year }}&type=year" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:shadow-lg hover:shadow-indigo-500/50 transition-all text-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Comparisons
+                    </a>
+                    
+                    <!-- Predictions -->
+                    <a href="{% url 'predictions' %}?year={{ selected_year }}" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-violet-500 to-indigo-600 hover:shadow-lg hover:shadow-violet-500/50 transition-all text-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        2028 Forecast
+                    </a>
+                    
+                    <!-- Statistical Tests -->
+                    <a href="{% url 'statistical_tests' %}?year={{ selected_year }}" class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-fuchsia-500 to-purple-600 hover:shadow-lg hover:shadow-fuchsia-500/50 transition-all text-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Statistical Tests
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Panel -->
+        <div class="mb-8 group relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-purple-600/20 to-pink-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div class="relative rounded-2xl p-8 border-2 border-cyan-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl">
+                <h3 class="text-xl font-bold text-cyan-300 mb-6 flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                    </svg>
+                    Filter By
+                </h3>
+                
+                <!-- Comparison Mode Toggle -->
+                <div class="mb-6 pb-6 border-b-2 border-slate-700/60">
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="comparisonToggle" class="w-5 h-5 rounded border-2 border-cyan-500 bg-slate-700 cursor-pointer" 
+                                   onchange="toggleComparisonMode()" {% if comparison_mode %}checked{% endif %}>
+                            <span class="text-sm font-bold text-cyan-300 uppercase tracking-wide">Compare Multiple Years</span>
+                        </label>
+                        <a href="?comparison_mode=off" class="px-4 py-2 rounded-lg font-bold bg-gradient-to-r from-orange-500 to-red-600 text-white hover:shadow-lg hover:shadow-orange-500/50 transition-all text-sm">Reset</a>
+                    </div>
+                </div>
+
+                <!-- Year Comparison Selection -->
+                <div id="comparisonYears" class="mb-6 {% if not comparison_mode %}hidden{% endif %} pb-6 border-b-2 border-slate-700/60">
+                    <p class="text-sm font-bold text-cyan-300 mb-3 uppercase tracking-wide">Select Years to Compare:</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {% for year in available_years_list %}
+                        <label class="flex items-center gap-2 p-3 rounded-lg bg-slate-700/40 border-2 border-slate-600 hover:border-cyan-500/50 cursor-pointer transition">
+                            <input type="checkbox" name="comparison_year" value="{{ year }}" class="w-4 h-4 rounded border-2 border-cyan-500 bg-slate-700 cursor-pointer"
+                                   {% if comparison_data and year in comparison_years %}checked{% endif %}>
+                            <span class="text-white font-semibold">{{ year }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3 flex gap-3">
+                        <button type="button" onclick="applyYearComparison()" class="px-6 py-2 rounded-lg font-bold bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-lg hover:shadow-cyan-500/50 transition-all text-sm">
+                            Compare Selected Years
+                        </button>
+                        <button type="button" onclick="selectAllYears()" class="px-6 py-2 rounded-lg font-bold text-cyan-300 border-2 border-cyan-500 text-sm hover:bg-cyan-500/10 transition">
+                            Select All
+                        </button>
+                    </div>
+                </div>
+                
+                <form method="get" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+                    <!-- Academic Filters -->
+                    <div>
+                        <label class="block text-sm font-bold text-cyan-300 mb-2 uppercase tracking-wide">Academic Year</label>
+                        <select name="year" class="w-full px-4 py-2 rounded-lg bg-slate-700/60 border-2 border-cyan-500/50 text-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/50">
+                            {% for year in available_years %}
+                                <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-cyan-300 mb-2 uppercase tracking-wide">Class</label>
+                        <select name="class" class="w-full px-4 py-2 rounded-lg bg-slate-700/60 border-2 border-cyan-500/50 text-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/50">
+                            <option value="all" {% if selected_class == 'all' %}selected{% endif %}>All Classes</option>
+                            {% for cls in all_classes %}
+                                <option value="{{ cls.section }}" {% if selected_class == cls.section %}selected{% endif %}>Grade {{ cls.grade }} Section {{ cls.section }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Demographic Filters -->
+                    <div>
+                        <label class="block text-sm font-bold text-cyan-300 mb-2 uppercase tracking-wide">Gender</label>
+                        <select name="gender" class="w-full px-4 py-2 rounded-lg bg-slate-700/60 border-2 border-cyan-500/50 text-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/50">
+                            <option value="all" {% if filters.gender == 'all' %}selected{% endif %}>All Genders</option>
+                            <option value="M" {% if filters.gender == 'M' %}selected{% endif %}>Male</option>
+                            <option value="F" {% if filters.gender == 'F' %}selected{% endif %}>Female</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Performance Filters -->
+                    <div>
+                        <label class="block text-sm font-bold text-cyan-300 mb-2 uppercase tracking-wide">Pass/Fail Status</label>
+                        <select name="pass_status" class="w-full px-4 py-2 rounded-lg bg-slate-700/60 border-2 border-cyan-500/50 text-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/50">
+                            <option value="all" {% if filters.pass_status == 'all' %}selected{% endif %}>All Students</option>
+                            <option value="PASS" {% if filters.pass_status == 'PASS' %}selected{% endif %}>Passed</option>
+                            <option value="FAIL" {% if filters.pass_status == 'FAIL' %}selected{% endif %}>Failed</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-cyan-300 mb-2 uppercase tracking-wide">Percentile Filter</label>
+                        <select name="percentile" class="w-full px-4 py-2 rounded-lg bg-slate-700/60 border-2 border-cyan-500/50 text-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/50">
+                            <option value="all" {% if filters.percentile == 'all' %}selected{% endif %}>All Percentiles</option>
+                            <option value="top10" {% if filters.percentile == 'top10' %}selected{% endif %}>Top 10%</option>
+                            <option value="top25" {% if filters.percentile == 'top25' %}selected{% endif %}>Top 25%</option>
+                            <option value="middle50" {% if filters.percentile == 'middle50' %}selected{% endif %}>Middle 50%</option>
+                            <option value="bottom25" {% if filters.percentile == 'bottom25' %}selected{% endif %}>Bottom 25%</option>
+                            <option value="bottom10" {% if filters.percentile == 'bottom10' %}selected{% endif %}>Bottom 10%</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-cyan-300 mb-2 uppercase tracking-wide">Outlier Filter</label>
+                        <select name="outlier_filter" class="w-full px-4 py-2 rounded-lg bg-slate-700/60 border-2 border-cyan-500/50 text-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/50">
+                            <option value="all" {% if filters.outlier_filter == 'all' %}selected{% endif %}>All Students</option>
+                            <option value="outliers_only" {% if filters.outlier_filter == 'outliers_only' %}selected{% endif %}>Outliers Only</option>
+                            <option value="normal_only" {% if filters.outlier_filter == 'normal_only' %}selected{% endif %}>Normal Only</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Aggregate Range -->
+                    <div>
+                        <label class="block text-sm font-bold text-cyan-300 mb-2 uppercase tracking-wide">Min Aggregate</label>
+                        <input type="number" name="aggregate_min" step="0.01" placeholder="Min" class="w-full px-4 py-2 rounded-lg bg-slate-700/60 border-2 border-cyan-500/50 text-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/50" 
+                               {% if filters.aggregate_min %}value="{{ filters.aggregate_min }}"{% endif %}>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-cyan-300 mb-2 uppercase tracking-wide">Max Aggregate</label>
+                        <input type="number" name="aggregate_max" step="0.01" placeholder="Max" class="w-full px-4 py-2 rounded-lg bg-slate-700/60 border-2 border-cyan-500/50 text-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/50" 
+                               {% if filters.aggregate_max %}value="{{ filters.aggregate_max }}"{% endif %}>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="flex gap-2">
+                        <button type="submit" class="flex-1 px-8 py-2 rounded-lg font-bold bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-lg hover:shadow-cyan-500/50 transition-all">
+                            Apply Filters
+                        </button>
+                        <a href="?" class="px-6 py-2 rounded-lg font-bold bg-gradient-to-r from-orange-500 to-red-600 text-white hover:shadow-lg hover:shadow-orange-500/50 transition-all">
+                            Reset
+                        </a>
+                    </div>
+                </form>
+                
+                <!-- Active Filters Display -->
+                {% if active_filters %}
+                <div class="mt-6 pt-6 border-t-2 border-slate-700/60">
+                    <p class="text-sm font-bold text-green-300 mb-3 uppercase tracking-wide">Active Filters ({{ active_filters|length }}):</p>
+                    <div class="flex flex-wrap gap-2">
+                        {% for filter_item in active_filters %}
+                        <span class="px-3 py-1 rounded-full bg-green-500/20 border-2 border-green-500/50 text-green-300 text-xs font-semibold">
+                            {{ filter_item }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% if total_students_unfiltered != total_students_filtered %}
+                    <p class="text-xs text-gray-400 mt-3">Showing <span class="text-cyan-300 font-bold">{{ total_students_filtered }}</span> of <span class="text-cyan-300 font-bold">{{ total_students_unfiltered }}</span> students</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if no_data %}
+        <div class="rounded-2xl p-12 bg-slate-800/70 border-2 border-yellow-500/50 text-center">
+            <svg class="w-16 h-16 mx-auto mb-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-xl font-bold text-yellow-300">{{ message }}</p>
+        </div>
+
+        {% else %}
+
+        <!-- Overview Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <!-- Total Students Card -->
+            <div class="group relative animate-slideInUp">
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-600/40 to-cyan-600/30 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                <div class="relative rounded-xl p-6 border-2 border-blue-500/60 bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-300 text-sm font-semibold uppercase tracking-wide mb-2">Total Students</p>
+                            <p class="text-4xl font-black text-white">{{ overview_stats.total_students }}</p>
+                        </div>
+                        <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overall Pass Rate Card -->
+            <div class="group relative animate-slideInUp" style="animation-delay: 0.1s;">
+                <div class="absolute inset-0 bg-gradient-to-br from-green-600/40 to-emerald-600/30 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                <div class="relative rounded-xl p-6 border-2 border-green-500/60 bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-green-300 text-sm font-semibold uppercase tracking-wide mb-2">Pass Rate</p>
+                            <p class="text-4xl font-black text-white">{{ overview_stats.overall_pass_rate }}%</p>
+                            <p class="text-xs text-gray-400 mt-1">{{ overview_stats.passed_students }}/{{ overview_stats.total_students }} students</p>
+                        </div>
+                        <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Average Aggregate Card -->
+            <div class="group relative animate-slideInUp" style="animation-delay: 0.2s;">
+                <div class="absolute inset-0 bg-gradient-to-br from-purple-600/40 to-pink-600/30 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                <div class="relative rounded-xl p-6 border-2 border-purple-500/60 bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-purple-300 text-sm font-semibold uppercase tracking-wide mb-2">Avg Aggregate</p>
+                            <p class="text-4xl font-black text-white">{{ overview_stats.average_aggregate }}</p>
+                            <p class="text-xs text-gray-400 mt-1">Lower is better</p>
+                        </div>
+                        <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Student Card -->
+            <div class="group relative animate-slideInUp" style="animation-delay: 0.3s;">
+                <div class="absolute inset-0 bg-gradient-to-br from-amber-600/40 to-orange-600/30 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                <div class="relative rounded-xl p-6 border-2 border-amber-500/60 bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-amber-300 text-sm font-semibold uppercase tracking-wide mb-2">Top Student</p>
+                            {% if overview_stats.top_student %}
+                                <p class="text-lg font-bold text-white">{{ overview_stats.top_student.name }}</p>
+                                <p class="text-xs text-gray-400 mt-1">Agg: {{ overview_stats.top_student.aggregate }} ({{ overview_stats.top_student.class }})</p>
+                            {% else %}
+                                <p class="text-gray-400">No data</p>
+                            {% endif %}
+                        </div>
+                        <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Year Comparison Dashboard -->
+        {% if comparison_available and comparison_data %}
+        <div class="mb-12 group relative animate-slideInUp">
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-emerald-600/20 to-teal-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div class="relative rounded-2xl overflow-hidden border-2 border-cyan-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl p-8">
+                <h2 class="text-2xl font-black text-white mb-8 flex items-center gap-3">
+                    <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Year-Over-Year Comparison
+                </h2>
+
+                <!-- Year Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    {% for year in comparison_years %}
+                    <div class="group relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-blue-600/20 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-all"></div>
+                        <div class="relative p-6 rounded-xl bg-slate-700/50 border-2 border-cyan-500/40 hover:border-cyan-500/80 transition">
+                            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-600">
+                                <h3 class="text-xl font-black text-cyan-300">{{ year }}</h3>
+                                {% if forloop.counter == comparison_years|length %}
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/30 text-cyan-200">Latest</span>
+                                {% endif %}
+                            </div>
+                            <div id="year-card-{{ year }}" class="space-y-2 text-sm">
+                                <!-- Year card data will be loaded via JavaScript -->
+                                <p class="text-gray-400">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Trend Analysis -->
+                {% if comparison_data.changes %}
+                <div class="mb-8 p-6 rounded-xl bg-slate-700/30 border border-slate-600">
+                    <h3 class="text-lg font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Trend Analysis
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="p-4 rounded-lg bg-slate-700/40 border border-slate-600">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Pass Rate</p>
+                            <p class="text-2xl font-black {% if comparison_data.trends.pass_rate == 'improving' %}text-green-400{% elif comparison_data.trends.pass_rate == 'declining' %}text-red-400{% else %}text-gray-400{% endif %}">
+                                {% if comparison_data.trends.pass_rate == 'improving' %}↗{% elif comparison_data.trends.pass_rate == 'declining' %}↘{% else %}→{% endif %}
+                            </p>
+                            <p class="text-xs text-gray-300 mt-1">{{ comparison_data.trends.pass_rate }}</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-700/40 border border-slate-600">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Avg Aggregate</p>
+                            <p class="text-2xl font-black {% if comparison_data.trends.average_aggregate == 'improving' %}text-green-400{% elif comparison_data.trends.average_aggregate == 'declining' %}text-red-400{% else %}text-gray-400{% endif %}">
+                                {% if comparison_data.trends.average_aggregate == 'improving' %}↘{% elif comparison_data.trends.average_aggregate == 'declining' %}↗{% else %}→{% endif %}
+                            </p>
+                            <p class="text-xs text-gray-300 mt-1">{{ comparison_data.trends.average_aggregate }}</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-700/40 border border-slate-600">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Distinction Rate</p>
+                            <p class="text-2xl font-black {% if comparison_data.trends.distinction_rate == 'improving' %}text-green-400{% elif comparison_data.trends.distinction_rate == 'declining' %}text-red-400{% else %}text-gray-400{% endif %}">
+                                {% if comparison_data.trends.distinction_rate == 'improving' %}↗{% elif comparison_data.trends.distinction_rate == 'declining' %}↘{% else %}→{% endif %}
+                            </p>
+                            <p class="text-xs text-gray-300 mt-1">{{ comparison_data.trends.distinction_rate }}</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-700/40 border border-slate-600">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Enrollment</p>
+                            <p class="text-2xl font-black {% if comparison_data.trends.total_students == 'improving' %}text-green-400{% elif comparison_data.trends.total_students == 'declining' %}text-red-400{% else %}text-gray-400{% endif %}">
+                                {% if comparison_data.trends.total_students == 'improving' %}↗{% elif comparison_data.trends.total_students == 'declining' %}↘{% else %}→{% endif %}
+                            </p>
+                            <p class="text-xs text-gray-300 mt-1">{{ comparison_data.trends.total_students }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- 2028 Projections -->
+                {% if comparison_data.projections %}
+                <div class="p-6 rounded-xl bg-purple-500/10 border-2 border-purple-500/30">
+                    <h3 class="text-lg font-bold text-purple-300 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        2028 Projections (Based on {{ comparison_years|first }}-{{ comparison_years|last }} Trend)
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                        <div class="p-4 rounded-lg bg-slate-700/40 border border-purple-500/30">
+                            <p class="text-xs font-bold text-purple-300 uppercase tracking-wide mb-2">Expected Pass Rate</p>
+                            <p class="text-3xl font-black text-purple-300">{{ comparison_data.projections.pass_rate }}%</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-700/40 border border-purple-500/30">
+                            <p class="text-xs font-bold text-purple-300 uppercase tracking-wide mb-2">Expected Avg Aggregate</p>
+                            <p class="text-3xl font-black text-purple-300">{{ comparison_data.projections.average_aggregate }}</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-700/40 border border-purple-500/30">
+                            <p class="text-xs font-bold text-purple-300 uppercase tracking-wide mb-2">Expected Distinction Rate</p>
+                            <p class="text-3xl font-black text-purple-300">{{ comparison_data.projections.distinction_rate }}%</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-700/40 border border-purple-500/30">
+                            <p class="text-xs font-bold text-purple-300 uppercase tracking-wide mb-2">Expected Students</p>
+                            <p class="text-3xl font-black text-purple-300">{{ comparison_data.projections.total_students }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Advanced Statistical Analysis Panel -->
+        {% if advanced_stats %}
+        <div class="mb-12 group relative animate-slideInUp">
+            <div class="absolute inset-0 bg-gradient-to-r from-indigo-600/20 via-blue-600/20 to-cyan-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div class="relative rounded-2xl overflow-hidden border-2 border-indigo-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl">
+                <div class="p-8">
+                    <h2 class="text-2xl font-black text-white mb-8 flex items-center gap-3">
+                        <svg class="w-8 h-8 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6z"></path>
+                        </svg>
+                        Advanced Statistical Analysis
+                    </h2>
+                    
+                    <!-- Desktop Grid Layout -->
+                    <div class="hidden lg:grid grid-cols-4 gap-6 mb-8">
+                        <!-- Central Tendency Column -->
+                        <div class="p-6 rounded-xl bg-slate-700/40 border border-indigo-500/30">
+                            <h3 class="text-sm font-bold text-indigo-300 uppercase tracking-widest mb-4">Central Tendency</h3>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between items-start">
+                                    <span class="text-gray-300">Mean:</span>
+                                    <span class="font-bold {% if advanced_stats.mean_color == 'green' %}text-green-300{% elif advanced_stats.mean_color == 'orange' %}text-orange-300{% else %}text-red-300{% endif %}">{{ advanced_stats.mean }}</span>
+                                </div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-gray-300">Median:</span>
+                                    <span class="font-bold text-cyan-300">{{ advanced_stats.median }}</span>
+                                </div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-gray-300">Mode:</span>
+                                    <span class="font-bold text-purple-300">{{ advanced_stats.mode }} <span class="text-xs text-gray-400">({{ advanced_stats.mode_frequency }})</span></span>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-slate-600">
+                                    <span class="text-gray-300 text-xs uppercase">Shape:</span>
+                                    <p class="font-bold text-yellow-300 mt-1">{{ advanced_stats.shape_icon }} {{ advanced_stats.distribution_shape }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dispersion Column -->
+                        <div class="p-6 rounded-xl bg-slate-700/40 border border-indigo-500/30">
+                            <h3 class="text-sm font-bold text-indigo-300 uppercase tracking-widest mb-4">Dispersion</h3>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between items-start">
+                                    <span class="text-gray-300">Std Dev:</span>
+                                    <span class="font-bold {% if advanced_stats.std_dev_color == 'green' %}text-green-300{% elif advanced_stats.std_dev_color == 'orange' %}text-orange-300{% else %}text-red-300{% endif %}">{{ advanced_stats.std_dev }}</span>
+                                </div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-gray-300">Variance:</span>
+                                    <span class="font-bold text-cyan-300">{{ advanced_stats.variance }}</span>
+                                </div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-gray-300">Range:</span>
+                                    <span class="font-bold text-purple-300">{{ advanced_stats.range }} <span class="text-xs text-gray-400">({{ advanced_stats.range_display }})</span></span>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-slate-600">
+                                    <span class="text-gray-300 text-xs uppercase">IQR:</span>
+                                    <p class="font-bold text-yellow-300 mt-1">{{ advanced_stats.iqr }} (Q1={{ advanced_stats.q1 }}, Q3={{ advanced_stats.q3 }})</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Percentiles Column -->
+                        <div class="p-6 rounded-xl bg-slate-700/40 border border-indigo-500/30">
+                            <h3 class="text-sm font-bold text-indigo-300 uppercase tracking-widest mb-4">Percentiles</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between items-start">
+                                    <span class="text-gray-300 text-xs">P90:</span>
+                                    <span class="font-bold text-green-300">≤{{ advanced_stats.percentiles.p90 }}</span>
+                                </div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-gray-300 text-xs">P75:</span>
+                                    <span class="font-bold text-cyan-300">≤{{ advanced_stats.percentiles.p75 }}</span>
+                                </div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-gray-300 text-xs">P50:</span>
+                                    <span class="font-bold text-yellow-300">{{ advanced_stats.percentiles.p50 }}</span>
+                                </div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-gray-300 text-xs">P25:</span>
+                                    <span class="font-bold text-orange-300">≤{{ advanced_stats.percentiles.p25 }}</span>
+                                </div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-gray-300 text-xs">P10:</span>
+                                    <span class="font-bold text-red-300">≤{{ advanced_stats.percentiles.p10 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Outliers Column -->
+                        <div class="p-6 rounded-xl bg-slate-700/40 border border-indigo-500/30">
+                            <h3 class="text-sm font-bold text-indigo-300 uppercase tracking-widest mb-4">Outliers</h3>
+                            <div class="flex flex-col items-center justify-center h-full">
+                                {% if advanced_stats.outlier_count > 0 %}
+                                    <div class="text-4xl font-black text-red-400 mb-2">{{ advanced_stats.outlier_count }}</div>
+                                    <p class="text-sm text-gray-300 text-center mb-4">outliers detected</p>
+                                    <button onclick="openOutlierModal()" class="px-4 py-2 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 text-xs font-bold transition-colors">
+                                        VIEW LIST
+                                    </button>
+                                {% else %}
+                                    <div class="text-4xl font-black text-green-400 mb-2">✓</div>
+                                    <p class="text-sm text-gray-300 text-center">No outliers detected</p>
+                                    <p class="text-xs text-gray-500 mt-2">Data is consistent</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Stacked Layout -->
+                    <div class="lg:hidden space-y-4 mb-8">
+                        <!-- Central Tendency -->
+                        <div class="p-4 rounded-lg bg-slate-700/40 border border-indigo-500/30">
+                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest mb-3">Central Tendency</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between"><span class="text-gray-300">Mean:</span><span class="font-bold {% if advanced_stats.mean_color == 'green' %}text-green-300{% elif advanced_stats.mean_color == 'orange' %}text-orange-300{% else %}text-red-300{% endif %}">{{ advanced_stats.mean }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-300">Median:</span><span class="font-bold text-cyan-300">{{ advanced_stats.median }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-300">Mode:</span><span class="font-bold text-purple-300">{{ advanced_stats.mode }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-300">Shape:</span><span class="font-bold text-yellow-300">{{ advanced_stats.distribution_shape }}</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Dispersion -->
+                        <div class="p-4 rounded-lg bg-slate-700/40 border border-indigo-500/30">
+                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest mb-3">Dispersion</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between"><span class="text-gray-300">Std Dev:</span><span class="font-bold {% if advanced_stats.std_dev_color == 'green' %}text-green-300{% elif advanced_stats.std_dev_color == 'orange' %}text-orange-300{% else %}text-red-300{% endif %}">{{ advanced_stats.std_dev }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-300">Variance:</span><span class="font-bold text-cyan-300">{{ advanced_stats.variance }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-300">Range:</span><span class="font-bold text-purple-300">{{ advanced_stats.range }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-300">IQR:</span><span class="font-bold text-yellow-300">{{ advanced_stats.iqr }}</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Percentiles -->
+                        <div class="p-4 rounded-lg bg-slate-700/40 border border-indigo-500/30">
+                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest mb-3">Percentiles</h3>
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between"><span class="text-gray-300">P90:</span><span class="font-bold text-green-300">{{ advanced_stats.percentiles.p90 }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-300">P75:</span><span class="font-bold text-cyan-300">{{ advanced_stats.percentiles.p75 }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-300">P50:</span><span class="font-bold text-yellow-300">{{ advanced_stats.percentiles.p50 }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-300">P25:</span><span class="font-bold text-orange-300">{{ advanced_stats.percentiles.p25 }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-300">P10:</span><span class="font-bold text-red-300">{{ advanced_stats.percentiles.p10 }}</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Outliers -->
+                        <div class="p-4 rounded-lg bg-slate-700/40 border border-indigo-500/30">
+                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest mb-3">Outliers</h3>
+                            {% if advanced_stats.outlier_count > 0 %}
+                                <p class="text-sm font-bold text-red-300 mb-2">{{ advanced_stats.outlier_count }} outliers detected</p>
+                                <button onclick="openOutlierModal()" class="w-full px-3 py-2 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 text-xs font-bold transition-colors">
+                                    VIEW LIST
+                                </button>
+                            {% else %}
+                                <p class="text-sm text-gray-300">✓ No outliers detected</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Normality & Interpretation -->
+                    <div class="p-6 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-sm">
+                        <p class="text-gray-300 mb-2">
+                            <span class="font-bold text-indigo-300">Distribution Shape:</span>
+                            {{ advanced_stats.distribution_shape }} (Skewness: {{ advanced_stats.skewness }})
+                        </p>
+                        <p class="text-gray-400 text-xs">
+                            {% if "Normal" in advanced_stats.distribution_shape %}
+                                Data is approximately normally distributed - students' scores are fairly evenly spread across the range.
+                            {% elif "Right-skewed" in advanced_stats.distribution_shape %}
+                                Data is right-skewed - most students achieved lower aggregates with a few achieving higher ones (performing better).
+                            {% else %}
+                                Data is left-skewed - most students achieved higher aggregates with a few achieving lower ones.
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Subject Performance Table -->
+        <div class="mb-12 group relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-cyan-600/20 to-blue-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div class="relative rounded-2xl overflow-hidden border-2 border-emerald-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl">
+                <div class="p-8">
+                    <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
+                        <svg class="w-8 h-8 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6z"></path>
+                        </svg>
+                        Subject Performance
+                    </h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b-2 border-cyan-500/30">
+                                    <th class="text-left py-3 px-4 text-cyan-300 font-bold">Subject</th>
+                                    <th class="text-center py-3 px-4 text-cyan-300 font-bold">Avg Units</th>
+                                    <th class="text-center py-3 px-4 text-cyan-300 font-bold">Pass Rate</th>
+                                    <th class="text-center py-3 px-4 text-cyan-300 font-bold">Distinction</th>
+                                    <th class="text-left py-3 px-4 text-cyan-300 font-bold">Performance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subject in subject_stats %}
+                                <tr class="border-b border-slate-700/50 hover:bg-slate-700/40 transition-colors">
+                                    <td class="py-4 px-4 font-semibold text-white">{{ subject.name }}</td>
+                                    <td class="py-4 px-4 text-center text-cyan-300 font-bold">{{ subject.avg_units }}</td>
+                                    <td class="py-4 px-4 text-center">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold {% if subject.color == 'green' %}bg-green-500/20 text-green-300{% elif subject.color == 'orange' %}bg-orange-500/20 text-orange-300{% else %}bg-red-500/20 text-red-300{% endif %}">
+                                            {{ subject.pass_rate }}%
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 text-center text-emerald-300 font-semibold">{{ subject.distinction_count }}</td>
+                                    <td class="py-4 px-4">
+                                        <div class="w-full bg-slate-700/40 rounded-full h-2 overflow-hidden">
+                                            <div class="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all" style="width: {{ subject.pass_rate }}%"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Class Performance Table -->
+        <div class="mb-12 group relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-cyan-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div class="relative rounded-2xl overflow-hidden border-2 border-purple-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl">
+                <div class="p-8">
+                    <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
+                        <svg class="w-8 h-8 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M7 3a1 1 0 000 2h6a1 1 0 000-2H7zM4 7a1 1 0 011-1h10a1 1 0 011 1v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"></path>
+                        </svg>
+                        Class Performance
+                    </h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b-2 border-purple-500/30">
+                                    <th class="text-left py-3 px-4 text-purple-300 font-bold">Class</th>
+                                    <th class="text-center py-3 px-4 text-purple-300 font-bold">Students</th>
+                                    <th class="text-center py-3 px-4 text-purple-300 font-bold">Avg Aggregate</th>
+                                    <th class="text-center py-3 px-4 text-purple-300 font-bold">Pass Rate</th>
+                                    <th class="text-center py-3 px-4 text-purple-300 font-bold">Top Agg</th>
+                                    <th class="text-center py-3 px-4 text-purple-300 font-bold">Bottom Agg</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cls in class_stats %}
+                                <tr class="border-b border-slate-700/50 hover:bg-slate-700/40 transition-colors">
+                                    <td class="py-4 px-4 font-semibold text-white">{{ cls.name }}</td>
+                                    <td class="py-4 px-4 text-center text-purple-300 font-bold">{{ cls.student_count }}</td>
+                                    <td class="py-4 px-4 text-center text-cyan-300 font-bold">{{ cls.avg_aggregate }}</td>
+                                    <td class="py-4 px-4 text-center">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold {% if cls.color == 'green' %}bg-green-500/20 text-green-300{% elif cls.color == 'orange' %}bg-orange-500/20 text-orange-300{% else %}bg-red-500/20 text-red-300{% endif %}">
+                                            {{ cls.pass_rate }}%
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 text-center text-emerald-300 font-semibold">{{ cls.top_aggregate }}</td>
+                                    <td class="py-4 px-4 text-center text-red-300 font-semibold">{{ cls.bottom_aggregate }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 Performers -->
+        <div class="mb-12 group relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-green-600/20 via-emerald-600/20 to-cyan-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div class="relative rounded-2xl overflow-hidden border-2 border-green-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl">
+                <div class="p-8">
+                    <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
+                        <svg class="w-8 h-8 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                        Top 10 Performers
+                    </h2>
+                    
+                    <div class="space-y-3">
+                        {% for performer in top_performers %}
+                        <div class="flex items-center gap-4 p-4 rounded-lg bg-slate-700/40 hover:bg-slate-700/60 transition-colors border border-green-500/30">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center font-bold text-white text-lg">
+                                #{{ performer.rank }}
+                            </div>
+                            <div class="flex-grow">
+                                <p class="font-bold text-white">{{ performer.name }}</p>
+                                <p class="text-xs text-gray-400">{{ performer.class }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-emerald-300">{{ performer.aggregate }}</p>
+                                <p class="text-xs text-gray-400">Aggregate</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom 10 Performers -->
+        <div class="mb-12 group relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-red-600/20 via-orange-600/20 to-yellow-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div class="relative rounded-2xl overflow-hidden border-2 border-red-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl">
+                <div class="p-8">
+                    <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
+                        <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17H9v4H7v-4H3v-2h4v-4h2v4h4v2z"></path>
+                        </svg>
+                        Bottom 10 Performers
+                    </h2>
+                    
+                    <div class="space-y-3">
+                        {% for performer in bottom_performers %}
+                        <div class="flex items-center gap-4 p-4 rounded-lg bg-slate-700/40 hover:bg-slate-700/60 transition-colors border border-red-500/30">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center font-bold text-white text-lg">
+                                #{{ performer.rank }}
+                            </div>
+                            <div class="flex-grow">
+                                <p class="font-bold text-white">{{ performer.name }}</p>
+                                <p class="text-xs text-gray-400">{{ performer.class }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-red-300">{{ performer.aggregate }}</p>
+                                <p class="text-xs text-gray-400">Aggregate</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
+            <!-- Aggregate Distribution -->
+            <div class="group relative">
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+                <div class="relative rounded-2xl overflow-hidden border-2 border-blue-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl p-8">
+                    <h3 class="text-lg font-bold text-white mb-6">Distribution of Aggregates</h3>
+                    <canvas id="aggregateChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Subject Pass Rates -->
+            <div class="group relative">
+                <div class="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+                <div class="relative rounded-2xl overflow-hidden border-2 border-purple-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl p-8">
+                    <h3 class="text-lg font-bold text-white mb-6">Subject Pass Rates</h3>
+                    <canvas id="subjectChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Class Comparison -->
+            <div class="group relative">
+                <div class="absolute inset-0 bg-gradient-to-br from-orange-600/20 to-yellow-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+                <div class="relative rounded-2xl overflow-hidden border-2 border-orange-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl p-8">
+                    <h3 class="text-lg font-bold text-white mb-6">Class Comparison</h3>
+                    <canvas id="classChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Pass/Fail Pie Chart -->
+            <div class="group relative">
+                <div class="absolute inset-0 bg-gradient-to-br from-green-600/20 to-emerald-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+                <div class="relative rounded-2xl overflow-hidden border-2 border-green-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl p-8">
+                    <h3 class="text-lg font-bold text-white mb-6">Pass/Fail Distribution</h3>
+                    <canvas id="passFailChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const chartColors = {
+    primary: '#06b6d4',
+    success: '#10b981',
+    warning: '#f59e0b',
+    danger: '#ef4444',
+    info: '#3b82f6',
+    purple: '#a855f7',
+    pink: '#ec4899'
+};
+
+// Aggregate Distribution Chart
+{% if distribution %}
+const aggregateCtx = document.getElementById('aggregateChart');
+if (aggregateCtx) {
+    const distributionData = {{ distribution_json|safe }};
+    new Chart(aggregateCtx, {
+        type: 'bar',
+        data: {
+            labels: distributionData.labels,
+            datasets: [{
+                label: 'Number of Students',
+                data: distributionData.data,
+                backgroundColor: [
+                    '#10b981',
+                    '#10b981',
+                    '#f59e0b',
+                    '#f59e0b',
+                    '#ef4444'
+                ],
+                borderColor: '#06b6d4',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    labels: { color: '#e5e7eb', font: { size: 12, weight: 'bold' } }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: { color: '#9ca3af' },
+                    grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                },
+                x: {
+                    ticks: { color: '#9ca3af' },
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
+{% endif %}
+
+// Subject Pass Rates Chart
+{% if subject_pass_json %}
+const subjectCtx = document.getElementById('subjectChart');
+if (subjectCtx) {
+    const subjectData = {{ subject_pass_json|safe }};
+    new Chart(subjectCtx, {
+        type: 'bar',
+        data: {
+            labels: subjectData.labels,
+            datasets: [{
+                label: 'Pass Rate (%)',
+                data: subjectData.data,
+                backgroundColor: subjectData.data.map(val => {
+                    if (val >= 90) return '#10b981';
+                    if (val >= 75) return '#f59e0b';
+                    return '#ef4444';
+                }),
+                borderColor: '#06b6d4',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    labels: { color: '#e5e7eb', font: { size: 12, weight: 'bold' } }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#9ca3af' },
+                    grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                    max: 100
+                },
+                y: {
+                    ticks: { color: '#9ca3af' },
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
+{% endif %}
+
+// Class Comparison Chart
+{% if class_comparison_json %}
+const classCtx = document.getElementById('classChart');
+if (classCtx) {
+    const classData = {{ class_comparison_json|safe }};
+    new Chart(classCtx, {
+        type: 'bar',
+        data: {
+            labels: classData.labels,
+            datasets: [
+                {
+                    label: 'Avg Aggregate',
+                    data: classData.avg_aggregates,
+                    backgroundColor: '#06b6d4',
+                    borderColor: '#0891b2',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Pass Rate (%)',
+                    data: classData.pass_rates,
+                    backgroundColor: '#10b981',
+                    borderColor: '#059669',
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    labels: { color: '#e5e7eb', font: { size: 12, weight: 'bold' } }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: { color: '#9ca3af' },
+                    grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                },
+                x: {
+                    ticks: { color: '#9ca3af' },
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
+{% endif %}
+
+// Pass/Fail Pie Chart
+{% if passfail_json %}
+const passFailCtx = document.getElementById('passFailChart');
+if (passFailCtx) {
+    const passFailData = {{ passfail_json|safe }};
+    new Chart(passFailCtx, {
+        type: 'doughnut',
+        data: {
+            labels: passFailData.labels,
+            datasets: [{
+                data: passFailData.data,
+                backgroundColor: ['#10b981', '#ef4444'],
+                borderColor: '#1f2937',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    labels: { color: '#e5e7eb', font: { size: 12, weight: 'bold' } }
+                }
+            }
+        }
+    });
+}
+{% endif %}
+
+// Outlier Modal Function
+function openOutlierModal() {
+    const modal = document.getElementById('outlierModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+}
+
+function closeOutlierModal() {
+    const modal = document.getElementById('outlierModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('outlierModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeOutlierModal();
+            }
+        });
+    }
+});
+</script>
+
+<!-- Outlier Modal -->
+<div id="outlierModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="relative rounded-2xl p-8 max-w-2xl max-h-96 overflow-y-auto border-2 border-red-500/60 bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-xl shadow-2xl animate-slideInUp">
+        <button onclick="closeOutlierModal()" class="absolute top-6 right-6 p-2 rounded-lg hover:bg-slate-700/50 transition-colors">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        
+        <h3 class="text-2xl font-black text-white mb-2">Statistical Outliers</h3>
+        <p class="text-sm text-gray-400 mb-6">Students identified using the 1.5×IQR rule</p>
+        
+        {% if advanced_stats.outlier_count > 0 %}
+            <div class="space-y-4">
+                <div class="p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-sm text-gray-300">
+                    <p><span class="font-bold">Detection Method:</span> 1.5×IQR Rule</p>
+                    <p><span class="font-bold">Lower Bound:</span> Q1 - (1.5 × IQR) = {{ advanced_stats.q1 }} - (1.5 × {{ advanced_stats.iqr }}) = {{ advanced_stats.lower_bound }}</p>
+                    <p><span class="font-bold">Upper Bound:</span> Q3 + (1.5 × IQR) = {{ advanced_stats.q3 }} + (1.5 × {{ advanced_stats.iqr }}) = {{ advanced_stats.upper_bound }}</p>
+                </div>
+                
+                <div class="mt-6">
+                    <h4 class="text-sm font-bold text-red-300 mb-3">Students Above {{ advanced_stats.upper_bound }} Units:</h4>
+                    <div class="space-y-2">
+                        {% for result in results %}
+                            {% if result.total_aggregate > advanced_stats.upper_bound %}
+                                <div class="p-3 rounded-lg bg-slate-700/40 border border-red-500/30 flex items-center justify-between">
+                                    <div>
+                                        <p class="font-semibold text-white">{{ result.student.surname }}, {{ result.student.first_name }}</p>
+                                        <p class="text-xs text-gray-400">{{ result.student.current_class.grade }} Section {{ result.student.current_class.section }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-lg font-bold text-red-400">{{ result.total_aggregate }}</p>
+                                        <p class="text-xs text-gray-400">Aggregate</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Toggle comparison mode
+function toggleComparisonMode() {
+    const toggle = document.getElementById('comparisonToggle');
+    const comparisonYears = document.getElementById('comparisonYears');
+    
+    if (toggle.checked) {
+        comparisonYears.classList.remove('hidden');
+    } else {
+        comparisonYears.classList.add('hidden');
+        // Reset to single year view
+        window.location.href = '{% url "grade7_statistics" %}?year={{ selected_year }}&comparison_mode=off';
+    }
+}
+
+// Apply year comparison
+function applyYearComparison() {
+    const checkboxes = document.querySelectorAll('input[name="comparison_year"]:checked');
+    const selectedYears = Array.from(checkboxes).map(cb => cb.value);
+    
+    if (selectedYears.length === 0) {
+        alert('Please select at least one year to compare');
+        return;
+    }
+    
+    const yearsParam = selectedYears.join(',');
+    window.location.href = '{% url "grade7_statistics" %}?comparison_mode=on&years=' + yearsParam;
+}
+
+// Select all years
+function selectAllYears() {
+    const checkboxes = document.querySelectorAll('input[name="comparison_year"]');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    
+    checkboxes.forEach(cb => {
+        cb.checked = !allChecked;
+    });
+}
+
+// Load year card data from JSON
+{% if year_cards_json %}
+document.addEventListener('DOMContentLoaded', function() {
+    const yearCardsData = {{ year_cards_json|safe }};
+    
+    Object.keys(yearCardsData).forEach(year => {
+        const data = yearCardsData[year];
+        const cardElement = document.getElementById('year-card-' + year);
+        
+        if (cardElement) {
+            cardElement.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-300">Students:</span>
+                    <span class="font-bold text-white">${data.total_students}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-300">Pass Rate:</span>
+                    <span class="font-bold text-green-300">${data.pass_rate}%</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-300">Avg Aggregate:</span>
+                    <span class="font-bold text-purple-300">${data.average_aggregate}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-300">Distinction:</span>
+                    <span class="font-bold text-amber-300">${data.distinction_rate}%</span>
+                </div>
+                ${data.top_aggregate ? `
+                <div class="flex justify-between items-center pt-2 border-t border-slate-600">
+                    <span class="text-gray-300 text-xs">Best Score:</span>
+                    <span class="font-bold text-cyan-300">${data.top_aggregate}</span>
+                </div>
+                ` : ''}
+            `;
+        }
+    });
+});
+{% endif %}
+</script>
+
+{% endblock %}

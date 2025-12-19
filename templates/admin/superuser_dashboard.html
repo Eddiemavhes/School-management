@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Superuser Dashboard - System Administration{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card-gradient {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+        backdrop-filter: blur(10px);
+    }
+    
+    .metric-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(148, 163, 184, 0.3);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .stat-value {
+        font-size: clamp(1.875rem, 4vw, 2.25rem);
+        font-weight: 700;
+        letter-spacing: -0.025em;
+    }
+    
+    .section-title {
+        background: linear-gradient(90deg, #fff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .badge-success {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+    }
+    
+    .badge-warning {
+        background: rgba(234, 179, 8, 0.1);
+        color: #eab308;
+    }
+    
+    .badge-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-slideUp {
+        animation: slideUp 0.6s ease-out forwards;
+    }
+    
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <!-- Header Section -->
+    <div class="relative overflow-hidden border-b border-slate-700/50 bg-gradient-to-r from-slate-900/50 to-transparent">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div class="relative p-8">
+            <div class="mb-2">
+                <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold badge-success">
+                    ✓ System Operational
+                </span>
+            </div>
+            <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                Superuser Dashboard
+            </h1>
+            <p class="text-slate-400 text-lg">Complete system administration and oversight panel</p>
+        </div>
+    </div>
+
+    <div class="p-8 space-y-8">
+
+    <!-- Financial Overview Section -->
+    <section class="animate-slideUp delay-1">
+        <div class="flex items-center gap-3 mb-6">
+            <span class="text-4xl">💰</span>
+            <h2 class="section-title text-3xl font-bold">Financial Overview</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Total Fees Card -->
+            <div class="metric-card card-gradient rounded-xl p-8 border border-slate-700/50">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-2xl">📊</span>
+                    <span class="text-sm font-semibold text-amber-400">THIS TERM</span>
+                </div>
+                <div class="stat-value text-amber-400">${{ financial.total_fees|floatformat:0 }}</div>
+                <p class="text-sm text-slate-400 mt-3">{{ financial.term_name }}</p>
+                <div class="mt-4 pt-4 border-t border-slate-700/50">
+                    <p class="text-xs text-slate-500">{{ financial.balance_records }} student balance records</p>
+                </div>
+            </div>
+
+            <!-- Total Collected Card -->
+            <div class="metric-card card-gradient rounded-xl p-8 border border-slate-700/50">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-2xl">✓</span>
+                    <span class="badge badge-success">COLLECTED</span>
+                </div>
+                <div class="stat-value text-green-400">${{ financial.total_collected|floatformat:0 }}</div>
+                <p class="text-sm text-slate-400 mt-3">{{ financial.students_paid }} students have paid</p>
+                <div class="mt-4 pt-4 border-t border-slate-700/50 flex items-center justify-between">
+                    <span class="text-xs text-slate-500">Payment success rate</span>
+                    <span class="text-sm font-semibold text-green-400">{{ financial.collection_rate }}%</span>
+                </div>
+            </div>
+
+            <!-- Collection Rate Card -->
+            <div class="metric-card card-gradient rounded-xl p-8 border border-slate-700/50">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-2xl">📈</span>
+                    <span class="badge badge-success">RATE</span>
+                </div>
+                <div class="stat-value text-cyan-400">{{ financial.collection_rate }}%</div>
+                <p class="text-sm text-slate-400 mt-3">Overall collection efficiency</p>
+                <div class="mt-4 pt-4 border-t border-slate-700/50">
+                    <div class="w-full bg-slate-700/30 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full" style="width: {{ financial.collection_rate }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Financial Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <!-- Outstanding Card -->
+            <div class="metric-card card-gradient rounded-xl p-8 border border-slate-700/50">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-2xl">⚠️</span>
+                    <span class="badge badge-warning">OUTSTANDING</span>
+                </div>
+                <div class="stat-value text-red-400">${{ financial.total_outstanding|floatformat:0 }}</div>
+                <p class="text-sm text-slate-400 mt-3">Amount still owed by students</p>
+                <div class="mt-4 pt-4 border-t border-slate-700/50">
+                    <p class="text-xs text-slate-500">This requires immediate attention</p>
+                </div>
+            </div>
+
+            <!-- Students in Arrears Card -->
+            <div class="metric-card card-gradient rounded-xl p-8 border border-slate-700/50">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-2xl">👥</span>
+                    <span class="badge badge-danger">ARREARS</span>
+                </div>
+                <div class="stat-value text-red-500">{{ financial.students_in_arrears }}</div>
+                <p class="text-sm text-slate-400 mt-3">Students with outstanding balances</p>
+                <div class="mt-4 pt-4 border-t border-slate-700/50">
+                    <p class="text-xs text-slate-500">Recommend follow-up actions</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Student Population Section -->
+    <section class="animate-slideUp delay-2">
+        <div class="flex items-center gap-3 mb-6">
+            <span class="text-4xl">👥</span>
+            <h2 class="section-title text-3xl font-bold">Student Population</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            <!-- Total Students -->
+            <div class="metric-card card-gradient rounded-xl p-6 border border-slate-700/50 flex flex-col justify-center">
+                <p class="text-slate-400 text-sm font-semibold mb-2">Total Students</p>
+                <div class="stat-value text-white">
+                    {% if students.total %}
+                        {{ students.total }}
+                    {% else %}
+                        {{ students.total|default:"ERROR" }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Active -->
+            <div class="metric-card card-gradient rounded-xl p-6 border border-slate-700/50 flex flex-col justify-center">
+                <p class="text-slate-400 text-sm font-semibold mb-2">Active</p>
+                <div class="stat-value text-green-400">{{ students.by_status.active }}</div>
+            </div>
+
+            <!-- Enrolled -->
+            <div class="metric-card card-gradient rounded-xl p-6 border border-slate-700/50 flex flex-col justify-center">
+                <p class="text-slate-400 text-sm font-semibold mb-2">Enrolled</p>
+                <div class="stat-value text-blue-400">{{ students.by_status.enrolled }}</div>
+            </div>
+
+            <!-- Male -->
+            <div class="metric-card card-gradient rounded-xl p-6 border border-slate-700/50 flex flex-col justify-center">
+                <p class="text-slate-400 text-sm font-semibold mb-2">Male</p>
+                <div class="stat-value text-cyan-400">{{ students.by_gender.male }}</div>
+            </div>
+
+            <!-- Female -->
+            <div class="metric-card card-gradient rounded-xl p-6 border border-slate-700/50 flex flex-col justify-center">
+                <p class="text-slate-400 text-sm font-semibold mb-2">Female</p>
+                <div class="stat-value text-pink-400">{{ students.by_gender.female }}</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- System Health Section -->
+    <section class="animate-slideUp delay-3">
+        <div class="flex items-center gap-3 mb-6">
+            <span class="text-4xl">⚙️</span>
+            <h2 class="section-title text-3xl font-bold">System Health</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Status -->
+            <div class="metric-card card-gradient rounded-xl p-8 border border-slate-700/50">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-2xl">✓</span>
+                    <span class="inline-block w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+                </div>
+                <p class="text-slate-400 text-sm font-semibold mb-2">Status</p>
+                <div class="text-2xl font-bold text-green-400">{{ system.status }}</div>
+            </div>
+
+            <!-- Database -->
+            <div class="metric-card card-gradient rounded-xl p-8 border border-slate-700/50">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-2xl">🗄️</span>
+                    <span class="badge badge-success">ACTIVE</span>
+                </div>
+                <p class="text-slate-400 text-sm font-semibold mb-2">Database</p>
+                <div class="text-2xl font-bold text-green-400">{{ system.database }}</div>
+            </div>
+
+            <!-- Uptime -->
+            <div class="metric-card card-gradient rounded-xl p-8 border border-slate-700/50">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-2xl">📊</span>
+                    <span class="badge badge-success">RELIABLE</span>
+                </div>
+                <p class="text-slate-400 text-sm font-semibold mb-2">Uptime</p>
+                <div class="text-2xl font-bold text-blue-400">{{ system.uptime }}</div>
+            </div>
+
+            <!-- Disk Usage -->
+            <div class="metric-card card-gradient rounded-xl p-8 border border-slate-700/50">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-2xl">💾</span>
+                    <span class="text-xs font-semibold text-slate-400">{{ system.disk_usage }}%</span>
+                </div>
+                <p class="text-slate-400 text-sm font-semibold mb-2">Disk Usage</p>
+                <div class="w-full bg-slate-700/30 rounded-full h-2 mt-2">
+                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full" style="width: {{ system.disk_usage }}%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- User Management Section -->
+    <section class="animate-slideUp delay-4">
+        <div class="flex items-center gap-3 mb-6">
+            <span class="text-4xl">👤</span>
+            <h2 class="section-title text-3xl font-bold">User Management</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            <!-- Total Users -->
+            <div class="metric-card card-gradient rounded-xl p-6 border border-slate-700/50">
+                <p class="text-slate-400 text-sm font-semibold mb-2">Total Users</p>
+                <div class="stat-value text-white">{{ users.total_users }}</div>
+            </div>
+
+            <!-- Superusers -->
+            <div class="metric-card card-gradient rounded-xl p-6 border border-slate-700/50">
+                <p class="text-slate-400 text-sm font-semibold mb-2">Superusers</p>
+                <div class="stat-value text-red-400">{{ users.superusers }}</div>
+            </div>
+
+            <!-- Administrators -->
+            <div class="metric-card card-gradient rounded-xl p-6 border border-slate-700/50">
+                <p class="text-slate-400 text-sm font-semibold mb-2">Administrators</p>
+                <div class="stat-value text-purple-400">{{ users.administrators }}</div>
+            </div>
+
+            <!-- Active Users -->
+            <div class="metric-card card-gradient rounded-xl p-6 border border-slate-700/50">
+                <p class="text-slate-400 text-sm font-semibold mb-2">Active Users</p>
+                <div class="stat-value text-green-400">{{ users.active_users }}</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- System Alerts Section -->
+    {% if alerts %}
+    <section class="animate-slideUp">
+        <div class="flex items-center gap-3 mb-6">
+            <span class="text-4xl">🚨</span>
+            <h2 class="section-title text-3xl font-bold">System Alerts</h2>
+        </div>
+        
+        <div class="space-y-4">
+            {% for alert in alerts %}
+            <div class="card-gradient rounded-xl p-6 border-l-4 {% if alert.level == 'critical' %}border-l-red-500 border-red-500/20{% elif alert.level == 'alert' %}border-l-orange-500 border-orange-500/20{% else %}border-l-yellow-500 border-yellow-500/20{% endif %} border border-slate-700/50">
+                <div class="flex items-start gap-4">
+                    <span class="text-3xl mt-1">{{ alert.icon }}</span>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-lg mb-1">{{ alert.title }}</h3>
+                        <p class="text-slate-300">{{ alert.message }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Recent Activity Section -->
+    {% if recent_activity %}
+    <section class="animate-slideUp">
+        <div class="flex items-center gap-3 mb-6">
+            <span class="text-4xl">📋</span>
+            <h2 class="section-title text-3xl font-bold">Recent Activity</h2>
+        </div>
+        
+        <div class="card-gradient rounded-xl border border-slate-700/50 overflow-hidden">
+            <div class="divide-y divide-slate-700/50">
+                {% for activity in recent_activity %}
+                <div class="p-6 hover:bg-slate-800/50 transition-colors duration-200">
+                    <div class="flex items-center gap-4">
+                        <span class="text-3xl">{{ activity.icon }}</span>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-semibold text-white truncate">{{ activity.description }}</p>
+                            <p class="text-xs text-slate-400 mt-1">{{ activity.timestamp|date:"M d, Y • H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <section class="animate-slideUp">
+        <div class="flex items-center gap-3 mb-6">
+            <span class="text-4xl">⚙️</span>
+            <h2 class="section-title text-3xl font-bold">System Administration</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- System Settings Action -->
+            <a href="{% url 'system_admin' %}" class="metric-card group card-gradient rounded-xl p-8 border border-slate-700/50 text-center transform transition-all duration-300 hover:scale-105">
+                <div class="text-5xl mb-4">⚙️</div>
+                <h3 class="text-xl font-bold mb-2 group-hover:text-purple-400 transition-colors">System Administration</h3>
+                <p class="text-slate-400 text-sm">Reset system data, manage passwords, configure settings</p>
+            </a>
+        </div>
+    </section>
+
+</div>
+</div>
+{% endblock %}

@@ -214,6 +214,22 @@
             </div>
         </div>
     </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div class="glass border border-red-500/30 rounded-2xl p-8 max-w-md shadow-2xl">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 rounded-lg bg-red-500/20 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></path></svg>
+                </div>
+                <h3 id="errorModalTitle" class="text-xl font-bold text-slate-100">Error</h3>
+            </div>
+            <p id="errorModalMessage" class="text-slate-300 mb-6"></p>
+            <button onclick="closeErrorModal()" class="w-full px-4 py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white rounded-lg font-semibold transition-all hover:shadow-lg hover:shadow-red-500/40">
+                OK
+            </button>
+        </div>
+    </div>
 </div>
 
 {% endblock %}
@@ -252,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function fetchAvailableClasses() {
-    fetch('/api/classes/')
+    fetch(`/api/classes/?student_id=${studentId}`)
         .then(response => response.json())
         .then(data => {
             classes = data;
@@ -329,7 +345,7 @@ function confirmPromotion() {
     const reason = document.getElementById('promoteReason').value;
     
     if (!newClassId) {
-        alert('Please select a class');
+        showModal('Promotion Error', 'Please select a class to promote the student to');
         return;
     }
     
@@ -349,12 +365,12 @@ function confirmPromotion() {
         if (data.success) {
             window.location.reload();
         } else {
-            alert(data.error || 'Failed to promote student');
+            showModal('Promotion Error', data.error || 'Failed to promote student');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Failed to promote student');
+        showModal('Promotion Error', 'An error occurred during promotion');
     });
 }
 
@@ -363,7 +379,7 @@ function confirmTransfer() {
     const reason = document.getElementById('transferReason').value;
     
     if (!newClassId) {
-        alert('Please select a class');
+        showModal('Transfer Error', 'Please select a class to transfer the student to');
         return;
     }
     
@@ -383,12 +399,12 @@ function confirmTransfer() {
         if (data.success) {
             window.location.reload();
         } else {
-            alert(data.error || 'Failed to transfer student');
+            showModal('Transfer Error', data.error || 'Failed to transfer student');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Failed to transfer student');
+        showModal('Transfer Error', 'An error occurred during transfer');
     });
 }
 
@@ -397,12 +413,12 @@ function confirmDemotion() {
     const reason = document.getElementById('demoteReason').value;
     
     if (!newClassId) {
-        alert('Please select a class');
+        showModal('Demotion Error', 'Please select a class to demote the student to');
         return;
     }
     
     if (!reason) {
-        alert('Please provide a reason for demotion');
+        showModal('Demotion Error', 'Please provide a reason for demotion');
         return;
     }
     
@@ -422,12 +438,12 @@ function confirmDemotion() {
         if (data.success) {
             window.location.reload();
         } else {
-            alert(data.error || 'Failed to demote student');
+            showModal('Demotion Error', data.error || 'Failed to demote student');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Failed to demote student');
+        showModal('Demotion Error', 'An error occurred during demotion');
     });
 }
 
@@ -445,6 +461,17 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+// Error Modal Functions
+function showModal(title, message) {
+    document.getElementById('errorModalTitle').textContent = title;
+    document.getElementById('errorModalMessage').textContent = message;
+    document.getElementById('errorModal').classList.remove('hidden');
+}
+
+function closeErrorModal() {
+    document.getElementById('errorModal').classList.add('hidden');
 }
 </script>
 {% endblock %}

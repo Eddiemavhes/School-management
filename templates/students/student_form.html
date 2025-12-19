@@ -1,64 +1,209 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Student{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Student{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-900 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-3xl mx-auto relative z-10">
         <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-4xl md:text-5xl font-black text-white mb-3 tracking-tight">{% if form.instance.pk %}Edit{% else %}Add New{% endif %} Student</h1>
-            <p class="text-lg text-indigo-200">Enter the student information below</p>
-            <div class="h-1 w-20 bg-gradient-to-r from-blue-400 to-purple-500 rounded mt-4"></div>
+        <div class="mb-8 animate-slideInUp">
+            <a href="{% url 'student_list' %}" class="inline-flex items-center text-emerald-400 hover:text-emerald-300 mb-4 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Students
+            </a>
+            <h1 class="text-5xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-300 bg-clip-text text-transparent mb-3">
+                {% if form.instance.pk %}Edit Student{% else %}Create New Student{% endif %}
+            </h1>
+            <p class="text-slate-400 text-lg">{% if form.instance.pk %}Update student information{% else %}Add a new student to your school{% endif %}</p>
         </div>
 
-        <!-- Form Container -->
-        <div class="bg-gradient-to-br from-slate-800/60 to-slate-900/60 border border-purple-500/20 backdrop-blur-sm rounded-2xl p-10 shadow-2xl">
-            <form method="post" class="space-y-6">
-                {% csrf_token %}
-                <div class="grid grid-cols-1 gap-8 sm:grid-cols-2">
-                    {% for field in form %}
-                    <div>
-                        <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-indigo-200 mb-3">
-                            {{ field.label }}
-                        </label>
-                        <div class="mt-1">
-                            {% if field.field.widget.input_type == 'select' %}
-                                {{ field }}
-                            {% else %}
-                                {{ field }}
-                            {% endif %}
-                        </div>
-                        {% if field.errors %}
-                        <p class="mt-2 text-sm text-red-300 font-semibold">{{ field.errors.0 }}</p>
-                        {% endif %}
+        <!-- Main Form Card -->
+        <div class="glass rounded-2xl border border-slate-500/20 overflow-hidden animate-slideInUp">
+            <!-- Card Header -->
+            <div class="bg-gradient-to-r from-emerald-600/20 to-cyan-600/20 px-8 py-6 border-b border-slate-500/20">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
                     </div>
-                    {% endfor %}
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Student Information</h2>
+                        <p class="text-sm text-slate-400">Fill in all required fields</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <form method="post" class="p-8">
+                {% csrf_token %}
+
+                <!-- Personal Information Section -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-slate-100 mb-6 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+                        Personal Details
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% for field in form %}
+                            {% if field.name in 'first_name,middle_name,surname,sex' %}
+                            <div>
+                                <label for="{{ field.id_for_label }}" class="block text-sm font-bold text-slate-200 mb-3">
+                                    {{ field.label }}
+                                    {% if field.field.required %}<span class="text-red-400">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ field }}
+                                    {% if field.errors %}
+                                    <div class="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/30">
+                                        <p class="text-sm text-red-300">{{ field.errors.0 }}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
 
-                <!-- Form Buttons -->
-                <div class="flex justify-end gap-4 pt-8 border-t border-purple-500/20">
-                    <a href="{% url "student_list" %}" class="px-6 py-3 bg-slate-700/60 hover:bg-slate-600 text-white font-bold rounded-lg transition-all duration-300 shadow-md">
+                <!-- Date & Guardian Section -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-slate-100 mb-6 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-cyan-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.3A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z" clip-rule="evenodd"/></svg>
+                        Birth & Guardian Info
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% for field in form %}
+                            {% if field.name in 'date_of_birth,birth_entry_number,guardian_name,guardian_contact' %}
+                            <div>
+                                <label for="{{ field.id_for_label }}" class="block text-sm font-bold text-slate-200 mb-3">
+                                    {{ field.label }}
+                                    {% if field.field.required %}<span class="text-red-400">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ field }}
+                                    {% if field.errors %}
+                                    <div class="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/30">
+                                        <p class="text-sm text-red-300">{{ field.errors.0 }}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Class & Address Section -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-slate-100 mb-6 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+                        Class & Address
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% for field in form %}
+                            {% if field.name in 'current_class,street_address,city,country' %}
+                            <div>
+                                <label for="{{ field.id_for_label }}" class="block text-sm font-bold text-slate-200 mb-3">
+                                    {{ field.label }}
+                                    {% if field.field.required %}<span class="text-red-400">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ field }}
+                                    {% if field.errors %}
+                                    <div class="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/30">
+                                        <p class="text-sm text-red-300">{{ field.errors.0 }}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Other Fields -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-slate-100 mb-6 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-teal-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000-2 4 4 0 00-4 4v10a4 4 0 004 4h12a4 4 0 004-4V5a4 4 0 00-4-4 1 1 0 000 2 2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clip-rule="evenodd"/></svg>
+                        Additional Info
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% for field in form %}
+                            {% if field.name not in 'first_name,middle_name,surname,sex,date_of_birth,birth_entry_number,guardian_name,guardian_contact,current_class,street_address,city,country' %}
+                            <div>
+                                <label for="{{ field.id_for_label }}" class="block text-sm font-bold text-slate-200 mb-3">
+                                    {{ field.label }}
+                                    {% if field.field.required %}<span class="text-red-400">*</span>{% endif %}
+                                </label>
+                                <div class="relative">
+                                    {{ field }}
+                                    {% if field.errors %}
+                                    <div class="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/30">
+                                        <p class="text-sm text-red-300">{{ field.errors.0 }}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-600/30">
+                    <a href="{% url 'student_list' %}" class="flex-1 px-6 py-3.5 rounded-lg bg-slate-700/50 border border-slate-600/50 text-slate-300 font-bold hover:bg-slate-700 transition-all text-center flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
                         Cancel
                     </a>
-                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-lg transition-all duration-300 shadow-lg">
-                        Save Student
+                    <button type="submit" class="flex-1 px-6 py-3.5 rounded-lg bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold hover:from-emerald-600 hover:to-cyan-600 hover:shadow-lg hover:shadow-emerald-500/30 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        {% if form.instance.pk %}Update Student{% else %}Create Student{% endif %}
                     </button>
                 </div>
             </form>
+        </div>
+
+        <!-- Info Box -->
+        <div class="mt-8 glass rounded-2xl p-6 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.1s;">
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zm-11-1a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white mb-2">Required Fields</h3>
+                    <ul class="text-sm text-slate-400 space-y-1">
+                        <li>✓ All fields marked with <span class="text-red-400">*</span> are required</li>
+                        <li>✓ Birth Entry Number must be unique</li>
+                        <li>✓ Guardian contact information is important for communication</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Ensure all form inputs and selects have proper styling */
-    input,
-    select,
-    textarea {
-        color: #0f172a !important;
-    }
-
+    /* Form Input Styling */
     input[type="text"],
     input[type="email"],
     input[type="number"],
@@ -67,10 +212,10 @@
     textarea {
         width: 100%;
         padding: 0.75rem 1rem;
-        border-radius: 0.75rem;
-        background: rgba(255, 255, 255, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: #0f172a !important;
+        border-radius: 0.5rem;
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(71, 85, 105, 0.5);
+        color: #f1f5f9;
         font-weight: 500;
         transition: all 0.3s ease;
     }
@@ -82,39 +227,30 @@
     select:focus,
     textarea:focus {
         outline: none;
-        background: rgba(255, 255, 255, 0.25) !important;
-        border-color: rgba(59, 130, 246, 0.8);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        color: #0f172a !important;
+        background: rgba(30, 41, 59, 0.7);
+        border-color: rgba(16, 185, 129, 0.6);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
 
     input[type="text"]::placeholder,
     input[type="email"]::placeholder,
     input[type="number"]::placeholder {
-        color: rgba(255, 255, 255, 0.6) !important;
+        color: rgba(226, 232, 240, 0.5);
     }
 
-    /* Select dropdown styling */
     select {
         appearance: none;
-        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f1f5f9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
         background-repeat: no-repeat;
         background-position: right 0.75rem center;
         background-size: 1.5em 1.5em;
         padding-right: 2.5rem;
+        cursor: pointer;
     }
 
-    /* Label styling - ensure visibility */
     label {
-        color: #e0e7ff !important;
+        color: #e2e8f0;
         display: block;
-    }
-
-    .form-input,
-    .form-select,
-    .form-textarea {
-        color: #0f172a !important;
-        background: rgba(255, 255, 255, 0.15) !important;
     }
 </style>
 
@@ -122,7 +258,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll(".datepicker").forEach(function(el) {
+        document.querySelectorAll("input[type='date']").forEach(function(el) {
             flatpickr(el, {
                 dateFormat: "Y-m-d",
                 enableTime: false,

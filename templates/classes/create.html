@@ -11,7 +11,7 @@
         <div class="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
     </div>
 
-    <div class="max-w-2xl mx-auto relative z-10">
+    <div class="max-w-3xl mx-auto relative z-10">
         <!-- Header -->
         <div class="mb-8 animate-slideInUp">
             <a href="/classes/" class="inline-flex items-center text-blue-400 hover:text-blue-300 mb-4 transition-colors">
@@ -20,21 +20,44 @@
                 </svg>
                 Back to Classes
             </a>
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent mb-2">Create New Class</h1>
-            <p class="text-slate-400">Add a new class to your school</p>
+            <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent mb-3">Create New Class</h1>
+            <p class="text-slate-400 text-lg">Set up a new class for your school</p>
         </div>
 
-        <!-- Form Card -->
-        <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp">
-            <form id="classForm" method="POST" action="/classes/create/">
+        <!-- Main Form Card -->
+        <div class="glass rounded-2xl border border-slate-500/20 overflow-hidden animate-slideInUp">
+            <!-- Card Header -->
+            <div class="bg-gradient-to-r from-blue-600/20 to-teal-600/20 px-8 py-6 border-b border-slate-500/20">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m5 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Class Information</h2>
+                        <p class="text-sm text-slate-400">Enter the grade, section, and teacher assignment</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <form id="classForm" method="POST" action="/classes/create/" class="p-8">
                 {% csrf_token %}
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <!-- Grade and Section Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <!-- Grade -->
                     <div>
-                        <label for="grade" class="block text-sm font-bold text-slate-200 mb-3">Grade *</label>
-                        <select id="grade" name="grade" required class="w-full px-5 py-3.5 rounded-lg bg-white/95 border-2 border-slate-400 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all focus:bg-white cursor-pointer hover:bg-white/98">
-                            <option value="" class="text-slate-600">Select Grade</option>
+                        <label for="grade" class="block text-sm font-bold text-slate-200 mb-3">
+                            <span class="inline-flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
+                                Grade
+                            </span>
+                            <span class="text-red-400 ml-1">*</span>
+                        </label>
+                        <select id="grade" name="grade" required class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-600/50 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-slate-500 hover:border-slate-600 cursor-pointer">
+                            <option value="" class="text-slate-600">Select a grade...</option>
                             <option value="1">Grade 1</option>
                             <option value="2">Grade 2</option>
                             <option value="3">Grade 3</option>
@@ -43,50 +66,111 @@
                             <option value="6">Grade 6</option>
                             <option value="7">Grade 7</option>
                         </select>
+                        <p class="text-xs text-slate-500 mt-2">Choose the grade level for this class</p>
                     </div>
 
                     <!-- Section -->
                     <div>
-                        <label for="section" class="block text-sm font-bold text-slate-200 mb-3">Section *</label>
-                        <select id="section" name="section" required class="w-full px-5 py-3.5 rounded-lg bg-white/95 border-2 border-slate-400 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all focus:bg-white cursor-pointer hover:bg-white/98">
-                            <option value="" class="text-slate-600">Select Section</option>
+                        <label for="section" class="block text-sm font-bold text-slate-200 mb-3">
+                            <span class="inline-flex items-center gap-2">
+                                <svg class="w-4 h-4 text-teal-400" fill="currentColor" viewBox="0 0 20 20"><path d="M5 9V7a1 1 0 011-1h8a1 1 0 011 1v2M5 9a2 2 0 002 2h6a2 2 0 002-2m-6 4h6a2 2 0 110 4H9a2 2 0 110-4z"/></svg>
+                                Section
+                            </span>
+                            <span class="text-red-400 ml-1">*</span>
+                        </label>
+                        <select id="section" name="section" required class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-600/50 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all placeholder-slate-500 hover:border-slate-600 cursor-pointer">
+                            <option value="" class="text-slate-600">Select a section...</option>
                             <option value="A">Section A</option>
                             <option value="B">Section B</option>
                             <option value="C">Section C</option>
                             <option value="D">Section D</option>
                         </select>
+                        <p class="text-xs text-slate-500 mt-2">Choose the class section/group</p>
                     </div>
                 </div>
 
-                <!-- Teacher -->
+                <!-- Teacher Selection -->
                 <div class="mb-8">
-                    <label for="teacher" class="block text-sm font-bold text-slate-200 mb-3">Teacher (Optional)</label>
-                    <select id="teacher" name="teacher" class="w-full px-5 py-3.5 rounded-lg bg-white/95 border-2 border-slate-400 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all focus:bg-white cursor-pointer hover:bg-white/98">
+                    <label for="teacher" class="block text-sm font-bold text-slate-200 mb-3">
+                        <span class="inline-flex items-center gap-2">
+                            <svg class="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10.5 1.5H5.75a2 2 0 00-2 2v12.5a2 2 0 002 2h8.5a2 2 0 002-2V8.75m-12.5-5h6m-6 3h6M4 15h6"/></svg>
+                            Class Teacher
+                        </span>
+                        <span class="text-slate-500 ml-1">(Optional)</span>
+                    </label>
+                    <select id="teacher" name="teacher" class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-600/50 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder-slate-500 hover:border-slate-600 cursor-pointer">
                         <option value="" class="text-slate-600">-- No Teacher Assigned --</option>
                         {% for teacher in available_teachers %}
                         <option value="{{ teacher.id }}">{{ teacher.full_name }}</option>
                         {% endfor %}
                     </select>
+                    <p class="text-xs text-slate-500 mt-2">You can assign a teacher later if needed</p>
                 </div>
                 
                 <!-- Hidden Academic Year Field -->
-                <input type="hidden" name="academic_year" value="{{ active_year }}"
+                <input type="hidden" name="academic_year" value="{{ active_year }}">
 
                 <!-- Error Message -->
-                <div id="errorMessage" class="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hidden">
-                    <div id="errorText"></div>
+                <div id="errorMessage" class="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 hidden animate-slideInUp">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <p class="font-semibold text-red-400">Error creating class</p>
+                            <p id="errorText" class="text-red-300 text-sm mt-1"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success Message -->
+                <div id="successMessage" class="mb-6 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 hidden animate-slideInUp">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <p class="font-semibold text-emerald-400">Class created successfully!</p>
+                            <p class="text-emerald-300 text-sm mt-1">Redirecting you to classes...</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex gap-4">
-                    <button type="submit" class="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg hover:shadow-xl">
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-600/30">
+                    <button type="submit" id="submitBtn" class="flex-1 px-6 py-3.5 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold hover:from-blue-600 hover:to-cyan-600 hover:shadow-lg hover:shadow-blue-500/30 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
                         Create Class
                     </button>
-                    <a href="/classes/" class="flex-1 px-6 py-3 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-300 font-medium hover:bg-slate-700 transition-all text-center">
+                    <a href="/classes/" class="flex-1 px-6 py-3.5 rounded-lg bg-slate-700/50 border border-slate-600/50 text-slate-300 font-bold hover:bg-slate-700 transition-all text-center flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
                         Cancel
                     </a>
                 </div>
             </form>
+        </div>
+
+        <!-- Info Box -->
+        <div class="mt-8 glass rounded-2xl p-6 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.1s;">
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zm-11-1a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white mb-2">Tips for Creating a Class</h3>
+                    <ul class="text-sm text-slate-400 space-y-1">
+                        <li>✓ <strong>Grade</strong> is the level (e.g., Grade 7, Grade 12)</li>
+                        <li>✓ <strong>Section</strong> distinguishes classes within the same grade (A, B, C, D)</li>
+                        <li>✓ <strong>Teacher</strong> can be assigned now or later</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -94,6 +178,18 @@
 <script>
 document.getElementById('classForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    
+    // Hide previous messages
+    errorMessage.classList.add('hidden');
+    successMessage.classList.add('hidden');
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ Creating...';
     
     const formData = new FormData(this);
     
@@ -109,13 +205,28 @@ document.getElementById('classForm').addEventListener('submit', async function(e
         const data = await response.json();
         
         if (response.ok) {
-            window.location.href = '/classes/';
+            // Check if there's a redirect URL (for fresh system setup)
+            if (data.redirect_url) {
+                successMessage.classList.remove('hidden');
+                setTimeout(() => {
+                    window.location.href = data.redirect_url;
+                }, 1500);
+            } else {
+                successMessage.classList.remove('hidden');
+                setTimeout(() => {
+                    window.location.href = '/classes/';
+                }, 1500);
+            }
         } else {
-            document.getElementById('errorMessage').classList.remove('hidden');
-            document.getElementById('errorText').textContent = data.error || 'An error occurred';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Class';
+            errorMessage.classList.remove('hidden');
+            document.getElementById('errorText').textContent = data.error || 'An error occurred while creating the class';
         }
     } catch (error) {
-        document.getElementById('errorMessage').classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Class';
+        errorMessage.classList.remove('hidden');
         document.getElementById('errorText').textContent = 'Failed to create class: ' + error.message;
     }
 });

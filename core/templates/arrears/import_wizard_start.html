@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Arrears Import - Setup Wizard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-black text-white">Arrears Import Wizard</h1>
+                    <p class="text-cyan-300 text-sm font-semibold">Migrate existing student balances to the system</p>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex-1 h-2 bg-slate-700 rounded-full mx-2">
+                    <div class="h-full w-1/4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full"></div>
+                </div>
+                <span class="text-sm font-bold text-cyan-300">Step {{ step }} of {{ total_steps }}</span>
+            </div>
+        </div>
+        
+        <!-- Main Form -->
+        <div class="bg-slate-800/90 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl p-8 shadow-2xl">
+            <form method="POST" class="space-y-8">
+                {% csrf_token %}
+                
+                <!-- Academic Year Selection -->
+                <div class="space-y-4">
+                    <label class="block">
+                        <span class="text-sm font-bold text-cyan-300 uppercase tracking-wider mb-2 block">
+                            📅 Step 1: Select Academic Year
+                        </span>
+                        {{ form.academic_year }}
+                    </label>
+                    {% if form.academic_year.errors %}
+                        <div class="text-red-400 text-sm">{{ form.academic_year.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Starting Term (Optional) -->
+                <div class="space-y-4">
+                    <label class="block">
+                        <span class="text-sm font-bold text-cyan-300 uppercase tracking-wider mb-2 block">
+                            🎓 Step 2: Select Starting Term (Optional)
+                        </span>
+                        <p class="text-gray-400 text-xs mb-3">Leave blank to use Term 1</p>
+                        {{ form.starting_term }}
+                    </label>
+                    {% if form.starting_term.errors %}
+                        <div class="text-red-400 text-sm">{{ form.starting_term.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Import Method Selection -->
+                <div class="space-y-6">
+                    <div>
+                        <span class="text-sm font-bold text-cyan-300 uppercase tracking-wider mb-4 block">
+                            📊 Step 3: Choose Import Method
+                        </span>
+                        <p class="text-gray-400 text-xs mb-5">Select how you want to import arrears data</p>
+                    </div>
+                    
+                    {% for value, label in form.import_method.field.choices %}
+                    <label class="group cursor-pointer">
+                        <div class="flex items-start gap-4 p-4 rounded-lg border-2 border-slate-600 hover:border-cyan-500/60 transition-all hover:bg-cyan-500/5 group-has-[:checked]:border-cyan-500 group-has-[:checked]:bg-cyan-500/10">
+                            <input 
+                                type="radio" 
+                                name="import_method" 
+                                value="{{ value }}"
+                                {% if form.import_method.value == value %}checked{% endif %}
+                                class="mt-1 flex-shrink-0"
+                            >
+                            <div class="flex-1">
+                                <div class="text-white font-semibold">{{ label }}</div>
+                                {% if value == 'MANUAL' %}
+                                    <p class="text-gray-400 text-sm mt-1">Add students one by one with individual verification</p>
+                                {% elif value == 'BULK_UPLOAD' %}
+                                    <p class="text-gray-400 text-sm mt-1">Upload Excel or CSV file with multiple students</p>
+                                {% else %}
+                                    <p class="text-gray-400 text-sm mt-1">Copy arrears from a previous system or spreadsheet</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </label>
+                    {% endfor %}
+                    
+                    {% if form.import_method.errors %}
+                        <div class="text-red-400 text-sm">{{ form.import_method.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="flex-1 py-3 px-6 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-cyan-500/50">
+                        ➜ Continue to Next Step
+                    </button>
+                    <a href="{% url 'admin_dashboard' %}" class="flex-1 py-3 px-6 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-bold transition-all text-center">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Info Box -->
+        <div class="mt-8 p-6 rounded-lg bg-blue-500/10 border border-blue-500/30">
+            <h3 class="text-blue-300 font-bold mb-2">💡 About Arrears Import</h3>
+            <ul class="text-gray-300 text-sm space-y-1">
+                <li>✓ This is a one-time setup to migrate existing balances from paper records</li>
+                <li>✓ All amounts will be verified before import</li>
+                <li>✓ Arrears will be applied to the starting term balance</li>
+                <li>✓ You can export a template with all students for bulk import</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

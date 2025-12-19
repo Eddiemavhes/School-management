@@ -6,6 +6,16 @@ from .student_movement import StudentMovement
 from .academic import AcademicTerm, Payment
 from .fee import TermFee, StudentBalance
 from .academic_year import AcademicYear
+from .zimsec import ZimsecResults, Grade7Statistics
+from .payment_allocation import PaymentAllocation, PaymentAllocationLog, StudentCredit
+from .term_history import StudentTermHistory
+from .arrears_import import (
+    ArrearsImportBatch,
+    ArrearsImportEntry,
+    ArrearsCategory,
+    StudentArrearsRecord,
+)
+from .arrears_vault import ArrearsVault, ArrearsPaymentLog, ArrearsReport
 
 __all__ = [
     'Administrator',
@@ -17,5 +27,18 @@ __all__ = [
     'Payment',
     'TermFee',
     'StudentBalance',
-    'AcademicYear'
+    'AcademicYear',
+    'ZimsecResults',
+    'Grade7Statistics',
+    'PaymentAllocation',
+    'PaymentAllocationLog',
+    'StudentCredit',
+    'StudentTermHistory',
+    'ArrearsImportBatch',
+    'ArrearsImportEntry',
+    'ArrearsCategory',
+    'StudentArrearsRecord',
+    'ArrearsVault',
+    'ArrearsPaymentLog',
+    'ArrearsReport',
 ]

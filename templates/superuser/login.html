@@ -105,12 +105,29 @@
 </div>
 
 <!-- Loading Spinner Overlay -->
-<div id="loading-spinner" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-    <div class="flex flex-col items-center gap-4">
-        <div class="relative w-12 h-12">
-            <div class="absolute inset-0 bg-gradient-to-r from-red-600 to-red-500 rounded-full animate-spin" style="mask: radial-gradient(circle, transparent 30%, black 70%)"></div>
+<div id="loading-spinner" class="hidden fixed inset-0 bg-gradient-to-br from-black/60 via-red-900/40 to-black/60 backdrop-blur-md flex items-center justify-center z-50">
+    <div class="flex flex-col items-center gap-6">
+        <!-- Vibrant spinning circle with red gradient -->
+        <div class="relative w-20 h-20">
+            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-red-500 via-red-600 to-pink-500 animate-spin"></div>
+            <div class="absolute inset-2 rounded-full bg-slate-900"></div>
+            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 to-pink-400 opacity-30 blur-xl animate-pulse"></div>
         </div>
-        <p class="text-white text-sm font-medium">Accessing Control Panel...</p>
+        
+        <!-- Animated text -->
+        <div class="text-center">
+            <p class="text-white text-lg font-semibold bg-gradient-to-r from-red-400 via-pink-400 to-red-400 bg-clip-text text-transparent animate-pulse">
+                Accessing Control Panel...
+            </p>
+            <p class="text-red-300 text-xs mt-2 opacity-75">Please wait</p>
+        </div>
+        
+        <!-- Floating dots animation -->
+        <div class="flex gap-2 mt-2">
+            <div class="w-2 h-2 rounded-full bg-red-400 animate-bounce" style="animation-delay: 0s;"></div>
+            <div class="w-2 h-2 rounded-full bg-pink-400 animate-bounce" style="animation-delay: 0.2s;"></div>
+            <div class="w-2 h-2 rounded-full bg-red-500 animate-bounce" style="animation-delay: 0.4s;"></div>
+        </div>
     </div>
 </div>
 

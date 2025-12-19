@@ -5,6 +5,7 @@ from ..models.student import Student
 from ..models.class_model import Class
 from ..models.payment import Payment
 from ..models.student_movement import StudentMovement
+from ..models.academic import AcademicTerm
 from django.utils import timezone
 from datetime import timedelta
 
@@ -43,6 +44,9 @@ def dashboard(request):
         total_count=Count('id')
     )
 
+    # Get current term and academic year
+    current_term = AcademicTerm.get_current_term()
+
     context = {
         'recent_movements': recent_movements,
         'recent_transfers': recent_transfers,  # Add recent transfers to context
@@ -51,6 +55,7 @@ def dashboard(request):
         'recent_payments': recent_payments,
         'class_distribution': class_distribution,
         'payment_stats': payment_stats,
+        'current_term': current_term,
     }
     
     return render(request, 'dashboard/dashboard.html', context)

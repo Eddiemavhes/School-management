@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ZIMSEC Result - Edit{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-6xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="flex justify-between items-start mb-12 animate-slideInUp">
+            <div>
+                <h1 class="text-5xl font-bold bg-gradient-to-r from-amber-300 via-orange-300 to-red-300 bg-clip-text text-transparent mb-3">✏️ Edit ZIMSEC Result</h1>
+                <p class="text-slate-400 text-lg">Update examination result for {{ result.student.first_name }} {{ result.student.last_name }}</p>
+            </div>
+            <a href="{% url 'zimsec_result_detail' result.id %}" class="px-6 py-3 rounded-lg font-bold text-white bg-slate-700 hover:bg-slate-600 transition">
+                ← Back
+            </a>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="glass rounded-2xl p-6 border border-red-500/30 bg-red-500/10 mb-8 animate-slideInUp">
+            <div class="text-red-300">
+                <strong>⚠️ Error:</strong>
+                {% for error in form.non_field_errors %}
+                    <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Form -->
+            <div class="lg:col-span-2">
+                <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.1s;">
+                    <h3 class="text-2xl font-bold text-slate-100 mb-8 flex items-center gap-3">
+                        <div class="w-1.5 h-8 bg-gradient-to-b from-amber-400 to-orange-400 rounded-full"></div>
+                        Subject Units Entry
+                    </h3>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Subject Units Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <!-- English Units -->
+                            <div>
+                                <label for="{{ form.english_units.id_for_label }}" class="block text-slate-300 font-bold mb-3">
+                                    🇬🇧 English Units (1-9)
+                                </label>
+                                <input type="number" name="english_units" value="{{ result.english_units }}" min="1" max="9" class="w-full px-4 py-3 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 text-center text-xl font-bold focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30">
+                                {% if form.english_units.errors %}<p class="text-red-400 text-sm mt-2">{{ form.english_units.errors }}</p>{% endif %}
+                            </div>
+
+                            <!-- Mathematics Units -->
+                            <div>
+                                <label for="{{ form.mathematics_units.id_for_label }}" class="block text-slate-300 font-bold mb-3">
+                                    🔢 Mathematics Units (1-9)
+                                </label>
+                                <input type="number" name="mathematics_units" value="{{ result.mathematics_units }}" min="1" max="9" class="w-full px-4 py-3 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 text-center text-xl font-bold focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30">
+                                {% if form.mathematics_units.errors %}<p class="text-red-400 text-sm mt-2">{{ form.mathematics_units.errors }}</p>{% endif %}
+                            </div>
+
+                            <!-- Science Units -->
+                            <div>
+                                <label for="{{ form.science_units.id_for_label }}" class="block text-slate-300 font-bold mb-3">
+                                    🔬 Science Units (1-9)
+                                </label>
+                                <input type="number" name="science_units" value="{{ result.science_units }}" min="1" max="9" class="w-full px-4 py-3 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 text-center text-xl font-bold focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30">
+                                {% if form.science_units.errors %}<p class="text-red-400 text-sm mt-2">{{ form.science_units.errors }}</p>{% endif %}
+                            </div>
+
+                            <!-- Social Studies Units -->
+                            <div>
+                                <label for="{{ form.social_studies_units.id_for_label }}" class="block text-slate-300 font-bold mb-3">
+                                    📚 Social Studies Units (1-9)
+                                </label>
+                                <input type="number" name="social_studies_units" value="{{ result.social_studies_units }}" min="1" max="9" class="w-full px-4 py-3 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 text-center text-xl font-bold focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30">
+                                {% if form.social_studies_units.errors %}<p class="text-red-400 text-sm mt-2">{{ form.social_studies_units.errors }}</p>{% endif %}
+                            </div>
+
+                            <!-- Indigenous Language Units -->
+                            <div>
+                                <label for="{{ form.indigenous_language_units.id_for_label }}" class="block text-slate-300 font-bold mb-3">
+                                    🗣️ Indigenous Language Units (1-9)
+                                </label>
+                                <input type="number" name="indigenous_language_units" value="{{ result.indigenous_language_units }}" min="1" max="9" class="w-full px-4 py-3 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 text-center text-xl font-bold focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30">
+                                {% if form.indigenous_language_units.errors %}<p class="text-red-400 text-sm mt-2">{{ form.indigenous_language_units.errors }}</p>{% endif %}
+                            </div>
+
+                            <!-- Agriculture Units -->
+                            <div>
+                                <label for="{{ form.agriculture_units.id_for_label }}" class="block text-slate-300 font-bold mb-3">
+                                    🌾 Agriculture Units (1-9)
+                                </label>
+                                <input type="number" name="agriculture_units" value="{{ result.agriculture_units }}" min="1" max="9" class="w-full px-4 py-3 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 text-center text-xl font-bold focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30">
+                                {% if form.agriculture_units.errors %}<p class="text-red-400 text-sm mt-2">{{ form.agriculture_units.errors }}</p>{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-600/30 pt-8 mb-8">
+                            <h4 class="text-lg font-bold text-slate-100 mb-6">Exam Details</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <!-- Exam Center -->
+                                <div>
+                                    <label for="{{ form.exam_center.id_for_label }}" class="block text-slate-300 font-bold mb-3">Exam Center</label>
+                                    <input type="text" name="exam_center" value="{{ result.exam_center }}" class="w-full px-4 py-3 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30">
+                                    {% if form.exam_center.errors %}<p class="text-red-400 text-sm mt-2">{{ form.exam_center.errors }}</p>{% endif %}
+                                </div>
+
+                                <!-- Candidate Number -->
+                                <div>
+                                    <label for="{{ form.candidate_number.id_for_label }}" class="block text-slate-300 font-bold mb-3">Candidate Number</label>
+                                    <input type="text" name="candidate_number" value="{{ result.candidate_number }}" class="w-full px-4 py-3 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30">
+                                    {% if form.candidate_number.errors %}<p class="text-red-400 text-sm mt-2">{{ form.candidate_number.errors }}</p>{% endif %}
+                                </div>
+
+                                <!-- Result Date -->
+                                <div>
+                                    <label for="{{ form.result_date.id_for_label }}" class="block text-slate-300 font-bold mb-3">Result Date</label>
+                                    <input type="date" name="result_date" value="{% if result.result_date %}{{ result.result_date|date:'Y-m-d' }}{% endif %}" class="w-full px-4 py-3 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30">
+                                    {% if form.result_date.errors %}<p class="text-red-400 text-sm mt-2">{{ form.result_date.errors }}</p>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info Alert -->
+                        <div class="glass rounded-lg p-4 border border-blue-500/30 bg-blue-500/10 mb-8">
+                            <p class="text-blue-300 text-sm font-semibold mb-2">📌 Important Reminders:</p>
+                            <ul class="text-blue-300 text-sm space-y-1 ml-4 list-disc">
+                                <li>All units must be between 1 and 9</li>
+                                <li>Lower units = better performance (1=best, 9=worst)</li>
+                                <li>Aggregate will be auto-calculated after save</li>
+                                <li>System will recalculate class statistics</li>
+                            </ul>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-4">
+                            <button type="submit" class="flex-1 px-6 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition">
+                                💾 Save Changes
+                            </button>
+                            <a href="{% url 'zimsec_result_detail' result.id %}" class="flex-1 px-6 py-3 rounded-lg font-bold text-white bg-slate-700 hover:bg-slate-600 transition text-center">
+                                ✕ Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-8">
+                <!-- Student Info -->
+                <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.2s;">
+                    <h3 class="text-lg font-bold text-slate-100 mb-4">Student Information</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-slate-400 text-xs font-bold uppercase">Name</p>
+                            <p class="text-slate-100 font-bold">{{ result.student.first_name }} {{ result.student.last_name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-xs font-bold uppercase">Student ID</p>
+                            <p class="text-slate-100 font-bold">{{ result.student.student_id }}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-xs font-bold uppercase">Academic Year</p>
+                            <p class="text-slate-100 font-bold">{{ result.academic_year }}</p>
+                        </div>
+                        <div class="border-t border-slate-600/30 pt-3 mt-3">
+                            <p class="text-slate-400 text-xs font-bold uppercase">Current Aggregate</p>
+                            <p class="text-amber-400 font-bold text-lg">{{ result.total_aggregate }} Units</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit Scale Reference -->
+                <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.3s;">
+                    <h3 class="text-lg font-bold text-slate-100 mb-4">Unit Scale Reference</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between items-center p-2 rounded bg-slate-700/30 border border-slate-600/30">
+                            <span><strong class="text-emerald-400">1</strong></span>
+                            <span class="text-slate-300">Distinction</span>
+                            <span class="px-2 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300">PASS</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 rounded bg-slate-700/30 border border-slate-600/30">
+                            <span><strong class="text-emerald-400">2</strong></span>
+                            <span class="text-slate-300">Merit</span>
+                            <span class="px-2 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300">PASS</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 rounded bg-slate-700/30 border border-slate-600/30">
+                            <span><strong class="text-emerald-400">3</strong></span>
+                            <span class="text-slate-300">Credit</span>
+                            <span class="px-2 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300">PASS</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 rounded bg-slate-700/30 border border-slate-600/30">
+                            <span><strong class="text-emerald-400">4</strong></span>
+                            <span class="text-slate-300">Sat Pass</span>
+                            <span class="px-2 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300">PASS</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 rounded bg-slate-700/30 border border-slate-600/30">
+                            <span><strong class="text-emerald-400">5</strong></span>
+                            <span class="text-slate-300">Low Pass</span>
+                            <span class="px-2 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300">PASS</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 rounded bg-slate-700/30 border border-slate-600/30">
+                            <span><strong class="text-red-400">6-9</strong></span>
+                            <span class="text-slate-300">Fail</span>
+                            <span class="px-2 py-1 rounded text-xs font-bold bg-red-500/20 text-red-300">FAIL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(20px);
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-slideInUp {
+        animation: slideInUp 0.6s ease-out forwards;
+    }
+
+    input[type="number"], input[type="text"], input[type="date"] {
+        font-variant-numeric: tabular-nums;
+    }
+</style>
+
+{% endblock %}

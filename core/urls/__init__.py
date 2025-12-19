@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from core.views.auth_views import AdminLoginView, AdminLogoutView, AdminDashboardView, SuperuserLoginView
 from core.views.class_views import (
     class_list, class_detail, class_create,
@@ -11,7 +11,7 @@ from core.views.teacher_views import (
 from core.views.student_views import (
     StudentListView, StudentDetailView, StudentCreateView,
     StudentUpdateView, StudentDeleteView, transfer_student,
-    ArchivedStudentsListView, ArchivedStudentDeleteView
+    GraduatedWithArrearsListView, ArchivedStudentsListView, ArchivedStudentDeleteView
 )
 from core.views.payment_views import (
     PaymentCreateView, PaymentListView,
@@ -37,6 +37,33 @@ from core.views.superuser_views import (
     SuperuserDashboardView, ResetAdminPasswordView,
     reset_system_api, clear_payments_api, clear_students_api, clear_terms_api
 )
+from core.views.system_admin import (
+    SystemAdministrationView, ResetAdminPasswordView as SystemResetPasswordView,
+    reset_system_data, clear_student_data, clear_payment_data
+)
+from core.views.superuser_dashboard import SuperuserDashboardView as PremiumSuperuserDashboardView
+from core.views.setup_views import FreshSystemSetupView
+from core.views.zimsec_views import (
+    ZimsecResultsEntryView,
+    ZimsecResultDetailView,
+    ZimsecResultEditView,
+    Grade7StatisticsView,
+    YearComparisonView,
+    ZimsecResultsListView,
+    ZimsecStatisticsView,
+    ExportPowerPointView,
+    ExportExcelView,
+    ExportPDFView,
+    ExportDetailedResultsView,
+    ExportGrade7CompletionView,
+    ExportHTMLView,
+    ZimsecResultsBatchSaveAPI,
+)
+from core.views.advanced_analytics import (
+    ComparisonView,
+    PredictionView,
+    StatisticalTestsView,
+)
 
 urlpatterns = [
     # Authentication URLs
@@ -44,6 +71,9 @@ urlpatterns = [
     path('login/admin/', SuperuserLoginView.as_view(), name='superuser_login'),
     path('logout/', AdminLogoutView.as_view(), name='logout'),
     path('dashboard/', AdminDashboardView.as_view(), name='admin_dashboard'),
+    
+    # Fresh System Setup Wizard
+    path('setup/', FreshSystemSetupView.as_view(), name='fresh_system_setup'),
     
     # Class Management URLs
     path('classes/', class_list, name='class_list'),
@@ -64,6 +94,7 @@ urlpatterns = [
     # Student Management URLs
     path('students/', StudentListView.as_view(), name='student_list'),
     path('students/create/', StudentCreateView.as_view(), name='student_create'),
+    path('students/graduated-with-arrears/', GraduatedWithArrearsListView.as_view(), name='graduated_with_arrears'),
     path('students/archived/', ArchivedStudentsListView.as_view(), name='archived_students'),
     path('students/archived/<int:pk>/delete/', ArchivedStudentDeleteView.as_view(), name='archived_student_delete'),
     path('students/<int:pk>/', StudentDetailView.as_view(), name='student_detail'),
@@ -112,10 +143,50 @@ urlpatterns = [
     path('admin/api/activate-first-term/', activate_first_term_api, name='activate_first_term_api'),
     
     # Superuser Management URLs
-    path('superuser/', SuperuserDashboardView.as_view(), name='superuser_dashboard'),
+    path('superuser/', PremiumSuperuserDashboardView.as_view(), name='superuser_dashboard'),
+    path('superuser/premium/', PremiumSuperuserDashboardView.as_view(), name='premium_superuser_dashboard'),
     path('superuser/reset-password/', ResetAdminPasswordView.as_view(), name='reset_admin_password'),
     path('superuser/api/reset-system/', reset_system_api, name='reset_system_api'),
     path('superuser/api/clear-payments/', clear_payments_api, name='clear_payments_api'),
     path('superuser/api/clear-students/', clear_students_api, name='clear_students_api'),
     path('superuser/api/clear-terms/', clear_terms_api, name='clear_terms_api'),
+    
+    # System Administration URLs
+    path('system-admin/', SystemAdministrationView.as_view(), name='system_admin'),
+    path('system-admin/reset-password/', SystemResetPasswordView.as_view(), name='reset_admin_password_system'),
+    path('api/reset-system/', reset_system_data, name='api_reset_system'),
+    path('api/clear-students/', clear_student_data, name='api_clear_students'),
+    path('api/clear-payments/', clear_payment_data, name='api_clear_payments'),
+    
+    # ZIMSEC Grade 7 Examination Management URLs
+    path('zimsec/entry/', ZimsecResultsEntryView.as_view(), name='zimsec_entry'),
+    path('zimsec/result/<int:pk>/', ZimsecResultDetailView.as_view(), name='zimsec_result_detail'),
+    path('zimsec/result/<int:pk>/edit/', ZimsecResultEditView.as_view(), name='zimsec_result_edit'),
+    path('zimsec/results/', ZimsecResultsListView.as_view(), name='zimsec_results_list'),
+    path('zimsec/statistics/', Grade7StatisticsView.as_view(), name='grade7_statistics'),
+    path('zimsec/year-comparison/', YearComparisonView.as_view(), name='year_comparison'),
+    path('api/zimsec/batch-save/', ZimsecResultsBatchSaveAPI.as_view(), name='zimsec_batch_save'),
+    
+    # ZIMSEC Export URLs
+    path('zimsec/export/powerpoint/', ExportPowerPointView.as_view(), name='export_powerpoint'),
+    path('zimsec/export/excel/', ExportExcelView.as_view(), name='export_excel'),
+    path('zimsec/export/pdf/', ExportPDFView.as_view(), name='export_pdf'),
+    path('zimsec/export/detailed-results/', ExportDetailedResultsView.as_view(), name='export_detailed_results'),
+    path('zimsec/export/html/', ExportHTMLView.as_view(), name='export_html'),
+    
+    # Grade 7 Export URLs
+    path('grade7/export/completion-report/', ExportGrade7CompletionView.as_view(), name='export_grade7_completion'),
+    
+    # Advanced Analytics URLs
+    path('zimsec/comparison/', ComparisonView.as_view(), name='comparison_advanced'),
+    path('zimsec/predictions/', PredictionView.as_view(), name='predictions'),
+    path('zimsec/statistical-tests/', StatisticalTestsView.as_view(), name='statistical_tests'),
+    
+    # Arrears Vault - Strict Management System
+    path('arrears/', include('core.urls.arrears')),
+    
+    # Arrears Import Wizard URLs
+    path('', include('core.urls.arrears_import_urls')),
 ]
+
+

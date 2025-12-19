@@ -298,7 +298,7 @@ class Payment(models.Model):
                     student=self.student,
                     term=next_term,
                     defaults={
-                        'term_fee': term_fee.amount,
+                        'term_fee_record': term_fee,
                         'previous_arrears': Decimal('0')
                     }
                 )

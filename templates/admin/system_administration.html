@@ -1,0 +1,605 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}System Administration{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="mb-12 animate-slideInUp">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h1 class="text-5xl font-bold bg-gradient-to-r from-purple-300 via-cyan-300 to-blue-300 bg-clip-text text-transparent mb-3">⚙️ System Administration</h1>
+                    <p class="text-slate-400 text-lg">Manage system data, reset records, and configure admin credentials</p>
+                </div>
+                <a href="{% url 'superuser_dashboard' %}" class="px-6 py-2.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg">
+                    ← Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- System Statistics -->
+        <div class="mb-12 animate-slideInUp" style="animation-delay: 0.1s;">
+            <h2 class="text-3xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent mb-8 flex items-center gap-3">
+                <span class="text-4xl">📊</span> System Statistics
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                <!-- Students Stat Card -->
+                <div class="group relative rounded-xl overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-purple-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="relative border border-purple-500/30 group-hover:border-purple-500/60 rounded-xl p-6 backdrop-blur-sm bg-slate-900/40 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-purple-500/20">
+                        <p class="text-purple-300 text-xs font-bold mb-3 uppercase tracking-widest">📚 Students</p>
+                        <p class="text-5xl font-black text-slate-100 group-hover:text-purple-300 transition-colors">{{ stats.students }}</p>
+                        <div class="mt-3 h-1 w-12 bg-gradient-to-r from-purple-500 to-purple-300 rounded-full"></div>
+                    </div>
+                </div>
+                <!-- Payments Stat Card -->
+                <div class="group relative rounded-xl overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-amber-600/20 to-amber-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="relative border border-amber-500/30 group-hover:border-amber-500/60 rounded-xl p-6 backdrop-blur-sm bg-slate-900/40 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-amber-500/20">
+                        <p class="text-amber-300 text-xs font-bold mb-3 uppercase tracking-widest">💳 Payments</p>
+                        <p class="text-5xl font-black text-slate-100 group-hover:text-amber-300 transition-colors">{{ stats.payments }}</p>
+                        <div class="mt-3 h-1 w-12 bg-gradient-to-r from-amber-500 to-amber-300 rounded-full"></div>
+                    </div>
+                </div>
+                <!-- Balances Stat Card -->
+                <div class="group relative rounded-xl overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-emerald-600/20 to-emerald-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="relative border border-emerald-500/30 group-hover:border-emerald-500/60 rounded-xl p-6 backdrop-blur-sm bg-slate-900/40 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-500/20">
+                        <p class="text-emerald-300 text-xs font-bold mb-3 uppercase tracking-widest">💰 Balances</p>
+                        <p class="text-5xl font-black text-slate-100 group-hover:text-emerald-300 transition-colors">{{ stats.balances }}</p>
+                        <div class="mt-3 h-1 w-12 bg-gradient-to-r from-emerald-500 to-emerald-300 rounded-full"></div>
+                    </div>
+                </div>
+                <!-- Admins Stat Card -->
+                <div class="group relative rounded-xl overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-cyan-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="relative border border-cyan-500/30 group-hover:border-cyan-500/60 rounded-xl p-6 backdrop-blur-sm bg-slate-900/40 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-cyan-500/20">
+                        <p class="text-cyan-300 text-xs font-bold mb-3 uppercase tracking-widest">🔐 Admins</p>
+                        <p class="text-5xl font-black text-slate-100 group-hover:text-cyan-300 transition-colors">{{ stats.admins }}</p>
+                        <div class="mt-3 h-1 w-12 bg-gradient-to-r from-cyan-500 to-cyan-300 rounded-full"></div>
+                    </div>
+                </div>
+                <!-- Teachers Stat Card -->
+                <div class="group relative rounded-xl overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-red-600/20 to-red-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="relative border border-red-500/30 group-hover:border-red-500/60 rounded-xl p-6 backdrop-blur-sm bg-slate-900/40 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-red-500/20">
+                        <p class="text-red-300 text-xs font-bold mb-3 uppercase tracking-widest">👨‍🏫 Teachers</p>
+                        <p class="text-5xl font-black text-slate-100 group-hover:text-red-300 transition-colors">{{ stats.teachers }}</p>
+                        <div class="mt-3 h-1 w-12 bg-gradient-to-r from-red-500 to-red-300 rounded-full"></div>
+                    </div>
+                </div>
+                <!-- Terms Stat Card -->
+                <div class="group relative rounded-xl overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-blue-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="relative border border-blue-500/30 group-hover:border-blue-500/60 rounded-xl p-6 backdrop-blur-sm bg-slate-900/40 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-blue-500/20">
+                        <p class="text-blue-300 text-xs font-bold mb-3 uppercase tracking-widest">📅 Terms</p>
+                        <p class="text-5xl font-black text-slate-100 group-hover:text-blue-300 transition-colors">{{ stats.terms }}</p>
+                        <div class="mt-3 h-1 w-12 bg-gradient-to-r from-blue-500 to-blue-300 rounded-full"></div>
+                    </div>
+                </div>
+                <!-- Classes Stat Card -->
+                <div class="group relative rounded-xl overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-pink-600/20 to-pink-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="relative border border-pink-500/30 group-hover:border-pink-500/60 rounded-xl p-6 backdrop-blur-sm bg-slate-900/40 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-pink-500/20">
+                        <p class="text-pink-300 text-xs font-bold mb-3 uppercase tracking-widest">🏫 Classes</p>
+                        <p class="text-5xl font-black text-slate-100 group-hover:text-pink-300 transition-colors">{{ stats.classes }}</p>
+                        <div class="mt-3 h-1 w-12 bg-gradient-to-r from-pink-500 to-pink-300 rounded-full"></div>
+                    </div>
+                </div>
+                <!-- Superusers Stat Card -->
+                <div class="group relative rounded-xl overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-indigo-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="relative border border-indigo-500/30 group-hover:border-indigo-500/60 rounded-xl p-6 backdrop-blur-sm bg-slate-900/40 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-indigo-500/20">
+                        <p class="text-indigo-300 text-xs font-bold mb-3 uppercase tracking-widest">👑 Superusers</p>
+                        <p class="text-5xl font-black text-slate-100 group-hover:text-indigo-300 transition-colors">{{ stats.superusers }}</p>
+                        <div class="mt-3 h-1 w-12 bg-gradient-to-r from-indigo-500 to-indigo-300 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Management & Data Management in one row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12 animate-slideInUp" style="animation-delay: 0.2s;">
+            <!-- Reset Admin Password -->
+            <div class="group relative rounded-2xl overflow-hidden">
+                <!-- Animated Background Gradient -->
+                <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 opacity-80"></div>
+                <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-500/10 to-transparent rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                <div class="relative border border-slate-500/20 group-hover:border-purple-500/30 rounded-2xl p-8 backdrop-blur-xl transition-all duration-300 bg-slate-900/50">
+                    <!-- Header -->
+                    <div class="mb-8">
+                        <h3 class="text-3xl font-black bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+                            🔐 Reset Admin Password
+                        </h3>
+                        <p class="text-slate-400 text-sm font-medium">Update administrator credentials securely</p>
+                    </div>
+                
+                    <form method="post" action="{% url 'reset_admin_password_system' %}" class="space-y-4">
+                        {% csrf_token %}
+                        {% if password_reset_form.non_field_errors %}
+                        <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                            {% for error in password_reset_form.non_field_errors %}
+                            <p class="text-red-300 text-sm font-medium">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Select Admin User</label>
+                                <div class="relative">
+                                    {{ password_reset_form.admin }}
+                                    <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-500">⌄</div>
+                                </div>
+                                {% if password_reset_form.admin.errors %}
+                                <p class="text-red-400 text-xs mt-2">{{ password_reset_form.admin.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">New Password</label>
+                                {{ password_reset_form.new_password }}
+                                {% if password_reset_form.new_password.errors %}
+                                <p class="text-red-400 text-xs mt-2">{{ password_reset_form.new_password.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Confirm Password</label>
+                                {{ password_reset_form.confirm_password }}
+                                {% if password_reset_form.confirm_password.errors %}
+                                <p class="text-red-400 text-xs mt-2">{{ password_reset_form.confirm_password.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full mt-6 group relative overflow-hidden rounded-lg px-6 py-3 font-bold text-white transition-all shadow-lg">
+                            <div class="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 group-hover:from-purple-700 group-hover:via-blue-700 group-hover:to-cyan-700 transition-all"></div>
+                            <div class="relative flex items-center justify-center gap-2">
+                                <span>✓</span>
+                                <span>Reset Password</span>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="group relative rounded-2xl overflow-hidden">
+                <!-- Animated Background Gradient -->
+                <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 opacity-80"></div>
+                <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-cyan-500/10 to-transparent rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                <div class="relative border border-slate-500/20 group-hover:border-emerald-500/30 rounded-2xl p-8 backdrop-blur-xl transition-all duration-300 bg-slate-900/50">
+                    <!-- Header -->
+                    <div class="mb-8">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-3xl font-black bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2">
+                                    💾 Data Management
+                                </h3>
+                                <p class="text-slate-400 text-sm font-medium">Control your database with advanced precision and safety</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Cards Grid -->
+                    <div class="space-y-3 mb-8">
+                        <!-- Clear Students -->
+                        <div class="group/card relative overflow-hidden rounded-xl border border-blue-500/20 hover:border-blue-500/50 transition-all duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-r from-blue-600/0 via-blue-500/5 to-blue-600/0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300"></div>
+                            <button onclick="confirmClear('students', {{ stats.students }})" class="relative w-full px-6 py-4 flex items-center justify-between group/btn">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center text-xl shadow-lg group-hover/btn:shadow-blue-500/50 transition-all">
+                                        👥
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-sm font-bold text-slate-200">Clear Students</p>
+                                        <p class="text-xs text-slate-400 mt-0.5">Remove {{ stats.students }} student records</p>
+                                    </div>
+                                </div>
+                                <div class="text-2xl text-blue-400 opacity-0 group-hover/btn:opacity-100 group-hover/btn:translate-x-1 transition-all duration-300">→</div>
+                            </button>
+                        </div>
+
+                        <!-- Clear Payments -->
+                        <div class="group/card relative overflow-hidden rounded-xl border border-amber-500/20 hover:border-amber-500/50 transition-all duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-r from-amber-600/0 via-amber-500/5 to-amber-600/0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300"></div>
+                            <button onclick="confirmClear('payments', {{ stats.payments }})" class="relative w-full px-6 py-4 flex items-center justify-between group/btn">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center text-xl shadow-lg group-hover/btn:shadow-amber-500/50 transition-all">
+                                        💳
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-sm font-bold text-slate-200">Clear Payments</p>
+                                        <p class="text-xs text-slate-400 mt-0.5">Remove {{ stats.payments }} payment records</p>
+                                    </div>
+                                </div>
+                                <div class="text-2xl text-amber-400 opacity-0 group-hover/btn:opacity-100 group-hover/btn:translate-x-1 transition-all duration-300">→</div>
+                            </button>
+                        </div>
+
+                        <!-- Full System Reset -->
+                        <div class="group/card relative overflow-hidden rounded-xl border border-red-500/20 hover:border-red-500/50 transition-all duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-r from-red-600/0 via-red-500/5 to-red-600/0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300"></div>
+                            <button onclick="confirmClear('system', 0)" class="relative w-full px-6 py-4 flex items-center justify-between group/btn">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-red-600 to-pink-600 flex items-center justify-center text-xl shadow-lg group-hover/btn:shadow-red-500/50 transition-all">
+                                        🔴
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-sm font-bold text-slate-200">System Reset</p>
+                                        <p class="text-xs text-slate-400 mt-0.5">Complete database reset - keep admin only</p>
+                                    </div>
+                                </div>
+                                <div class="text-2xl text-red-400 opacity-0 group-hover/btn:opacity-100 group-hover/btn:translate-x-1 transition-all duration-300">→</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Safety Alert -->
+                    <div class="relative rounded-xl p-4 border border-red-500/30 bg-gradient-to-r from-red-600/5 via-amber-600/5 to-red-600/5 backdrop-blur-sm">
+                        <div class="flex gap-3">
+                            <span class="text-xl flex-shrink-0 mt-0.5">⚠️</span>
+                            <div>
+                                <p class="text-sm font-bold text-red-300 mb-1">Permanent Actions</p>
+                                <p class="text-xs text-red-200 leading-relaxed">These operations cannot be undone. All selected data will be permanently deleted from the database. Admin credentials will be preserved for security.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Users List -->
+        <div class="group relative rounded-2xl overflow-hidden animate-slideInUp" style="animation-delay: 0.3s;">
+            <!-- Animated Background Gradient -->
+            <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 opacity-80"></div>
+            <div class="absolute top-0 left-1/2 w-96 h-96 bg-gradient-to-bl from-indigo-500/10 to-transparent rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-tr from-purple-500/10 to-transparent rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
+            <div class="relative border border-slate-500/20 group-hover:border-indigo-500/30 rounded-2xl overflow-hidden backdrop-blur-xl transition-all duration-300 bg-slate-900/50">
+                <div class="bg-gradient-to-r from-slate-800/50 to-slate-700/50 px-8 py-6 border-b border-slate-500/20 backdrop-blur-sm">
+                    <h3 class="text-3xl font-black bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">👥 System Administrators</h3>
+                    <p class="text-slate-400 text-sm mt-3">Total: <span class="text-indigo-300 font-bold">{{ stats.admins }}</span> administrators • <span class="text-purple-300 font-bold">{{ stats.superusers }}</span> superuser</p>
+                </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-slate-500/20 bg-slate-800/40">
+                            <th class="px-8 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Username</th>
+                            <th class="px-8 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Email</th>
+                            <th class="px-8 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Role</th>
+                            <th class="px-8 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for admin in admin_users %}
+                        <tr class="border-b border-slate-500/10 hover:bg-slate-800/50 transition-all duration-200">
+                            <td class="px-8 py-4 text-sm text-slate-300 font-medium">{{ admin.first_name }} {{ admin.last_name }}</td>
+                            <td class="px-8 py-4 text-sm text-slate-400">{{ admin.email }}</td>
+                            <td class="px-8 py-4 text-sm">
+                                {% if admin.is_superuser %}
+                                    <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-purple-500/30 text-purple-300 border border-purple-500/50 inline-flex items-center gap-1.5">
+                                        <span>👑</span> Superuser
+                                    </span>
+                                {% else %}
+                                    <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-blue-500/30 text-blue-300 border border-blue-500/50 inline-flex items-center gap-1.5">
+                                        <span>🔐</span> Admin
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-8 py-4 text-sm">
+                                {% if admin.is_active %}
+                                    <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 inline-flex items-center gap-1.5">
+                                        <span>✓</span> Active
+                                    </span>
+                                {% else %}
+                                    <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-red-500/30 text-red-300 border border-red-500/50 inline-flex items-center gap-1.5">
+                                        <span>✗</span> Inactive
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-8 py-12 text-center text-slate-500 font-medium">No admin users found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-xl hidden flex items-center justify-center z-50 animate-fadeIn">
+    <div class="group relative rounded-2xl overflow-hidden max-w-md w-full mx-4 shadow-2xl">
+        <!-- Animated Background -->
+        <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
+        <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-red-500/20 to-transparent rounded-full blur-3xl opacity-50"></div>
+        
+        <div class="relative border border-slate-500/30 backdrop-blur-xl p-8 bg-slate-900/80">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="text-5xl">⚠️</span>
+                <h3 class="text-2xl font-black text-slate-100">Confirm Action</h3>
+            </div>
+            
+            <p class="text-slate-300 mb-6 leading-relaxed font-medium text-sm" id="confirmMessage"></p>
+            
+            <div class="space-y-4 mb-8">
+                <div id="itemsList" class="bg-slate-800/50 rounded-lg p-4 border border-slate-500/20 max-h-48 overflow-y-auto">
+                    <!-- Dynamically populated -->
+                </div>
+                
+                <div class="bg-red-500/10 rounded-lg p-4 border border-red-500/30">
+                    <p class="text-xs font-bold text-red-300 mb-2">
+                        <strong>🔒 WARNING:</strong> This action <span class="font-black">CANNOT BE UNDONE</span>
+                    </p>
+                    <p class="text-xs text-red-300">
+                        Admin and superuser credentials will be <span class="font-bold text-emerald-400">PRESERVED</span>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="closeModal()" class="flex-1 group/btn px-4 py-3 relative overflow-hidden rounded-lg text-slate-200 font-bold transition-all border border-slate-600/50">
+                    <div class="absolute inset-0 bg-slate-700/30 group-hover/btn:bg-slate-700/60 transition-all"></div>
+                    <div class="relative flex items-center justify-center gap-2">
+                        <span>✗</span> Cancel
+                    </div>
+                </button>
+                <button id="confirmBtn" onclick="executeAction()" class="flex-1 group/btn relative overflow-hidden rounded-lg px-4 py-3 font-bold text-white transition-all shadow-lg">
+                    <div class="absolute inset-0 bg-gradient-to-r from-red-600 to-pink-600 group-hover/btn:from-red-700 group-hover/btn:to-pink-700 transition-all"></div>
+                    <div class="relative flex items-center justify-center gap-2">
+                        <span>✓</span> Confirm & Delete
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Message -->
+{% if messages %}
+<div id="messageContainer" class="fixed top-24 right-4 z-50 space-y-2">
+    {% for message in messages %}
+    <div class="glass rounded-lg border border-slate-500/30 px-6 py-4 shadow-xl {% if message.tags %}border-{{ message.tags }}-500/30 bg-{{ message.tags }}-500/10{% else %}border-emerald-500/30 bg-emerald-500/10{% endif %} animate-slideInRight">
+        <p class="text-slate-100 font-semibold">{{ message }}</p>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    setTimeout(() => {
+        const container = document.getElementById('messageContainer');
+        if (container) {
+            container.style.opacity = '0';
+            container.style.transition = 'opacity 0.3s';
+            setTimeout(() => container.remove(), 300);
+        }
+    }, 5000);
+</script>
+{% endif %}
+
+<script>
+let currentAction = null;
+let currentCount = 0;
+
+function confirmClear(action, count) {
+    currentAction = action;
+    currentCount = count;
+    
+    const messages = {
+        'students': {
+            title: '👥 Delete All Students?',
+            description: `You are about to permanently delete ${count} student record(s) and all associated fee balances.`,
+            items: [
+                `• ${count} student profile(s) will be removed`,
+                '• All fee balances will be cleared',
+                '• Payment history will be preserved',
+                '✓ Admin credentials will be preserved'
+            ]
+        },
+        'payments': {
+            title: '💳 Delete All Payments?',
+            description: `You are about to permanently delete ${count} payment record(s) from the system.`,
+            items: [
+                `• ${count} payment record(s) will be erased`,
+                '• Payment history will be completely removed',
+                '• Student fee balances remain',
+                '✓ Admin credentials will be preserved'
+            ]
+        },
+        'system': {
+            title: '🔴 FULL SYSTEM RESET?',
+            description: 'You are about to completely reset the entire system. All data except admin credentials will be permanently deleted.',
+            items: [
+                '✓ Students → DELETED',
+                '✓ Payments → DELETED',
+                '✓ Fee Balances → DELETED',
+                '✓ Terms → DELETED',
+                '✓ Classes → DELETED',
+                '✓ Teachers → DELETED',
+                '✓ Years → DELETED',
+                '✓ All other data → DELETED',
+                '✅ Admin & Superuser accounts → PRESERVED'
+            ]
+        }
+    };
+    
+    const msgObj = messages[action];
+    document.getElementById('confirmMessage').innerHTML = `<strong>${msgObj.title}</strong><p class="mt-3 text-slate-400">${msgObj.description}</p>`;
+    
+    const itemsList = document.getElementById('itemsList');
+    itemsList.innerHTML = `<div class="space-y-2">${msgObj.items.map(item => `<p class="text-sm font-mono ${item.includes('DELETED') ? 'text-red-400' : item.includes('PRESERVED') ? 'text-green-400' : 'text-slate-300'}">${item}</p>`).join('')}</div>`;
+    
+    document.getElementById('confirmModal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('confirmModal').classList.add('hidden');
+    currentAction = null;
+    currentCount = 0;
+}
+
+function executeAction() {
+    const btn = document.getElementById('confirmBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="animate-spin">⏳</span> <span>Processing... Please wait</span>';
+    
+    const tokens = {
+        'students': 'CONFIRM_CLEAR_STUDENTS_2025',
+        'payments': 'CONFIRM_CLEAR_PAYMENTS_2025',
+        'system': 'CONFIRM_SYSTEM_RESET_2025'
+    };
+    
+    const urls = {
+        'students': '/api/clear-students/',
+        'payments': '/api/clear-payments/',
+        'system': '/api/reset-system/'
+    };
+    
+    const formData = new FormData();
+    formData.append('reset_token', tokens[currentAction]);
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    
+    fetch(urls[currentAction], {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeModal();
+            showSuccessMessage(currentAction, data);
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            closeModal();
+            showErrorMessage(data.error);
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    })
+    .catch(error => {
+        closeModal();
+        showErrorMessage(`Network error: ${error.message}`);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+}
+
+function showSuccessMessage(action, data) {
+    const titles = {
+        'students': '✅ Students Deleted Successfully',
+        'payments': '✅ Payments Cleared Successfully',
+        'system': '✅ System Reset Completed'
+    };
+    
+    const messages = {
+        'students': `${data.students_deleted || currentCount} student record(s) and ${data.balances_deleted || 'associated'} balance(s) have been permanently deleted.`,
+        'payments': `${data.payments_deleted || currentCount} payment record(s) have been permanently deleted.`,
+        'system': `System reset completed successfully!\n\n✓ All students, payments, terms, classes, and teachers deleted\n✓ Admin & Superuser accounts preserved\n✓ System ready for fresh start`
+    };
+    
+    const div = document.createElement('div');
+    div.className = 'fixed top-4 right-4 z-50 bg-green-900 border border-green-700 rounded-lg p-6 max-w-md shadow-2xl animate-slideUp';
+    div.innerHTML = `
+        <h4 class="text-lg font-bold text-green-300 mb-2">${titles[action]}</h4>
+        <p class="text-green-200 text-sm whitespace-pre-line">${messages[action]}</p>
+    `;
+    document.body.appendChild(div);
+    
+    setTimeout(() => {
+        div.style.opacity = '0';
+        div.style.transition = 'opacity 0.3s';
+        setTimeout(() => div.remove(), 300);
+    }, 5000);
+}
+
+function showErrorMessage(error) {
+    const div = document.createElement('div');
+    div.className = 'fixed top-4 right-4 z-50 bg-red-900 border border-red-700 rounded-lg p-6 max-w-md shadow-2xl animate-slideUp';
+    div.innerHTML = `
+        <h4 class="text-lg font-bold text-red-300 mb-2">❌ Operation Failed</h4>
+        <p class="text-red-200 text-sm">${error}</p>
+    `;
+    document.body.appendChild(div);
+    
+    setTimeout(() => {
+        div.style.opacity = '0';
+        div.style.transition = 'opacity 0.3s';
+        setTimeout(() => div.remove(), 300);
+    }, 5000);
+}
+
+// Close modal when clicking outside
+document.getElementById('confirmModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+</script>
+
+<style>
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-slideUp {
+    animation: slideUp 0.3s ease-out;
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.2s ease-out;
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+/* Form inputs premium styling */
+select {
+    @apply w-full px-4 py-2.5 rounded-lg bg-slate-800/50 border border-slate-600/50 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all;
+}
+
+input[type="password"],
+input[type="text"] {
+    @apply w-full px-4 py-2.5 rounded-lg bg-slate-800/50 border border-slate-600/50 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all;
+}
+</style>
+{% endblock %}

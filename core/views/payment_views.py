@@ -181,6 +181,9 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
             # Save the payment
             payment.save()
             
+            # Check if student should be archived (graduated with all fees paid)
+            student.check_and_archive()
+            
             # The post_save signal automatically updates the student balance,
             # so we just need to fetch the updated balance for the success message
             balance = StudentBalance.objects.filter(
@@ -268,11 +271,19 @@ class PaymentListView(LoginRequiredMixin, ListView):
         queryset = super().get_queryset()
         term_id = self.request.GET.get('term')
         student_id = self.request.GET.get('student')
+        search_query = self.request.GET.get('search', '')
 
         if term_id:
             queryset = queryset.filter(term_id=term_id)
         if student_id:
             queryset = queryset.filter(student_id=student_id)
+        if search_query:
+            # Search by student name (first name or surname)
+            from django.db.models import Q
+            queryset = queryset.filter(
+                Q(student__first_name__icontains=search_query) |
+                Q(student__surname__icontains=search_query)
+            )
 
         return queryset.select_related('student', 'term')
 
@@ -286,13 +297,16 @@ class PaymentListView(LoginRequiredMixin, ListView):
         context['term_total'] = Payment.objects.filter(term=current_term).aggregate(
             total=Sum('amount'))['total'] or 0
         
-        # Get payment status counts
-        balances = StudentBalance.objects.filter(term=current_term)
+        # Get payment status counts (using Python since term_fee is a property)
+        balances = list(StudentBalance.objects.filter(term=current_term))
+        fully_paid_count = sum(1 for b in balances if b.amount_paid >= (b.term_fee + b.previous_arrears))
+        partial_paid_count = sum(1 for b in balances if 0 < b.amount_paid < (b.term_fee + b.previous_arrears))
+        no_payment_count = sum(1 for b in balances if b.amount_paid == 0)
+        
         context.update({
-            'fully_paid': balances.filter(amount_paid__gte=F('term_fee') + F('previous_arrears')).count(),
-            'partial_paid': balances.filter(amount_paid__gt=0).exclude(
-                amount_paid__gte=F('term_fee') + F('previous_arrears')).count(),
-            'no_payment': balances.filter(amount_paid=0).count(),
+            'fully_paid': fully_paid_count,
+            'partial_paid': partial_paid_count,
+            'no_payment': no_payment_count,
         })
         
         return context
@@ -425,15 +439,15 @@ class FeeDashboardView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         current_term = AcademicTerm.get_current_term()
         
-        # Payment statistics
-        total_expected = StudentBalance.objects.filter(term=current_term).aggregate(
-            total=Sum(F('term_fee') + F('previous_arrears')))['total'] or 0
+        # Payment statistics (using Python since term_fee is a property)
+        balances = list(StudentBalance.objects.filter(term=current_term))
+        total_expected = sum(b.term_fee + b.previous_arrears for b in balances) or 0
+        
         total_collected = Payment.objects.filter(term=current_term).aggregate(
             total=Sum('amount'))['total'] or 0
         
         # Total outstanding (current balance) = sum of all current_balance amounts
-        total_outstanding = StudentBalance.objects.filter(term=current_term).aggregate(
-            total=Sum(F('term_fee') + F('previous_arrears') - F('amount_paid')))['total'] or 0
+        total_outstanding = sum(max(0, b.term_fee + b.previous_arrears - b.amount_paid) for b in balances) or 0
         
         context.update({
             'current_term': current_term,

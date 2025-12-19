@@ -135,6 +135,10 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
         from ..models.academic import Payment
         recent_payments = Payment.objects.select_related('student', 'term').order_by('-payment_date')[:5]
         
+        # Get current term
+        from ..models.academic import AcademicTerm
+        current_term = AcademicTerm.get_current_term()
+        
         context.update({
             'total_classes': total_classes,
             'total_teachers': total_teachers,
@@ -144,6 +148,7 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
             'recent_students': recent_students,  # Add recent students to context
             'recent_payments': recent_payments,  # Add recent payments to context
             'class_distribution': class_distribution,  # Add class distribution data
+            'current_term': current_term,  # Add current term to context
         })
         return context
 

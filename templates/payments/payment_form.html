@@ -163,19 +163,6 @@
                             </svg>
                             {{ field.label }}
                         </label>
-                        <div class="mb-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs">
-                            <p class="flex items-center gap-2">
-                                <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2z" clip-rule="evenodd"/></path></svg>
-                                💡 <strong>Auto-generated format:</strong> [METHOD]-[TIMESTAMP]-[UNIQUE] (e.g., BNK-20251122141234-5829)
-                            </p>
-                            <p class="mt-2 ml-6">Leave blank and the system will generate based on payment method:</p>
-                            <ul class="mt-1 ml-6 space-y-1 text-xs">
-                                <li>🪙 <strong>Cash</strong> → CSH-*</li>
-                                <li>🏦 <strong>Bank Transfer</strong> → BNK-*</li>
-                                <li>📱 <strong>Mobile Money</strong> → MOB-*</li>
-                                <li>✓ <strong>Cheque</strong> → CHQ-*</li>
-                            </ul>
-                        </div>
                         {% if field.errors %}
                         <p class="mt-1 text-sm text-red-400">{{ field.errors.0 }}</p>
                         {% endif %}

@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}2028 Predictions & Forecasting - ZIMSEC{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-20 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-950 via-purple-950/30 to-slate-950">
+    <!-- Vibrant Background -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-cyan-500/30 to-blue-600/20 rounded-full blur-3xl opacity-60 animate-pulse"></div>
+        <div class="absolute bottom-0 right-1/3 w-[500px] h-[500px] bg-gradient-to-tl from-emerald-500/20 to-cyan-500/15 rounded-full blur-3xl opacity-50 animate-pulse" style="animation-delay: 2s;"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/40 to-slate-950/60"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="mb-12 text-center animate-slideInDown">
+            <h1 class="text-5xl font-black mb-4">
+                <span class="bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-500 bg-clip-text text-transparent drop-shadow-2xl">{{ projection_year }} Projections</span>
+            </h1>
+            <p class="text-slate-400 text-base tracking-widest uppercase">Linear Regression Forecasting Based on Historical Trends</p>
+        </div>
+
+        <!-- Pass Rate Forecast -->
+        <!-- Unified Forecasting Card -->
+        <div class="mb-8 group relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-purple-600/20 to-pink-600/20 rounded-3xl blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div class="relative rounded-3xl overflow-hidden border-2 border-cyan-500/40 bg-gradient-to-br from-slate-800/95 via-slate-800/80 to-slate-900/95 backdrop-blur-xl shadow-2xl">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-cyan-600/10 via-purple-600/10 to-pink-600/10 px-8 py-6 border-b border-slate-700/50">
+                    <h3 class="text-3xl font-black bg-gradient-to-r from-cyan-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
+                        {{ projection_year }} Academic Forecast
+                    </h3>
+                    <p class="text-slate-400 text-sm mt-2">Based on 2026 Performance Data</p>
+                </div>
+
+                <!-- Main Content Grid -->
+                <div class="p-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                        <!-- Pass Rate Card -->
+                        <div class="group/card relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-600/10 rounded-2xl blur opacity-0 group-hover/card:opacity-100 transition-all"></div>
+                            <div class="relative rounded-2xl p-6 border border-green-500/30 bg-slate-700/40 hover:border-green-500/60 transition-all">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h4 class="text-xl font-bold text-green-300">Pass Rate</h4>
+                                    <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4 mb-6">
+                                    {% for card in predictions.year_cards %}
+                                    <div class="bg-slate-600/40 rounded-lg p-3 border border-slate-600">
+                                        <p class="text-xs text-slate-400 mb-1">{{ card.year }}</p>
+                                        <p class="text-2xl font-black text-green-300">{{ card.pass_rate }}%</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="bg-gradient-to-br from-green-500/20 to-emerald-600/10 rounded-xl p-4 border border-green-500/30 mb-4">
+                                    <p class="text-xs text-green-300 uppercase tracking-widest font-bold mb-2">{{ projection_year }} Projection</p>
+                                    <p class="text-4xl font-black text-green-300">{{ predictions.pass_rate_projection }}%</p>
+                                    <p class="text-xs text-slate-300 mt-2">{{ predictions.pass_rate_projection_range }}</p>
+                                </div>
+                                
+                                {% if predictions.pass_rate_trend_lines %}
+                                <div class="border-t border-slate-600 pt-4">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wide mb-3 font-bold">Trend</p>
+                                    <div class="space-y-2">
+                                        {% for trend in predictions.pass_rate_trend_lines %}
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-slate-300">{{ trend.label }}</span>
+                                            <span class="text-green-300 font-bold">{{ trend.pass_change|floatformat:1 }}%</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Aggregate Card -->
+                        <div class="group/card relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-600/10 rounded-2xl blur opacity-0 group-hover/card:opacity-100 transition-all"></div>
+                            <div class="relative rounded-2xl p-6 border border-blue-500/30 bg-slate-700/40 hover:border-blue-500/60 transition-all">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h4 class="text-xl font-bold text-blue-300">Average Aggregate</h4>
+                                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4 mb-6">
+                                    {% for card in predictions.year_cards %}
+                                    <div class="bg-slate-600/40 rounded-lg p-3 border border-slate-600">
+                                        <p class="text-xs text-slate-400 mb-1">{{ card.year }}</p>
+                                        <p class="text-2xl font-black text-blue-300">{{ card.avg_agg }}</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="bg-gradient-to-br from-blue-500/20 to-cyan-600/10 rounded-xl p-4 border border-blue-500/30 mb-4">
+                                    <p class="text-xs text-blue-300 uppercase tracking-widest font-bold mb-2">{{ projection_year }} Projection</p>
+                                    <p class="text-4xl font-black text-blue-300">{{ predictions.agg_projection }}</p>
+                                    <p class="text-xs text-slate-300 mt-2">{{ predictions.agg_projection_range }}</p>
+                                </div>
+                                
+                                <div class="bg-slate-600/40 rounded-lg p-3 border border-slate-600 mb-4">
+                                    <div class="grid grid-cols-3 gap-2 text-center">
+                                        <div>
+                                            <p class="text-xs text-slate-400 mb-1">Ideal</p>
+                                            <p class="text-lg font-black text-cyan-300">≤ 13</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-slate-400 mb-1">Target</p>
+                                            <p class="text-lg font-black text-blue-300">{{ predictions.agg_projection }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-slate-400 mb-1">Status</p>
+                                            <p class="text-lg font-black {% if predictions.agg_projection|floatformat:2|add:"0" <= 13 %}text-green-300{% else %}text-orange-300{% endif %}">
+                                                {% if predictions.agg_projection|floatformat:2|add:"0" <= 13 %}✓{% else %}⚠{% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {% if predictions.pass_rate_trend_lines %}
+                                <div class="border-t border-slate-600 pt-4">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wide mb-3 font-bold">Trend</p>
+                                    <div class="space-y-2">
+                                        {% for trend in predictions.pass_rate_trend_lines %}
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-slate-300">{{ trend.label }}</span>
+                                            <span class="text-blue-300 font-bold">{{ trend.agg_change|floatformat:2 }}</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="mb-8 group relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-red-600/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div class="relative rounded-2xl p-8 border-2 border-purple-500/60 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl shadow-2xl">
+                <h3 class="text-xl font-bold text-purple-300 mb-6 flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Key Insights & Recommendations
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-700/40 rounded-lg p-6 border-2 border-purple-500/30">
+                        <h4 class="text-lg font-bold text-purple-300 mb-3">Pass Rate Outlook</h4>
+                        <ul class="space-y-2 text-slate-300 text-sm">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Consistent improvement trend from 2025 to 2027</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>2028 projection: {{ predictions.pass_rate_2028 }}% ({{ predictions.pass_rate_2028_range }})</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Focus on maintaining and accelerating improvement momentum</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-slate-700/40 rounded-lg p-6 border-2 border-purple-500/30">
+                        <h4 class="text-lg font-bold text-purple-300 mb-3">Aggregate Outlook</h4>
+                        <ul class="space-y-2 text-slate-300 text-sm">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Current trajectory: {{ predictions.agg_2028 }}</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Target aggregate: ≤ 13 (excellent performance)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Prioritize Mathematics and Science support</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="text-center">
+            <a href="{% url 'grade7_statistics' %}" class="inline-flex items-center gap-2 px-8 py-3 rounded-lg font-bold text-cyan-300 border-2 border-cyan-500 hover:bg-cyan-500/10 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Statistics
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-slideInDown {
+        animation: slideInDown 0.6s ease-out;
+    }
+</style>
+{% endblock %}

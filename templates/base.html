@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}School Management System{% endblock %}</title>
     {% load static %}
-    <link href="{% static 'css/output.css' %}" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -17,11 +15,26 @@
                         secondary: '#EC4899',
                         accent: '#14B8A6',
                         dark: '#0F172A',
+                    },
+                    animation: {
+                        float: 'float 3s ease-in-out infinite',
+                        glow: 'glow 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        glow: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(99, 102, 241, 0.3)' },
+                            '50%': { boxShadow: '0 0 40px rgba(236, 72, 153, 0.4)' },
+                        },
                     }
                 }
             }
         }
     </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     {% block head_js %}{% endblock %}
     <style>
         @keyframes gradient {
@@ -454,6 +467,10 @@
         .status-success { color: #10B981; }
         .status-warning { color: #F59E0B; }
         .status-error { color: #EF4444; }
+
+        /* Hide Django messages globally */
+        .messages { display: none !important; }
+        [class*="message"] { display: none !important; }
     </style>
 </head>
 <body class="gradient-background min-h-screen">
@@ -511,6 +528,22 @@
                                 <a href="{% url 'school_details' %}" class="dropdown-link">School Details</a>
                                 <a href="{% url 'admin_settings' %}" class="dropdown-link">School Settings</a>
                                 <a href="{% url 'admin_profile' %}" class="dropdown-link">Profile</a>
+                            </div>
+                        </div>
+
+                        <!-- ZIMSEC Dropdown -->
+                        <div class="relative group">
+                            <button class="nav-link flex items-center gap-1">
+                                <span>ZIMSEC</span>
+                                <svg class="w-4 h-4 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div class="absolute right-0 mt-0 w-64 rounded-xl shadow-2xl bg-slate-800 ring-1 ring-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
+                                <a href="{% url 'zimsec_entry' %}" class="dropdown-link">Results Entry</a>
+                                <a href="{% url 'zimsec_results_list' %}" class="dropdown-link">View Results</a>
+                                <a href="{% url 'grade7_statistics' %}" class="dropdown-link">Statistics</a>
+                                <a href="{% url 'year_comparison' %}" class="dropdown-link">Compare Years</a>
                             </div>
                         </div>
 

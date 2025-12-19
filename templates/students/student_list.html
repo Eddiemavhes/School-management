@@ -4,141 +4,169 @@
 {% block title %}Students - School Management System{% endblock %}
 
 {% block content %}
-<div class="min-h-screen pt-24 pb-12 px-6 bg-slate-950">
-    <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="mb-12">
-            <h1 class="text-4xl font-bold text-cyan-300 mb-2">Student Management</h1>
-            <p class="text-slate-400">View and manage all enrolled students</p>
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Header with Navigation -->
+        <div class="mb-12 animate-slideInUp">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h1 class="text-5xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-300 bg-clip-text text-transparent mb-3">Student Management</h1>
+                    <p class="text-slate-400 text-lg">Manage and monitor all enrolled students</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <div class="flex gap-3 mb-6 flex-wrap">
+                <a href="{% url 'student_list' %}" class="px-6 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors">
+                    📚 Active Students
+                </a>
+                <a href="{% url 'graduated_with_arrears' %}" class="px-6 py-2 rounded-lg bg-orange-600 text-white font-semibold hover:bg-orange-700 transition-colors">
+                    ⚠️ Graduated with Arrears
+                </a>
+                <a href="{% url 'archived_students' %}" class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors">
+                    🎓 Alumni
+                </a>
+            </div>
         </div>
 
         <!-- Search & Filter Bar -->
-        <div class="bg-slate-900 rounded-xl p-6 mb-8 border border-slate-800">
-            <div class="flex flex-col md:flex-row gap-4 items-end">
+        <div class="glass rounded-2xl p-6 mb-8 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.1s;">
+            <form method="get" class="flex flex-col md:flex-row gap-4 items-end mb-4">
                 <div class="flex-1">
                     <label class="block text-sm font-medium text-slate-300 mb-2">Search</label>
-                    <div class="relative">
-                        <svg class="absolute left-4 top-3 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        <input type="text" id="searchStudents" placeholder="Search by name or ID..." 
-                               class="w-full pl-12 pr-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all">
-                    </div>
+                    <input type="text" name="search" placeholder="Search by name or ID..." 
+                           value="{{ request.GET.search }}"
+                           class="w-full px-4 py-2.5 rounded-lg bg-slate-800/50 border border-slate-600/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
                 </div>
                 <div class="w-full md:w-auto">
                     <label class="block text-sm font-medium text-slate-300 mb-2">Class</label>
-                    <select id="filterClass" class="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    <select name="class" class="w-full px-4 py-2.5 rounded-lg bg-slate-800/50 border border-slate-600/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
                         <option value="">All Classes</option>
                         {% for class in classes %}
-                        <option value="{{ class.id }}">Grade {{ class.grade }}{{ class.section }}</option>
+                        <option value="{{ class.id }}" {% if request.GET.class|add:"0" == class.id|add:"0" %}selected{% endif %}>Grade {{ class.grade }}{{ class.section }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="w-full md:w-auto">
                     <label class="block text-sm font-medium text-slate-300 mb-2">Gender</label>
-                    <select id="filterGender" class="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    <select name="sex" class="w-full px-4 py-2.5 rounded-lg bg-slate-800/50 border border-slate-600/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
                         <option value="">All Genders</option>
-                        <option value="M">Male</option>
-                        <option value="F">Female</option>
+                        <option value="M" {% if request.GET.sex == 'M' %}selected{% endif %}>Male</option>
+                        <option value="F" {% if request.GET.sex == 'F' %}selected{% endif %}>Female</option>
                     </select>
                 </div>
                 <div class="w-full md:w-auto">
                     <label class="block text-sm font-medium text-slate-300 mb-2">Balance</label>
-                    <select id="filterBalance" class="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    <select name="balance" class="w-full px-4 py-2.5 rounded-lg bg-slate-800/50 border border-slate-600/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
                         <option value="">All Balances</option>
-                        <option value="paid">Fully Paid</option>
-                        <option value="partial">Partial Payment</option>
-                        <option value="unpaid">Outstanding</option>
+                        <option value="paid" {% if request.GET.balance == 'paid' %}selected{% endif %}>Fully Paid</option>
+                        <option value="partial" {% if request.GET.balance == 'partial' %}selected{% endif %}>Partial Payment</option>
+                        <option value="unpaid" {% if request.GET.balance == 'unpaid' %}selected{% endif %}>Outstanding</option>
                     </select>
                 </div>
-                <a href="{% url 'archived_students' %}" class="w-full md:w-auto px-6 py-2.5 rounded-lg font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors inline-block text-center">
-                    👥 Alumni
+                <button type="submit" class="w-full md:w-auto px-6 py-2.5 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 hover:shadow-xl hover:shadow-blue-500/30 transition-all">
+                    Search
+                </button>
+                <a href="{% url 'student_list' %}" class="w-full md:w-auto px-6 py-2.5 rounded-lg font-semibold text-white bg-slate-700 hover:bg-slate-600 transition-all text-center">
+                    Clear
                 </a>
-                <button type="button" id="addStudentBtn" class="w-full md:w-auto px-6 py-2.5 rounded-lg font-semibold text-white bg-cyan-600 hover:bg-cyan-700 transition-colors">
-                    + Add Student
+            </form>
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <button type="button" id="addStudentBtn" class="w-full md:w-auto px-6 py-2.5 rounded-lg font-semibold text-white bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 hover:shadow-xl hover:shadow-emerald-500/30 transition-all transform hover:scale-105 active:scale-95 inline-flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Add Student
                 </button>
             </div>
         </div>
 
         <!-- Students Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
             {% for student in students %}
-            <div class="group bg-slate-900 rounded-xl border border-slate-800 hover:border-slate-700 transition-all overflow-hidden hover:shadow-lg student-card"
-                 data-class="{{ student.current_class.id|default:'' }}" 
-                 data-gender="{{ student.sex|default:'' }}" 
-                 data-name="{{ student.full_name|lower }}"
-                 data-balance="{% if student.overall_balance == 0 %}paid{% elif student.overall_balance > 0 %}unpaid{% else %}paid{% endif %}">
-                
-                <!-- Top accent bar -->
-                <div class="h-1 bg-gradient-to-r from-cyan-500 to-blue-500"></div>
+            <div class="group student-card glass rounded-2xl border border-emerald-500/30 hover:border-emerald-500/60 transition-all duration-300 overflow-hidden p-6">
+                <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
 
-                <!-- Content -->
-                <div class="p-6">
-                    <!-- Header with Avatar -->
-                    <div class="flex items-center gap-4 mb-5">
-                        <div class="w-14 h-14 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-base font-bold text-white flex-shrink-0">
-                            {{ student.initials }}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-lg font-semibold text-white truncate">{{ student.full_name }}</h3>
-                            <p class="text-xs text-slate-400">ID: {{ student.birth_entry_number }}</p>
-                        </div>
-                    </div>
+                <!-- Badge Section -->
+                <div class="flex items-center justify-between mb-4">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+                        Student
+                    </span>
+                    <span class="text-emerald-400 text-xs font-bold">ID: {{ student.birth_entry_number }}</span>
+                </div>
 
-                    <!-- Info badges -->
-                    <div class="mb-5 flex gap-2 flex-wrap">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-medium">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            {{ student.age }} yrs
-                        </span>
-                        {% if student.current_class %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-900/30 text-cyan-300 text-xs font-medium">
-                            Gr {{ student.current_class.grade }}{{ student.current_class.section }}
-                        </span>
-                        {% endif %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-medium">
-                            {{ student.get_sex_display|first }}
-                        </span>
-                    </div>
+                <!-- Student Name and Info -->
+                <div class="mb-4 pb-4 border-b border-slate-700/50">
+                    <h3 class="text-xl font-bold text-slate-100 mb-1">{{ student.full_name }}</h3>
+                    <p class="text-slate-400 text-sm">Age: {{ student.age }} years</p>
+                </div>
 
-                    <!-- Balance Information -->
-                    <div class="mb-5 p-4 rounded-lg {% if student.overall_balance == 0 %}bg-emerald-900/20 border border-emerald-800{% elif student.overall_balance > 0 %}bg-red-900/20 border border-red-800{% else %}bg-emerald-900/20 border border-emerald-800{% endif %}">
-                        <p class="text-xs font-semibold {% if student.overall_balance == 0 %}text-emerald-400{% elif student.overall_balance > 0 %}text-red-400{% else %}text-emerald-400{% endif %} mb-1 uppercase">Outstanding (Lifetime)</p>
-                        <p class="text-2xl font-bold {% if student.overall_balance == 0 %}text-emerald-300{% elif student.overall_balance > 0 %}text-red-300{% else %}text-emerald-300{% endif %}">
-                            ${{ student.overall_balance|floatformat:2|default:"0.00" }}
+                <!-- Info Grid -->
+                <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+                    <div>
+                        <p class="text-slate-500 text-xs uppercase tracking-wide">Class</p>
+                        <p class="text-slate-200 font-semibold">
+                            {% if student.current_class %}
+                                Gr {{ student.current_class.grade }}{{ student.current_class.section }}
+                            {% else %}
+                                —
+                            {% endif %}
                         </p>
                     </div>
+                    <div>
+                        <p class="text-slate-500 text-xs uppercase tracking-wide">Gender</p>
+                        <p class="text-slate-200 font-semibold">{{ student.get_sex_display|first }}</p>
+                    </div>
+                </div>
 
-                    <!-- Action Buttons -->
-                    <div class="flex flex-col gap-2 pt-4 border-t border-slate-800">
-                        <div class="flex gap-2">
-                            <a href="{% url 'student_detail' pk=student.id %}" class="flex-1 px-3 py-2 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-600/50 text-cyan-300 transition-all font-medium text-sm text-center">
-                                View
-                            </a>
-                            <a href="{% url 'student_update' pk=student.id %}" class="flex-1 px-3 py-2 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 border border-blue-600/50 text-blue-300 transition-all font-medium text-sm text-center">
-                                Edit
-                            </a>
-                        </div>
-                        <a href="{% url 'student_delete' pk=student.id %}" class="w-full px-3 py-2 rounded-lg bg-red-600/20 hover:bg-red-600/40 border border-red-600/50 text-red-300 transition-all font-medium text-sm text-center">
-                            Delete
+                <!-- Balance Box -->
+                <div class="bg-gradient-to-r {% if student.overall_balance == 0 %}from-emerald-500/10 to-teal-500/10{% else %}from-red-500/10 to-orange-500/10{% endif %} rounded-lg p-3 mb-4 border {% if student.overall_balance == 0 %}border-emerald-500/30{% else %}border-red-500/30{% endif %}">
+                    <p class="text-slate-500 text-xs uppercase tracking-wide mb-1">Outstanding Balance</p>
+                    <p class="text-slate-200 text-lg font-bold">
+                        {% if student.overall_balance == 0 %}
+                            <span class="text-emerald-400">✓ Fully Paid</span>
+                        {% else %}
+                            <span class="{% if student.overall_balance > 0 %}text-red-400{% else %}text-emerald-400{% endif %}">
+                                ${{ student.overall_balance|floatformat:2|default:"0.00" }}
+                            </span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col gap-2 pt-4 border-t border-slate-600/30">
+                    <a href="{% url 'student_detail' pk=student.id %}" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        View Profile
+                    </a>
+                    <div class="flex gap-2">
+                        <a href="{% url 'student_update' pk=student.id %}" class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-slate-300 bg-slate-700/50 border border-slate-600/50 hover:bg-slate-700 transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            Edit
+                        </a>
+                        <a href="{% url 'student_delete' pk=student.id %}" class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-red-300 bg-red-500/20 border border-red-500/30 hover:bg-red-500/30 transition-all" onclick="return confirm('Delete this student?');">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                         </a>
                     </div>
                 </div>
             </div>
             {% empty %}
             <div class="col-span-full">
-                <div class="bg-slate-900 rounded-xl p-16 text-center border border-slate-800">
-                    <div class="w-24 h-24 rounded-full bg-cyan-900/20 border border-cyan-800 flex items-center justify-center mx-auto mb-6">
-                        <svg class="w-12 h-12 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="glass rounded-2xl p-16 text-center border border-slate-500/20 animate-slideInUp">
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/20 flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-12 h-12 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">No Students Found</h3>
-                    <p class="text-slate-400 mb-8">Get started by adding students to your system</p>
+                    <h3 class="text-3xl font-bold text-slate-100 mb-2">No Students Found</h3>
+                    <p class="text-slate-400 mb-8 text-lg">Get started by adding your first student to the system</p>
                     <button type="button" onclick="document.getElementById('addStudentBtn').click()" 
-                            class="px-6 py-2.5 rounded-lg font-semibold text-white bg-cyan-600 hover:bg-cyan-700 transition-colors">
+                            class="px-8 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 hover:shadow-xl hover:shadow-emerald-500/30 transition-all">
                         Add First Student
                     </button>
                 </div>
@@ -149,76 +177,49 @@
 </div>
 
 <script>
-    // Filter functionality
-    const searchInput = document.getElementById('searchStudents');
-    const classFilter = document.getElementById('filterClass');
-    const genderFilter = document.getElementById('filterGender');
-    const balanceFilter = document.getElementById('filterBalance');
-    const studentCards = document.querySelectorAll('.student-card');
-
-    function filterStudents() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        const classValue = classFilter.value.trim();
-        const genderValue = genderFilter.value.trim();
-        const balanceValue = balanceFilter.value.trim();
-
-        console.log('Filtering with:', { searchTerm, classValue, genderValue, balanceValue });
-
-        let visibleCount = 0;
-
-        studentCards.forEach(card => {
-            const name = card.dataset.name || '';
-            const classId = (card.dataset.class || '').toString();
-            const gender = (card.dataset.gender || '').toString();
-            const balance = card.dataset.balance || '';
-
-            // Search by name or ID
-            const matchesSearch = searchTerm === '' || name.includes(searchTerm);
-            
-            // Filter by class
-            const matchesClass = classValue === '' || classId === classValue;
-            
-            // Filter by gender
-            const matchesGender = genderValue === '' || gender === genderValue;
-            
-            // Filter by balance status
-            const matchesBalance = balanceValue === '' || balance === balanceValue;
-
-            const show = matchesSearch && matchesClass && matchesGender && matchesBalance;
-            
-            card.style.display = show ? '' : 'none';
-            if (show) visibleCount++;
-
-            console.log(`Card: ${name} - Show: ${show} | Name: ${matchesSearch}, Class: ${matchesClass}, Gender: ${matchesGender}, Balance: ${matchesBalance}`);
-        });
-
-        // Show/hide empty state if needed
-        console.log(`Visible cards: ${visibleCount}`);
-    }
-
-    // Add event listeners
-    searchInput.addEventListener('input', filterStudents);
-    classFilter.addEventListener('change', filterStudents);
-    genderFilter.addEventListener('change', filterStudents);
-    balanceFilter.addEventListener('change', filterStudents);
-
     // Add student handler
     document.getElementById('addStudentBtn').addEventListener('click', function() {
         window.location.href = '{% url "student_create" %}';
     });
-
-    // Debug: Log all student data on load
-    window.addEventListener('load', function() {
-        console.log('Student cards loaded:');
-        studentCards.forEach((card, idx) => {
-            console.log(`Card ${idx}:`, {
-                name: card.dataset.name,
-                class: card.dataset.class,
-                gender: card.dataset.gender,
-                balance: card.dataset.balance
-            });
-        });
-    });
 </script>
+
+<!-- Pagination -->
+<div class="mt-12 flex flex-col md:flex-row gap-6 items-center justify-between">
+    <div class="text-slate-400">
+        {% if page_obj %}
+            Showing page <strong>{{ page_obj.number }}</strong> of <strong>{{ page_obj.paginator.num_pages }}</strong> 
+            ({{ paginator.count|default:"0" }} results)
+        {% else %}
+            No students found
+        {% endif %}
+    </div>
+    
+    {% if is_paginated %}
+    <nav class="flex gap-2">
+        {% if page_obj.has_previous %}
+        <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.class %}&class={{ request.GET.class }}{% endif %}{% if request.GET.sex %}&sex={{ request.GET.sex }}{% endif %}{% if request.GET.balance %}&balance={{ request.GET.balance }}{% endif %}" 
+           class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition-all">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.class %}&class={{ request.GET.class }}{% endif %}{% if request.GET.sex %}&sex={{ request.GET.sex }}{% endif %}{% if request.GET.balance %}&balance={{ request.GET.balance }}{% endif %}" 
+           class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition-all">Previous</a>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <span class="px-4 py-2 rounded-lg bg-emerald-500 text-white font-bold">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.class %}&class={{ request.GET.class }}{% endif %}{% if request.GET.sex %}&sex={{ request.GET.sex }}{% endif %}{% if request.GET.balance %}&balance={{ request.GET.balance }}{% endif %}" 
+               class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition-all">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.class %}&class={{ request.GET.class }}{% endif %}{% if request.GET.sex %}&sex={{ request.GET.sex }}{% endif %}{% if request.GET.balance %}&balance={{ request.GET.balance }}{% endif %}" 
+           class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition-all">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.class %}&class={{ request.GET.class }}{% endif %}{% if request.GET.sex %}&sex={{ request.GET.sex }}{% endif %}{% if request.GET.balance %}&balance={{ request.GET.balance }}{% endif %}" 
+           class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition-all">Last</a>
+        {% endif %}
+    </nav>
+    {% endif %}
+</div>
 
 {% endblock %}

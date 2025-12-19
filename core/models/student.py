@@ -27,6 +27,7 @@ class Student(models.Model):
     STATUS_CHOICES = [
         ('ENROLLED', 'Enrolled'),
         ('ACTIVE', 'Active'),
+        ('ALUMNI', 'Alumni'),
         ('GRADUATED', 'Graduated'),
         ('EXPELLED', 'Expelled'),
     ]
@@ -58,6 +59,7 @@ class Student(models.Model):
     is_active = models.BooleanField(default=True)
     is_archived = models.BooleanField(default=False, help_text="Graduated with all arrears paid - can be deleted")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='ENROLLED')
+    alumni_date = models.DateTimeField(null=True, blank=True, help_text="When student became alumni (immediately upon full fee payment in Grade 7)")
     
     # Audit Trail - Soft Delete
     is_deleted = models.BooleanField(default=False, help_text="Soft delete flag - financial records preserved for audit")
@@ -211,8 +213,8 @@ class Student(models.Model):
                 "Student must first be transitioned to GRADUATED or EXPELLED status."
             )
         
-        # Validation 4: Cannot reactivate graduated students
-        if old_status == 'GRADUATED' and new_status != 'GRADUATED':
+        # Validation 4: Cannot reactivate graduated students (EXCEPT to archive them)
+        if old_status == 'GRADUATED' and new_status != 'GRADUATED' and new_status != 'ALUMNI':
             raise ValidationError(
                 f"Cannot change status of a GRADUATED student. "
                 f"Graduated students cannot be re-enrolled."
@@ -225,10 +227,11 @@ class Student(models.Model):
         
         # Validate allowed transitions
         allowed_transitions = {
-            'ENROLLED': ['ACTIVE', 'GRADUATED', 'EXPELLED'],  # Allow direct ENROLLED->GRADUATED for Grade 7 auto-graduation
-            'ACTIVE': ['GRADUATED', 'EXPELLED'],
-            'GRADUATED': [],
-            'EXPELLED': [],
+            'ENROLLED': ['ACTIVE', 'GRADUATED', 'ALUMNI', 'EXPELLED'],  # Allow direct transitions
+            'ACTIVE': ['GRADUATED', 'ALUMNI', 'EXPELLED'],  # Allow ACTIVE->ALUMNI for Grade 7 completion
+            'ALUMNI': [],  # Alumni status is final
+            'GRADUATED': ['ALUMNI'],  # Graduated students can become Alumni when paid
+            'EXPELLED': [],  # Expelled status is final
         }
         
         if new_status not in allowed_transitions.get(old_status, []):
@@ -411,6 +414,7 @@ class Student(models.Model):
     def transfer_to_class(self, new_class):
         """Transfer student to a new class"""
         self.current_class = new_class
+        self.save()
 
     def auto_graduate_if_eligible(self):
         """

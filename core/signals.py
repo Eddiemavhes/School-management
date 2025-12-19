@@ -28,9 +28,22 @@ def update_student_balance_on_payment(sender, instance, created, **kwargs):
             balance.amount_paid = total_paid
             balance.save(update_fields=['amount_paid'])
         
-        # NOTE: Auto-graduation for Grade 7 is handled during year-end rollover
-        # NOT during payment processing. Grade 7 students remain active throughout
-        # their entire Grade 7 academic year (all 3 terms).
+        # CHECK FOR GRADE 7 TERM 3 ALUMNI CONVERSION
+        # If this is a Grade 7 student in Term 3 with zero/negative balance, convert to alumni
+        if student.current_class and student.current_class.grade == 7:
+            if term and term.term == 3:
+                # Check if all fees are paid (balance <= 0)
+                if balance and balance.current_balance <= 0:
+                    # Trigger alumni conversion
+                    from .services.alumni_conversion import AlumniConversionService
+                    
+                    try:
+                        # Only convert if not already properly configured as alumni
+                        if student.status != 'ALUMNI' or student.is_active:
+                            if AlumniConversionService.convert_to_alumni(student):
+                                print(f"✅ {student.first_name} {student.surname} converted to Alumni (Balance: {balance.current_balance})")
+                    except Exception as e:
+                        print(f"⚠️ Error converting {student.first_name} {student.surname} to alumni: {e}")
         
         # ONLY cascade to next terms if student is NOT graduating
         # When a payment changes the balance for the current term,
@@ -57,7 +70,6 @@ def update_student_balance_on_payment(sender, instance, created, **kwargs):
                 # Only update if balance already exists - don't create new ones
                 if StudentBalance.objects.filter(student=student, term=next_year_term).exists():
                     StudentBalance.initialize_term_balance(student, next_year_term)
-                
     except Exception as e:
         print(f"Error updating StudentBalance for payment {instance.id}: {e}")
 
@@ -86,7 +98,72 @@ def recalculate_balance_on_payment_delete(sender, instance, **kwargs):
             
     except Exception as e:
         print(f"Error recalculating balance after payment delete: {e}")
-        print(f"Error updating StudentBalance for payment {instance.id}: {e}")
+
+@receiver(post_save, sender=Payment)
+def check_grade7_alumni_status(sender, instance, created, **kwargs):
+    """Check if Grade 7 student should be marked as alumni upon full fee payment"""
+    from .models.student import Student
+    from .models.fee import StudentBalance
+    from decimal import Decimal
+    from django.utils import timezone
+    
+    student = instance.student
+    
+    # Only check Grade 7 students
+    if not student.current_class or int(student.current_class.grade) != 7:
+        return
+    
+    # Only check if still active (not already archived)
+    if student.is_archived:
+        return
+    
+    try:
+        # Get student's total outstanding balance across all terms
+        all_balances = StudentBalance.objects.filter(student=student)
+        total_outstanding = sum(b.current_balance for b in all_balances if b.current_balance > 0)
+        
+        # If all fees are paid (balance <= 0), mark as ALUMNI immediately
+        if total_outstanding <= 0:
+            student.status = 'ALUMNI'
+            student.alumni_date = timezone.now()
+            # Don't mark as inactive - they can still sit for exams and complete Grade 7
+            student.save(update_fields=['status', 'alumni_date'])
+            
+            print(f"✅ {student.full_name} marked as ALUMNI - all fees paid in Grade 7")
+    
+    except Exception as e:
+        print(f"Error checking Grade 7 alumni status: {e}")
+
+
+@receiver(post_delete, sender=Payment)
+def check_alumni_status_on_payment_delete(sender, instance, **kwargs):
+    """Re-check alumni status if payment is deleted"""
+    from .models.student import Student
+    from .models.fee import StudentBalance
+    
+    student = instance.student
+    
+    # Only check Grade 7 students
+    if not student.current_class or int(student.current_class.grade) != 7:
+        return
+    
+    try:
+        # Recalculate total outstanding
+        all_balances = StudentBalance.objects.filter(student=student)
+        total_outstanding = sum(b.current_balance for b in all_balances if b.current_balance > 0)
+        
+        # If balance became positive again (debt returned), remove alumni status if it was just for fees
+        if total_outstanding > 0 and student.status == 'ALUMNI':
+            # Check if this is a fee-based alumni (no graduation yet)
+            current_term = AcademicTerm.get_current_term()
+            if current_term and current_term.term < 3:
+                # Still in Term 1 or 2, not end-of-year graduation yet
+                student.status = 'ACTIVE'
+                student.save(update_fields=['status'])
+                print(f"❌ {student.full_name} alumni status revoked - fees unpaid again")
+    
+    except Exception as e:
+        print(f"Error rechecking alumni status after payment delete: {e}")
 
 @receiver(post_save, sender=AcademicTerm)
 def initialize_balances_on_term_activation(sender, instance, **kwargs):
@@ -142,12 +219,14 @@ def initialize_balances_on_term_activation(sender, instance, **kwargs):
             # Get students who have completed ALL 3 TERMS (intersection of all three)
             completed_all_terms = set(term1_students) & set(term2_students) & set(term3_students)
             
-            # Get these students and graduate them
+            # Get these students - but only graduate those in Grade 7!
+            # CRITICAL FIX: Only Grade 7 students can graduate. Grade 1-6 remain active.
             students_to_graduate = Student.objects.filter(
                 pk__in=completed_all_terms,
                 status='ENROLLED',  # Not yet graduated
                 is_active=True,
-                is_deleted=False
+                is_deleted=False,
+                current_class__grade=7  # ✅ CRITICAL: Only Grade 7 students graduate!
             )
             
             for student in students_to_graduate:

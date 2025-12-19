@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ZIMSEC Results Entry - {{ academic_year }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="flex justify-between items-start mb-12 animate-slideInUp">
+            <div>
+                <h1 class="text-5xl font-bold bg-gradient-to-r from-amber-300 via-orange-300 to-red-300 bg-clip-text text-transparent mb-3">📝 ZIMSEC Results Entry</h1>
+                <p class="text-slate-400 text-lg">Enter Grade 7 examination results for {{ academic_year }} - {{ class_name }}</p>
+            </div>
+            <a href="{% url 'zimsec_entry' %}" class="px-6 py-3 rounded-lg font-bold text-white bg-slate-700 hover:bg-slate-600 transition">
+                Back to Selection
+            </a>
+        </div>
+
+        {% if errors %}
+        <div class="glass rounded-2xl p-6 border border-red-500/30 bg-red-500/10 mb-8 animate-slideInUp">
+            <div class="text-red-300">
+                <strong>⚠️ Validation Errors:</strong>
+                <ul class="mt-2 mb-0 ml-4 list-disc">
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        <form method="post" class="needs-validation">
+            {% csrf_token %}
+            
+            <!-- Configuration Section -->
+            <div class="glass rounded-2xl p-8 border border-slate-500/20 mb-8 animate-slideInUp" style="animation-delay: 0.1s;">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="examCenter" class="block text-slate-300 font-bold mb-3">Exam Center</label>
+                        <input type="text" class="w-full px-4 py-3 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30" 
+                               id="examCenter" name="exam_center" placeholder="e.g., Central High School" value="{{ exam_center }}">
+                    </div>
+                    <div>
+                        <label for="resultDate" class="block text-slate-300 font-bold mb-3">Result Date</label>
+                        <input type="date" class="w-full px-4 py-3 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30" 
+                               id="resultDate" name="result_date" value="{{ result_date }}">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-bold mb-3">Students to Enter</label>
+                        <div class="px-4 py-3 rounded-lg bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-amber-300 font-bold text-lg">
+                            {{ students|length }} Students
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Entry Table -->
+            <div class="glass rounded-2xl p-8 border border-slate-500/20 mb-8 animate-slideInUp" style="animation-delay: 0.2s;">
+                <h3 class="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-3">
+                    <div class="w-1.5 h-8 bg-gradient-to-b from-blue-400 to-cyan-400 rounded-full"></div>
+                    Enter Results
+                </h3>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-600/30">
+                                <th class="pb-4 px-3 text-left text-xs font-bold uppercase text-slate-300" style="width: 20%">Student Name</th>
+                                <th class="pb-4 px-3 text-center text-xs font-bold uppercase text-slate-300" style="width: 10%">
+                                    ENG<br><span class="font-normal text-slate-400">(1-9)</span>
+                                </th>
+                                <th class="pb-4 px-3 text-center text-xs font-bold uppercase text-slate-300" style="width: 10%">
+                                    MATH<br><span class="font-normal text-slate-400">(1-9)</span>
+                                </th>
+                                <th class="pb-4 px-3 text-center text-xs font-bold uppercase text-slate-300" style="width: 10%">
+                                    SCI<br><span class="font-normal text-slate-400">(1-9)</span>
+                                </th>
+                                <th class="pb-4 px-3 text-center text-xs font-bold uppercase text-slate-300" style="width: 10%">
+                                    SOC<br><span class="font-normal text-slate-400">(1-9)</span>
+                                </th>
+                                <th class="pb-4 px-3 text-center text-xs font-bold uppercase text-slate-300" style="width: 10%">
+                                    LANG<br><span class="font-normal text-slate-400">(1-9)</span>
+                                </th>
+                                <th class="pb-4 px-3 text-center text-xs font-bold uppercase text-slate-300" style="width: 10%">
+                                    AGR<br><span class="font-normal text-slate-400">(1-9)</span>
+                                </th>
+                                <th class="pb-4 px-3 text-center text-xs font-bold uppercase text-slate-300" style="width: 10%">
+                                    AGG
+                                </th>
+                                <th class="pb-4 px-3 text-center text-xs font-bold uppercase text-slate-300" style="width: 10%">
+                                    STATUS
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTable" class="divide-y divide-slate-700/30">
+                            {% for student in students %}
+                            <tr class="student-row hover:bg-slate-700/20 transition-colors" data-student-id="{{ student.id }}">
+                                <td class="py-4 px-3">
+                                    <strong class="text-slate-100">{{ student.first_name }} {{ student.last_name }}</strong>
+                                    <br>
+                                    <small class="text-slate-500">#{{ student.student_id }}</small>
+                                </td>
+                                
+                                <!-- English Units -->
+                                <td class="py-4 px-3">
+                                    <input type="number" class="w-full px-3 py-2 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 text-center font-bold text-lg units-input focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30" 
+                                           name="english_units_{{ student.id }}" min="1" max="9" placeholder="1-9" data-field="english">
+                                </td>
+                                
+                                <!-- Mathematics Units -->
+                                <td class="py-4 px-3">
+                                    <input type="number" class="w-full px-3 py-2 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 text-center font-bold text-lg units-input focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30" 
+                                           name="mathematics_units_{{ student.id }}" min="1" max="9" placeholder="1-9" data-field="math">
+                                </td>
+                                
+                                <!-- Science Units -->
+                                <td class="py-4 px-3">
+                                    <input type="number" class="w-full px-3 py-2 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 text-center font-bold text-lg units-input focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30" 
+                                           name="science_units_{{ student.id }}" min="1" max="9" placeholder="1-9" data-field="science">
+                                </td>
+                                
+                                <!-- Social Studies Units -->
+                                <td class="py-4 px-3">
+                                    <input type="number" class="w-full px-3 py-2 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 text-center font-bold text-lg units-input focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30" 
+                                           name="social_studies_units_{{ student.id }}" min="1" max="9" placeholder="1-9" data-field="social">
+                                </td>
+                                
+                                <!-- Indigenous Language Units -->
+                                <td class="py-4 px-3">
+                                    <input type="number" class="w-full px-3 py-2 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 text-center font-bold text-lg units-input focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30" 
+                                           name="indigenous_language_units_{{ student.id }}" min="1" max="9" placeholder="1-9" data-field="language">
+                                </td>
+                                
+                                <!-- Agriculture Units -->
+                                <td class="py-4 px-3">
+                                    <input type="number" class="w-full px-3 py-2 rounded-lg bg-slate-700/40 border border-slate-600/40 text-slate-100 text-center font-bold text-lg units-input focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30" 
+                                           name="agriculture_units_{{ student.id }}" min="1" max="9" placeholder="1-9" data-field="agriculture">
+                                </td>
+                                
+                                <!-- Total Aggregate (auto-calculated) -->
+                                <td class="py-4 px-3 text-center">
+                                    <span class="aggregate-value font-bold text-lg text-amber-400">-</span>
+                                </td>
+                                
+                                <!-- Overall Status (auto-calculated) -->
+                                <td class="py-4 px-3 text-center">
+                                    <span class="status-badge px-3 py-1 rounded text-xs font-bold" style="display: none;">-</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Instructions Alert -->
+            <div class="glass rounded-2xl p-6 border border-blue-500/30 bg-blue-500/10 mb-8 animate-slideInUp" style="animation-delay: 0.3s;">
+                <p class="text-blue-300 text-sm font-semibold mb-2">📌 Instructions:</p>
+                <ul class="text-blue-300 text-sm space-y-1 ml-4 list-disc">
+                    <li>Enter units 1-9 for each subject (1-5 = PASS, 6-9 = FAIL)</li>
+                    <li>Aggregate calculates automatically (lower is better)</li>
+                    <li>Student must PASS all 6 subjects</li>
+                    <li>Save all results at once</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4 animate-slideInUp" style="animation-delay: 0.4s;">
+                <button type="submit" class="flex-1 px-6 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition">
+                    💾 Save All Results
+                </button>
+                <a href="{% url 'zimsec_entry' %}" class="flex-1 px-6 py-3 rounded-lg font-bold text-white bg-slate-700 hover:bg-slate-600 transition text-center">
+                    ✕ Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('.units-input');
+    
+    inputs.forEach(input => {
+        input.addEventListener('change', calculateAggregate);
+        input.addEventListener('blur', validateInput);
+    });
+    
+    function validateInput(e) {
+        const value = parseInt(e.target.value);
+        if (e.target.value && (value < 1 || value > 9)) {
+            e.target.classList.add('border-red-500', 'ring-2', 'ring-red-500/30');
+            e.target.title = 'Units must be between 1 and 9';
+        } else {
+            e.target.classList.remove('border-red-500', 'ring-2', 'ring-red-500/30');
+        }
+    }
+    
+    function calculateAggregate(e) {
+        const row = e.target.closest('.student-row');
+        const inputs = row.querySelectorAll('.units-input');
+        const aggregateSpan = row.querySelector('.aggregate-value');
+        const statusBadge = row.querySelector('.status-badge');
+        
+        let values = [];
+        inputs.forEach(input => {
+            if (input.value) {
+                values.push(parseInt(input.value));
+            }
+        });
+        
+        if (values.length === 6) {
+            const aggregate = values.reduce((a, b) => a + b, 0);
+            const allPass = values.every(v => v <= 5);
+            
+            aggregateSpan.textContent = aggregate;
+            
+            if (allPass) {
+                statusBadge.textContent = 'PASS';
+                statusBadge.className = 'status-badge px-3 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+            } else {
+                statusBadge.textContent = 'FAIL';
+                statusBadge.className = 'status-badge px-3 py-1 rounded text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30';
+            }
+            statusBadge.style.display = 'inline-block';
+        } else {
+            aggregateSpan.textContent = '-';
+            statusBadge.style.display = 'none';
+        }
+    }
+});
+</script>
+
+<style>
+    .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(20px);
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-slideInUp {
+        animation: slideInUp 0.6s ease-out forwards;
+    }
+
+    .units-input {
+        font-variant-numeric: tabular-nums;
+    }
+</style>
+
+{% endblock %}

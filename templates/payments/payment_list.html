@@ -261,6 +261,30 @@
         }
         window.location = url;
     });
+
+    // Handle student search with debouncing
+    const searchInput = document.getElementById('student-search');
+    let debounceTimer;
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            const url = new URL(window.location);
+            if (this.value.trim()) {
+                url.searchParams.set('search', this.value.trim());
+            } else {
+                url.searchParams.delete('search');
+            }
+            window.location = url;
+        }, 500);  // Wait 500ms after user stops typing
+    });
+
+    // Populate search field with current query if exists
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('search');
+    if (searchQuery) {
+        searchInput.value = searchQuery;
+    }
 </script>
 {% endblock %}
 {% endblock %}

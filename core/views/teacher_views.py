@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.db.models import Q
-from core.models import Administrator, Class
+from core.models import Administrator, Class, AcademicTerm
 from django.utils import timezone
 
 class TeacherListView(LoginRequiredMixin, ListView):
@@ -34,7 +34,11 @@ class TeacherListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['classes'] = Class.objects.all()
+        current_term = AcademicTerm.get_current_term()
+        if current_term:
+            context['classes'] = Class.objects.filter(academic_year=current_term.academic_year).order_by('grade', 'section')
+        else:
+            context['classes'] = Class.objects.none()
         return context
 
 class TeacherDetailView(LoginRequiredMixin, DetailView):
@@ -47,7 +51,11 @@ class TeacherDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['assignment_history'] = self.object.get_assignment_history()
-        context['available_classes'] = Class.objects.filter(teacher__isnull=True)
+        current_term = AcademicTerm.get_current_term()
+        if current_term:
+            context['available_classes'] = Class.objects.filter(academic_year=current_term.academic_year, teacher__isnull=True).order_by('grade', 'section')
+        else:
+            context['available_classes'] = Class.objects.none()
         return context
 
 class TeacherCreateView(LoginRequiredMixin, CreateView):

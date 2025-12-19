@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Import Complete{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div class="max-w-6xl mx-auto">
+        
+        <!-- Success Header -->
+        <div class="mb-8 text-center">
+            <div class="flex justify-center mb-4">
+                <div class="flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-2xl shadow-green-500/50">
+                    <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            <h1 class="text-5xl font-black text-white mb-2">Import Successful! ✅</h1>
+            <p class="text-green-300 text-lg font-semibold">All arrears have been successfully applied to student balances</p>
+            
+            <!-- Progress Bar (Complete) -->
+            <div class="flex items-center justify-between mt-8">
+                <div class="flex-1 h-2 bg-slate-700 rounded-full mx-2">
+                    <div class="h-full w-full bg-gradient-to-r from-green-500 to-emerald-600 rounded-full"></div>
+                </div>
+                <span class="text-sm font-bold text-green-400">Step {{ step }} of {{ total_steps }} - Complete!</span>
+            </div>
+        </div>
+        
+        <!-- Import Results -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            
+            <!-- Success Stats -->
+            <div class="bg-slate-800/90 backdrop-blur-xl border-2 border-green-500/30 rounded-2xl p-8 shadow-2xl">
+                <h2 class="text-2xl font-bold text-white mb-6">📊 Import Results</h2>
+                
+                <div class="space-y-4">
+                    <div class="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                        <p class="text-sm text-gray-400">Successfully Imported</p>
+                        <p class="text-4xl font-black text-green-400">{{ imported_count }}</p>
+                        <p class="text-xs text-gray-500">Student records updated</p>
+                    </div>
+                    
+                    {% if failed_count > 0 %}
+                    <div class="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                        <p class="text-sm text-gray-400">Failed to Import</p>
+                        <p class="text-4xl font-black text-red-400">{{ failed_count }}</p>
+                        <p class="text-xs text-gray-500">See details below</p>
+                    </div>
+                    {% else %}
+                    <div class="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                        <p class="text-sm text-gray-400">Failed to Import</p>
+                        <p class="text-4xl font-black text-emerald-400">0</p>
+                        <p class="text-xs text-gray-500">No errors!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Batch Info -->
+            <div class="bg-slate-800/90 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl p-8 shadow-2xl">
+                <h2 class="text-2xl font-bold text-white mb-6">ℹ️ Batch Information</h2>
+                
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Batch ID:</span>
+                        <span class="font-mono text-cyan-400">{{ batch.batch_id }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Academic Year:</span>
+                        <span class="text-white font-semibold">{{ batch.academic_year }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Import Method:</span>
+                        <span class="text-white font-semibold">{{ batch.get_import_method_display }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Import Date:</span>
+                        <span class="text-white font-semibold">{{ batch.imported_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Imported By:</span>
+                        <span class="text-white font-semibold">{{ batch.created_by.full_name|default:batch.created_by }}</span>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Sample Student Statements -->
+        {% if sample_statements %}
+        <div class="bg-slate-800/90 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl p-8 shadow-2xl mb-8">
+            <h2 class="text-2xl font-bold text-white mb-6">👤 Sample Student Statements</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {% for statement in sample_statements %}
+                <div class="p-4 rounded-lg border-2 border-slate-600 bg-slate-700/30 space-y-2">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <p class="font-bold text-white">{{ statement.student_name }}</p>
+                            <p class="text-xs text-gray-400">ID: {{ statement.student_id }}</p>
+                        </div>
+                        <span class="px-2 py-1 rounded text-xs font-bold bg-green-500/20 text-green-400">{{ statement.status }}</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                            <p class="text-xs text-gray-400">Previous Arrears</p>
+                            <p class="font-bold text-orange-400">${{ statement.previous_arrears }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400">Current Balance</p>
+                            <p class="font-bold text-white">${{ statement.current_balance }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-xs text-gray-500 pt-2 border-t border-slate-600">
+                        {{ statement.current_term }} - Opening: ${{ statement.opening_balance }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Failed Entries (if any) -->
+        {% if failed_entries %}
+        <div class="bg-red-500/10 backdrop-blur-xl border-2 border-red-500/30 rounded-2xl p-8 shadow-2xl mb-8">
+            <h2 class="text-2xl font-bold text-red-300 mb-6">⚠️ Failed Imports</h2>
+            
+            <div class="space-y-2 max-h-64 overflow-y-auto">
+                {% for entry in failed_entries %}
+                <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                    <p class="font-semibold text-white">{{ entry.student.full_name }}</p>
+                    <p class="text-xs text-red-300">{{ entry.error_message }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="mt-4 p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                <p class="text-sm text-yellow-300">
+                    <strong>Note:</strong> These entries will need to be manually added or corrected.
+                    Please contact the administrator if you need assistance.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Next Steps -->
+        <div class="bg-slate-800/90 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl p-8 shadow-2xl">
+            <h2 class="text-2xl font-bold text-white mb-6">📋 What's Next?</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                <div class="p-4 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                    <p class="text-sm font-bold text-cyan-300 mb-2">1. Review Balances</p>
+                    <p class="text-xs text-gray-400">Check that all student balances have been updated correctly in the fee dashboard</p>
+                </div>
+                
+                <div class="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                    <p class="text-sm font-bold text-purple-300 mb-2">2. Communicate with Parents</p>
+                    <p class="text-xs text-gray-400">Send statements to parents showing their updated balances including arrears</p>
+                </div>
+                
+                <div class="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                    <p class="text-sm font-bold text-green-300 mb-2">3. Monitor Payments</p>
+                    <p class="text-xs text-gray-400">Track payments against arrears to ensure proper allocation</p>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-4 flex-wrap">
+                <a href="{% url 'fee_dashboard' %}" class="flex items-center gap-2 py-3 px-6 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold transition-all duration-200 transform hover:scale-105 shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    View Fee Dashboard
+                </a>
+                
+                <a href="{% url 'student_list' %}" class="flex items-center gap-2 py-3 px-6 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold transition-all duration-200 transform hover:scale-105 shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 12H9m6 0a6 6 0 11-12 0 6 6 0 0112 0z"></path>
+                    </svg>
+                    View Students
+                </a>
+                
+                <a href="{% url 'admin_dashboard' %}" class="flex items-center gap-2 py-3 px-6 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-bold transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4m-4 4l-4-4"></path>
+                    </svg>
+                    Go to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

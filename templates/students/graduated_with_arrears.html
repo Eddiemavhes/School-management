@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Graduated Students with Arrears{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .glass {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .stat-card {
+        animation: slideInUp 0.6s ease-out forwards;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+
+    .student-row {
+        animation: slideInUp 0.6s ease-out;
+    }
+
+    .badge-arrears {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-red-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Header with Navigation -->
+        <div class="mb-12 animate-slideInUp">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h1 class="text-5xl font-bold bg-gradient-to-r from-red-300 via-orange-300 to-yellow-300 bg-clip-text text-transparent mb-2">Graduated with Arrears</h1>
+                    <p class="text-slate-400 text-lg">Students who completed Grade 7 but have outstanding fees to pay</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <div class="flex gap-3 mb-6 flex-wrap">
+                <a href="{% url 'student_list' %}" class="px-6 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors">
+                    📚 Active Students
+                </a>
+                <a href="{% url 'graduated_with_arrears' %}" class="px-6 py-2 rounded-lg bg-orange-600 text-white font-semibold hover:bg-orange-700 transition-colors">
+                    ⚠️ Graduated with Arrears
+                </a>
+                <a href="{% url 'archived_students' %}" class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors">
+                    🎓 Alumni
+                </a>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="mb-8 animate-slideInUp" style="animation-delay: 0.4s;">
+            <form method="get" class="glass rounded-lg p-6">
+                <div class="flex gap-4">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        placeholder="Search by name or birth entry number..." 
+                        value="{{ request.GET.search }}"
+                        class="flex-1 px-4 py-3 bg-slate-800 text-white rounded-lg border border-slate-600 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 outline-none transition-colors"
+                    >
+                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-lg font-semibold transition-all">
+                        Search
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Total Students -->
+            <div class="stat-card glass rounded-lg p-6 hover-lift transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm uppercase tracking-wide mb-2">Total Students</p>
+                        <p class="text-4xl font-bold text-white">{{ total_students }}</p>
+                    </div>
+                    <svg class="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292m0-5.292v.001M21 21H3c-.621 0-1.12-.504-1.12-1.121V5.03c0-.621.499-1.122 1.12-1.122h18.76c.621 0 1.12.501 1.12 1.121v14.849c0 .617-.499 1.121-1.12 1.121z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Total Amount Owed -->
+            <div class="stat-card glass rounded-lg p-6 hover-lift transition-all duration-300" style="animation-delay: 0.2s;">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm uppercase tracking-wide mb-2">Total Outstanding</p>
+                        <p class="text-4xl font-bold text-white">${{ total_owed }}</p>
+                    </div>
+                    <svg class="w-12 h-12 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Average Per Student -->
+            <div class="stat-card glass rounded-lg p-6 hover-lift transition-all duration-300" style="animation-delay: 0.3s;">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm uppercase tracking-wide mb-2">Average Per Student</p>
+                        <p class="text-4xl font-bold text-white">${{ average_owed|floatformat:2 }}</p>
+                    </div>
+                    <svg class="w-12 h-12 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="mb-8 animate-slideInUp" style="animation-delay: 0.4s;">
+            <form method="get" class="glass rounded-lg p-6">
+                <div class="flex gap-4">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        placeholder="Search by name or birth entry number..." 
+                        value="{{ request.GET.search }}"
+                        class="flex-1 px-4 py-3 bg-slate-800 text-white rounded-lg border border-slate-600 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 outline-none transition-colors"
+                    >
+                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-lg font-semibold transition-all">
+                        Search
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Students List -->
+        <div class="glass rounded-lg overflow-hidden animate-slideInUp" style="animation-delay: 0.5s;">
+            {% if graduated_students %}
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-slate-900/50 border-b border-slate-700">
+                                <th class="px-6 py-4 text-left text-slate-300 font-semibold uppercase text-sm tracking-wider">Name</th>
+                                <th class="px-6 py-4 text-left text-slate-300 font-semibold uppercase text-sm tracking-wider">Birth Entry</th>
+                                <th class="px-6 py-4 text-left text-slate-300 font-semibold uppercase text-sm tracking-wider">Grade</th>
+                                <th class="px-6 py-4 text-right text-slate-300 font-semibold uppercase text-sm tracking-wider">Outstanding</th>
+                                <th class="px-6 py-4 text-center text-slate-300 font-semibold uppercase text-sm tracking-wider">Status</th>
+                                <th class="px-6 py-4 text-center text-slate-300 font-semibold uppercase text-sm tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-700">
+                            {% for student in graduated_students %}
+                                <tr class="student-row hover:bg-slate-800/50 transition-colors duration-200">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-orange-400 to-red-400 flex items-center justify-center text-white font-bold text-sm">
+                                                {{ student.first_name|first|upper }}
+                                            </div>
+                                            <div>
+                                                <p class="text-white font-semibold">{{ student.full_name }}</p>
+                                                <p class="text-slate-400 text-sm">Enrolled: {{ student.date_enrolled|date:"M d, Y" }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <p class="text-slate-300 font-mono">{{ student.birth_entry_number }}</p>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-3 py-1 bg-slate-700 text-slate-200 rounded-full text-sm font-semibold">
+                                            {% if student.current_class %}
+                                                Grade {{ student.current_class.grade }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <p class="text-red-400 font-bold text-lg">
+                                            ${{ student.overall_balance|floatformat:2 }}
+                                        </p>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="badge-arrears px-3 py-1 rounded-full text-sm font-semibold">
+                                            Graduated
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <div class="flex gap-2 justify-center">
+                                            <a href="{% url 'student_detail' student.pk %}" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-semibold transition-colors">
+                                                View
+                                            </a>
+                                            <a href="{% url 'student_payment_history' student.pk %}" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-semibold transition-colors">
+                                                Payments
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                    <div class="px-6 py-4 bg-slate-900/50 border-t border-slate-700 flex items-center justify-between">
+                        <div class="text-slate-400 text-sm">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </div>
+                        <div class="flex gap-2">
+                            {% if page_obj.has_previous %}
+                                <a href="?page=1" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-colors">First</a>
+                                <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-colors">← Previous</a>
+                            {% endif %}
+                            
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-colors">Next →</a>
+                                <a href="?page={{ page_obj.paginator.num_pages }}" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-colors">Last</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="px-6 py-12 text-center">
+                    <svg class="w-20 h-20 text-slate-600 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <h3 class="text-2xl font-bold text-slate-300 mb-3">No Graduated Students with Arrears</h3>
+                    <p class="text-slate-400 text-lg mb-2">Great news! All graduated students have paid their fees.</p>
+                    <p class="text-slate-500 text-sm">Graduates automatically become alumni once all arrears are cleared.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Legend -->
+        <div class="mt-8 glass rounded-lg p-6 animate-slideInUp" style="animation-delay: 0.6s;">
+            <h3 class="text-lg font-bold text-white mb-4">Understanding This Page</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <h4 class="text-orange-300 font-semibold mb-2">Graduated Status</h4>
+                    <p class="text-slate-400 text-sm">These students have completed Grade 7 but still owe fees. They will become Alumni once all arrears are paid.</p>
+                </div>
+                <div>
+                    <h4 class="text-orange-300 font-semibold mb-2">Outstanding Balance</h4>
+                    <p class="text-slate-400 text-sm">The total amount each student still owes for all terms. This includes any unpaid fees from previous years.</p>
+                </div>
+                <div>
+                    <h4 class="text-orange-300 font-semibold mb-2">Next Steps</h4>
+                    <p class="text-slate-400 text-sm">Click "Payments" to record payment collections or "View" to see detailed information and payment history.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

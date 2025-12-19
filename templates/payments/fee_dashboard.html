@@ -120,13 +120,13 @@
                     All Students <span class="ml-2 text-xs bg-slate-700/50 px-2 py-1 rounded">{{ balances|length }}</span>
                 </button>
                 <button class="tab-btn px-4 py-2 text-sm font-bold text-slate-300 hover:text-slate-100 transition" data-filter="PAID">
-                    <span class="text-emerald-400">●</span> Fully Paid <span class="ml-2 text-xs bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded">0</span>
+                    <span class="text-emerald-400">●</span> Fully Paid <span class="ml-2 text-xs bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded">{{ fully_paid }}</span>
                 </button>
                 <button class="tab-btn px-4 py-2 text-sm font-bold text-slate-300 hover:text-slate-100 transition" data-filter="PARTIAL">
-                    <span class="text-amber-400">●</span> Partial <span class="ml-2 text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded">0</span>
+                    <span class="text-amber-400">●</span> Partial <span class="ml-2 text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded">{{ partial_paid }}</span>
                 </button>
                 <button class="tab-btn px-4 py-2 text-sm font-bold text-slate-300 hover:text-slate-100 transition" data-filter="UNPAID">
-                    <span class="text-red-400">●</span> Unpaid <span class="ml-2 text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded">0</span>
+                    <span class="text-red-400">●</span> Unpaid <span class="ml-2 text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded">{{ no_payment }}</span>
                 </button>
             </div>
             
@@ -139,6 +139,7 @@
                             <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Arrears</th>
                             <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Amount Paid</th>
                             <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Balance</th>
+                            <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Alumni Status</th>
                             <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Status</th>
                             <th class="pb-4 px-4 text-left text-xs font-bold uppercase tracking-wider text-slate-300">Action</th>
                         </tr>
@@ -165,15 +166,41 @@
                                 </span>
                             </td>
                             <td class="py-4 px-4">
-                                <span class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide
-                                    {% if balance.payment_status == 'PAID' %}
-                                        bg-emerald-500/20 text-emerald-300 border border-emerald-500/30
-                                    {% elif balance.payment_status == 'PARTIAL' %}
-                                        bg-amber-500/20 text-amber-300 border border-amber-500/30
+                                {% if balance.student.current_class.grade == 7 and balance.term.term == 3 and balance.student.status != 'ALUMNI' %}
+                                    {% if balance.current_balance <= 0 %}
+                                        <span class="px-2 py-1 rounded text-xs font-bold bg-purple-500/30 text-purple-300 border border-purple-500/40 animate-pulse">
+                                            ✓ Eligible Now
+                                        </span>
                                     {% else %}
-                                        bg-red-500/20 text-red-300 border border-red-500/30
+                                        <span class="px-2 py-1 rounded text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                            {{ balance.current_balance|floatformat:2 }} Remaining
+                                        </span>
+                                    {% endif %}
+                                {% elif balance.student.status == 'ALUMNI' %}
+                                    <span class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-indigo-500/30 text-indigo-300 border border-indigo-500/30">
+                                        Alumni
+                                    </span>
+                                {% else %}
+                                    <span class="text-slate-500 text-xs">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-4">
+                                <span class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 transition-all duration-300
+                                    {% if balance.payment_status == 'PAID' %}
+                                        bg-emerald-500/25 text-emerald-200 border border-emerald-500/50 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/30 hover:bg-emerald-500/35
+                                    {% elif balance.payment_status == 'PARTIAL' %}
+                                        bg-amber-500/25 text-amber-200 border border-amber-500/50 shadow-lg shadow-amber-500/10 hover:shadow-amber-500/30 hover:bg-amber-500/35
+                                    {% else %}
+                                        bg-red-500/25 text-red-200 border border-red-500/50 shadow-lg shadow-red-500/10 hover:shadow-red-500/30 hover:bg-red-500/35
                                     {% endif %}">
-                                    {{ balance.payment_status }}
+                                    {% if balance.payment_status == 'PAID' %}
+                                        <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                    {% elif balance.payment_status == 'PARTIAL' %}
+                                        <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+                                    {% else %}
+                                        <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+                                    {% endif %}
+                                    <span>{{ balance.payment_status }}</span>
                                 </span>
                             </td>
                             <td class="py-4 px-4">

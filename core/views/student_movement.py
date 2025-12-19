@@ -10,6 +10,7 @@ from decimal import Decimal
 from ..models.student_movement import StudentMovement, BulkMovement
 from ..models.student import Student
 from ..models.class_model import Class
+from ..models import AcademicTerm
 import uuid
 import json
 
@@ -24,6 +25,9 @@ def student_movement_history(request, student_id):
 
 @login_required
 def promote_student(request, student_id):
+    import json
+    from django.http import JsonResponse
+    
     student = get_object_or_404(Student, pk=student_id)
     
     if request.method == 'GET':
@@ -33,7 +37,11 @@ def promote_student(request, student_id):
             return redirect('student_detail', student_id=student_id)
         
         current_grade = student.current_class.grade
+        current_year = student.current_class.academic_year
+        
+        # Only show classes from the SAME academic year, with HIGHER grades
         available_classes = Class.objects.filter(
+            academic_year=current_year,
             grade__gt=current_grade
         ).order_by('grade', 'section')
         
@@ -44,16 +52,33 @@ def promote_student(request, student_id):
         })
     
     elif request.method == 'POST':
-        # Handle promotion
-        new_class_id = request.POST.get('new_class_id')
+        # Handle both JSON and form data
+        if request.content_type == 'application/json':
+            try:
+                data = json.loads(request.body)
+                new_class_id = data.get('new_class_id')
+                reason = data.get('reason', '')
+            except json.JSONDecodeError:
+                return JsonResponse({'success': False, 'error': 'Invalid JSON data'}, status=400)
+            is_json = True
+        else:
+            new_class_id = request.POST.get('new_class_id')
+            reason = request.POST.get('reason', '')
+            is_json = False
         
         if not new_class_id:
-            messages.error(request, 'New class is required')
+            error_msg = 'New class is required'
+            if is_json:
+                return JsonResponse({'success': False, 'error': error_msg}, status=400)
+            messages.error(request, error_msg)
             return redirect('promote_student', student_id=student_id)
         
         try:
             if not student.current_class:
-                messages.error(request, 'Student must be assigned to a class before promotion')
+                error_msg = 'Student must be assigned to a class before promotion'
+                if is_json:
+                    return JsonResponse({'success': False, 'error': error_msg}, status=400)
+                messages.error(request, error_msg)
                 return redirect('student_detail', student_id=student_id)
             
             # Check if student is in Grade 7 (highest grade) - they GRADUATE
@@ -68,13 +93,17 @@ def promote_student(request, student_id):
                         movement_type='GRADUATION',
                         moved_by=request.user,
                         previous_arrears=Decimal('0'),
-                        preserved_arrears=Decimal('0')
+                        preserved_arrears=Decimal('0'),
+                        reason=reason
                     )
                     
                     try:
                         movement.full_clean()
                     except ValidationError as e:
-                        messages.error(request, f'Cannot graduate student: {", ".join(e.messages)}')
+                        error_msg = f'Cannot graduate student: {", ".join(e.messages)}'
+                        if is_json:
+                            return JsonResponse({'success': False, 'error': error_msg}, status=400)
+                        messages.error(request, error_msg)
                         return redirect('promote_student', student_id=student_id)
                     
                     movement.save()
@@ -138,12 +167,25 @@ def promote_student(request, student_id):
 @login_required
 @transaction.atomic
 def demote_student(request, student_id):
+    import json
+    from django.http import JsonResponse
+    
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid request method'}, status=400)
     
     student = get_object_or_404(Student, pk=student_id)
-    new_class_id = request.POST.get('new_class_id')
-    reason = request.POST.get('reason')
+    
+    # Handle both JSON and form data
+    if request.content_type == 'application/json':
+        try:
+            data = json.loads(request.body)
+            new_class_id = data.get('new_class_id')
+            reason = data.get('reason')
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    else:
+        new_class_id = request.POST.get('new_class_id')
+        reason = request.POST.get('reason')
     
     if not new_class_id:
         return JsonResponse({'error': 'New class is required'}, status=400)
@@ -178,7 +220,7 @@ def demote_student(request, student_id):
             movement.full_clean()
         except ValidationError as e:
             transaction.set_rollback(True)
-            return JsonResponse({'error': ', '.join(e.messages)}, status=400)
+            return JsonResponse({'success': False, 'error': ', '.join(e.messages)}, status=400)
         
         # Save movement
         movement.save()
@@ -196,7 +238,7 @@ def demote_student(request, student_id):
         
     except ValidationError as e:
         transaction.set_rollback(True)
-        return JsonResponse({'error': ', '.join(e.messages)}, status=400)
+        return JsonResponse({'success': False, 'error': ', '.join(e.messages)}, status=400)
     except Exception as e:
         transaction.set_rollback(True)
         return JsonResponse({'error': str(e)}, status=500)
@@ -216,7 +258,11 @@ def bulk_promote_students(request):
             current_class__grade=7  # Exclude students already in the highest grade
         ).order_by('current_class__grade', 'current_class__section')
 
-        classes = Class.objects.all().order_by('grade', 'section')
+        current_term = AcademicTerm.get_current_term()
+        if current_term:
+            classes = Class.objects.filter(academic_year=current_term.academic_year).order_by('grade', 'section')
+        else:
+            classes = Class.objects.none()
 
         # Calculate next class for each student
         for student in students:

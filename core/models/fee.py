@@ -49,8 +49,13 @@ class StudentBalance(models.Model):
     """Model to track student balances and arrears"""
     student = models.ForeignKey('Student', on_delete=models.CASCADE, related_name='balances')
     term = models.ForeignKey('AcademicTerm', on_delete=models.PROTECT)
-    term_fee = models.DecimalField(max_digits=10, decimal_places=2)
-    previous_arrears = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    term_fee_record = models.ForeignKey('TermFee', on_delete=models.PROTECT, help_text="Link to the term fee configuration")
+    previous_arrears = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        default=0,
+        help_text="Balance from previous term (positive=owe, negative=credit)"
+    )
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     last_payment_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -95,24 +100,71 @@ class StudentBalance(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+    
+    @property
+    def term_fee(self):
+        """Dynamically get current term fee from TermFee record"""
+        return self.term_fee_record.amount
+    
     @property
     def total_due(self):
-        """Calculate total amount due including arrears"""
+        """Calculate total amount due including arrears and credits
+        
+        Formula: term_fee + previous_arrears
+        Where:
+        - term_fee = original charge for this term
+        - previous_arrears = balance from previous term (+ owe, - credit)
+        - If previous_arrears is negative (credit), it reduces the total due
+        """
         return self.term_fee + self.previous_arrears
 
     @property
     def current_balance(self):
-        """Calculate current balance"""
+        """Calculate current balance (what student still owes or has as credit)
+        
+        Formula: total_due - amount_paid
+        - If positive: student owes this amount
+        - If negative: student has credit (school owes student)
+        """
         return self.total_due - self.amount_paid
 
     @property
+    def current_outstanding(self):
+        """Show only positive outstanding (amount student owes)
+        
+        Returns 0 if student has paid in full or has credit
+        """
+        return max(Decimal('0'), self.current_balance)
+
+    @property
+    def current_credit(self):
+        """Show only credit balance (amount school owes student)
+        
+        Returns 0 if student has outstanding or no credit
+        """
+        return max(Decimal('0'), -self.current_balance)
+
+    @property
     def payment_status(self):
-        """Determine payment status with color coding"""
-        if self.current_balance <= 0:
-            return 'PAID'  # Green
+        """Return the payment status for display in UI
+        
+        Returns:
+        - 'PAID': Student has paid in full (amount_paid >= total_due)
+        - 'PARTIAL': Student has made partial payment (0 < amount_paid < total_due)
+        - 'UNPAID': Student has not made any payment (amount_paid == 0)
+        """
+        total_due = self.term_fee + self.previous_arrears
+        
+        if total_due <= 0:
+            # If no amount due (credit or zero), mark as paid
+            return 'PAID'
+        
+        if self.amount_paid >= total_due:
+            return 'PAID'
         elif self.amount_paid > 0:
-            return 'PARTIAL'  # Yellow
-        return 'UNPAID'  # Red
+            return 'PARTIAL'
+        else:
+            return 'UNPAID'
 
     @property
     def arrears_remaining(self):
@@ -120,44 +172,32 @@ class StudentBalance(models.Model):
         
         - If positive: amount of arrears still owed (must pay this first)
         - If negative: amount of credit available (reduces current term fee)
+        
+        For compatibility with legacy code
         """
         if self.previous_arrears > 0:
-            # Positive arrears: they're paid first, so cleared only if amount_paid >= previous_arrears
-            arrears_paid = min(self.amount_paid, self.previous_arrears)
-            return self.previous_arrears - arrears_paid
+            # Positive arrears: they're paid first
+            return max(Decimal('0'), self.previous_arrears - self.amount_paid)
         else:
             # Negative arrears (credit) or zero - no arrears owed
-            return 0
+            return Decimal('0')
 
     @property
     def term_fee_remaining(self):
         """Return how much of current term fee still needs to be paid
         
-        Calculation:
-        1. If previous_arrears is positive (debt): payment goes there first
-        2. After clearing arrears, remaining payment goes to term fee
-        3. If previous_arrears is negative (credit): reduces the term fee directly
+        For compatibility with legacy code that needs to understand payment breakdown
         """
         if self.previous_arrears > 0:
             # Positive arrears: payment goes to arrears first, then term fee
-            amount_to_current_fee = max(0, self.amount_paid - self.previous_arrears)
-            return max(0, self.term_fee - amount_to_current_fee)
+            amount_to_current_fee = max(Decimal('0'), self.amount_paid - self.previous_arrears)
+            return max(Decimal('0'), self.term_fee - amount_to_current_fee)
         else:
             # Negative arrears (credit): reduces term fee, then remaining payment applies
             # For example: term_fee=$120, previous_arrears=-$30, amount_paid=$0
             # Effective fee = $120 + (-$30) = $90
             effective_fee = self.term_fee + self.previous_arrears
-            return max(0, effective_fee - self.amount_paid)
-
-    @property
-    def payment_priority(self):
-        """Return payment priority text"""
-        if self.arrears_remaining > 0:
-            return f"Must pay ${self.arrears_remaining:.2f} in ARREARS first"
-        elif self.term_fee_remaining > 0:
-            return f"${self.term_fee_remaining:.2f} remaining for current term fee"
-        else:
-            return "Fully paid up"
+            return max(Decimal('0'), effective_fee - self.amount_paid)
 
     def update_balance(self, payment_amount=None):
         """Update balance - recalculates amount_paid from actual Payment records"""
@@ -215,7 +255,16 @@ class StudentBalance(models.Model):
             # Only return balance for previous terms (arrears), not current term
             try:
                 # Try to get existing balance
-                return cls.objects.get(student=student, term=term)
+                balance = cls.objects.get(student=student, term=term)
+                
+                # IMPORTANT: Even for inactive students, recalculate arrears in case previous term changed
+                # This ensures credits/arrears carry forward correctly
+                recalculated_arrears = cls.calculate_arrears(student, term)
+                if balance.previous_arrears != recalculated_arrears:
+                    balance.previous_arrears = recalculated_arrears
+                    balance.save()
+                
+                return balance
             except cls.DoesNotExist:
                 # Don't create new balance for graduated students in current term
                 return None
@@ -234,12 +283,18 @@ class StudentBalance(models.Model):
                 
                 if previous_year_last_balance and previous_year_last_balance.current_balance > 0:
                     # Grade 7 student with outstanding balance from previous year
+                    # Get the term fee but still create balance (for tracking)
+                    try:
+                        term_fee = TermFee.objects.get(term=term)
+                    except TermFee.DoesNotExist:
+                        raise ValidationError("Term fee has not been set for this term")
+                    
                     # Do NOT charge new fee - only carry forward the arrears
                     balance, created = cls.objects.get_or_create(
                         student=student,
                         term=term,
                         defaults={
-                            'term_fee': Decimal('0'),  # NO new fee for Grade 7 with arrears
+                            'term_fee_record': term_fee,
                             'previous_arrears': previous_year_last_balance.current_balance,
                             'amount_paid': Decimal('0')
                         }
@@ -253,50 +308,46 @@ class StudentBalance(models.Model):
 
         previous_arrears = cls.calculate_arrears(student, term)
         
-        # CREDIT HANDLING: If student has overpaid (negative balance/credit)
-        # Only skip charging if credit >= new term fee
-        if previous_arrears < 0:  # Student has credit (overpaid)
-            credit_amount = abs(previous_arrears)
-            if credit_amount >= term_fee.amount:
-                # Credit covers the full new fee - no new charge
-                # The credit will reduce the total due to $0
-                new_term_fee = Decimal('0')
-            else:
-                # Credit only partially covers - still charge full fee
-                # Credit will be applied in the balance calculation
-                # Example: Fee=$100, Credit=$20 → Balance shows $80 due
-                new_term_fee = term_fee.amount
-        else:
-            new_term_fee = term_fee.amount
+        # CRITICAL FIX: Always charge the full term fee
+        # The 'previous_arrears' field handles credits (negative values)
+        # 
+        # ALWAYS set term_fee to the actual fee amount
+        # Do NOT set it to 0 even if credit covers it - we need to track the original fee
+        # 
+        # Example (CORRECT logic):
+        #   Term 2: Fee=$100, Payment=$120 → current_balance=$20 (credit)
+        #   Term 3: term_fee=$100, previous_arrears=-$20 (credit)
+        #   Total Due = $100 + (-$20) = $80
+        #   This shows the student owes $80 after credit is applied
+        # 
+        # Example (WRONG logic - what was happening):
+        #   Term 2: Fee=$100, Payment=$120 → current_balance=$20 (credit)
+        #   Term 3: term_fee=$0 (WRONG!), previous_arrears=-$20
+        #   Total Due = $0 + (-$20) = -$20 (loses track that fee was $100)
+        new_term_fee = term_fee.amount
 
         
         balance, created = cls.objects.get_or_create(
             student=student,
             term=term,
             defaults={
-                'term_fee': new_term_fee,
+                'term_fee_record': term_fee,
                 'previous_arrears': previous_arrears,
-                'amount_paid': Decimal('0')  # New balances always start at 0 paid
+                'amount_paid': Decimal('0')
             }
         )
         
-        if not created:
-            # Balance already exists - update term_fee and recalculate arrears
-            # Arrears might change if previous term's balance was updated
-            updates_needed = False
-            
-            if balance.term_fee != new_term_fee:
-                balance.term_fee = new_term_fee
-                updates_needed = True
-            
-            # IMPORTANT: Always recalculate arrears in case previous term changed
-            # This ensures credits/arrears carry forward correctly
-            recalculated_arrears = cls.calculate_arrears(student, term)
-            if balance.previous_arrears != recalculated_arrears:
-                balance.previous_arrears = recalculated_arrears
-                updates_needed = True
-            
-            if updates_needed:
-                balance.save()
+        # PERMANENT FIX: Always verify and recalculate previous_arrears
+        # This ensures credits carry forward correctly from previous terms
+        # 
+        # ISSUE: When Term 3 becomes current, Term 2's payment may not be processed yet
+        # causing calculate_arrears() to return wrong value during initial creation.
+        # SOLUTION: Always recalculate and verify after get_or_create
+        recalculated_arrears = cls.calculate_arrears(student, term)
+        
+        if balance.previous_arrears != recalculated_arrears:
+            # Arrears changed - need to update the record
+            balance.previous_arrears = recalculated_arrears
+            balance.save(update_fields=['previous_arrears'])
             
         return balance

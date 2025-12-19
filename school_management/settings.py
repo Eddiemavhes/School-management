@@ -29,9 +29,9 @@ USE_MYSQL = os.getenv('USE_MYSQL', 'False').lower() == 'true'
 SECRET_KEY = 'django-insecure-cp9uuqfo_c!^-rl5ei933xg=-@*x%f9!o+9g!x3bhdmc!5vp0d'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'testserver']
+ALLOWED_HOSTS = ['schoolms.local', 'localhost', '127.0.0.1', '*']
 
 
 # Application definition
@@ -54,9 +54,9 @@ LOGIN_REDIRECT_URL = 'admin_dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
 # Session settings
-SESSION_COOKIE_AGE = 3600  # 1 hour
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_SAVE_EVERY_REQUEST = False  # Prevents race conditions; session saves only when modified
+SESSION_COOKIE_AGE = 28800  # 8 hours (instead of 1 hour)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session longer
+SESSION_SAVE_EVERY_REQUEST = True  # Update session timeout on every request
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Password validation
@@ -87,6 +87,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'school_management.middleware.SessionErrorHandlerMiddleware',  # Graceful session error handling
+    'core.middleware.FreshSystemMiddleware',  # Detect fresh system state
 ]
 
 ROOT_URLCONF = 'school_management.urls'
@@ -135,9 +136,9 @@ elif USE_POSTGRESQL:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'school_management_db'),
-            'USER': os.getenv('DB_USER', 'postgres'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'postgres123'),
+            'NAME': os.getenv('DB_NAME', 'schoolms_db'),
+            'USER': os.getenv('DB_USER', 'schoolms_user'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'StrongPassword123'),
             'HOST': os.getenv('DB_HOST', 'localhost'),
             'PORT': os.getenv('DB_PORT', '5432'),
         }

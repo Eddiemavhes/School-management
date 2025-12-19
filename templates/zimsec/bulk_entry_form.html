@@ -1,0 +1,1359 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ZIMSEC Entry - Grade 7 Examination Results{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-20 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-950 via-purple-950/30 to-slate-950">
+    <!-- Vibrant Animated Background -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <!-- Primary gradient orbs -->
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-cyan-500/30 to-blue-600/20 rounded-full blur-3xl opacity-60 animate-pulse"></div>
+        <div class="absolute top-1/4 left-0 w-[450px] h-[450px] bg-gradient-to-tr from-purple-500/25 to-pink-500/15 rounded-full blur-3xl opacity-50 animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-0 right-1/3 w-[500px] h-[500px] bg-gradient-to-tl from-emerald-500/20 to-cyan-500/15 rounded-full blur-3xl opacity-50 animate-pulse" style="animation-delay: 2s;"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/40 to-slate-950/60"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Vibrant Header Section -->
+        <div class="mb-20 text-center animate-slideInDown">
+            <div class="inline-flex items-center justify-center gap-3 mb-8">
+                <div class="h-1.5 w-20 bg-gradient-to-r from-transparent to-cyan-500 rounded-full"></div>
+                <div class="flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-600 p-0.5 shadow-2xl shadow-cyan-500/30">
+                    <div class="w-full h-full rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
+                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="h-1.5 w-20 bg-gradient-to-l from-transparent to-purple-500 rounded-full"></div>
+            </div>
+            
+            <h1 class="text-7xl font-black mb-4">
+                <span class="bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-500 bg-clip-text text-transparent drop-shadow-2xl">ZIMSEC</span>
+                <br>
+                <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-rose-400 bg-clip-text text-transparent">Entry System</span>
+            </h1>
+            <p class="text-2xl font-bold text-cyan-200 mb-2">Grade 7 Examination Results</p>
+            <p class="text-slate-400 text-base tracking-widest uppercase">Professional Assessment Management Platform</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-10">
+            <!-- Step 1: Selection Card - Vibrant Cyan -->
+            <div class="group relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan-600/40 via-blue-600/40 to-purple-600/30 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+                <div class="relative rounded-2xl p-8 border-2 border-cyan-500/60 animate-slideInUp shadow-2xl overflow-hidden bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-slate-900/90 backdrop-blur-xl">
+                    <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent pointer-events-none"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-4 mb-8">
+                            <div class="flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/50">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-black text-white">Select Academic Year</h3>
+                                <p class="text-cyan-300 text-sm font-semibold">Load all Grade 7 students</p>
+                            </div>
+                        </div>
+                        
+                        <form id="selectionForm" method="post" class="space-y-6">
+                            {% csrf_token %}
+                            
+                            <div class="space-y-3">
+                                <label for="academic_year" class="block text-sm font-bold text-cyan-300 uppercase tracking-widest">📅 Academic Year</label>
+                                <div class="relative group/select">
+                                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg blur opacity-0 group-hover/select:opacity-100 transition-all duration-300"></div>
+                                    <select id="academic_year" name="academic_year" required class="relative w-full px-6 py-3 rounded-lg bg-slate-700/60 border-2 border-cyan-500/50 text-slate-100 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 text-base font-semibold appearance-none cursor-pointer hover:border-cyan-400/70 hover:bg-slate-700/80">
+                                        <option value="" class="bg-slate-800">-- Select Academic Year --</option>
+                                        {% for year in years %}
+                                            <option value="{{ year }}" {% if year == current_year %}selected{% endif %} class="bg-slate-800">{{ year }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-cyan-400">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="w-full relative group/btn overflow-hidden px-8 py-4 rounded-lg font-black text-lg text-white bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 hover:from-cyan-600 hover:via-blue-600 hover:to-purple-700 transition-all duration-300 uppercase tracking-wider shadow-xl hover:shadow-2xl hover:shadow-cyan-500/60">
+                                <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
+                                <span class="relative flex items-center justify-center gap-3 text-white">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                                    </svg>
+                                    Load All Grade 7 Students
+                                </span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Information Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Card 1: Unit Scale - Green -->
+                <div class="group relative animate-slideInUp" style="animation-delay: 0.1s;">
+                    <div class="absolute inset-0 bg-gradient-to-br from-emerald-600/50 to-green-600/30 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                    <div class="relative rounded-xl p-8 border-2 border-emerald-500/60 overflow-hidden bg-gradient-to-br from-slate-800/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl h-full">
+                        <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent pointer-events-none"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/40">
+                                    <span class="text-xl">📊</span>
+                                </div>
+                                <h4 class="text-lg font-black text-emerald-300 uppercase tracking-wider">Unit Scale</h4>
+                            </div>
+                            <div class="space-y-2.5">
+                                <div class="flex justify-between items-center p-3 rounded-lg bg-slate-700/50 border border-emerald-500/30 hover:border-emerald-400/70 hover:bg-slate-700/80 transition-all">
+                                    <span class="text-slate-100 font-bold text-sm">1 = Distinction</span>
+                                    <span class="px-2.5 py-1 bg-emerald-500/40 text-emerald-200 rounded text-xs font-black border border-emerald-500/50">85-100%</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 rounded-lg bg-slate-700/50 border border-emerald-500/30 hover:border-emerald-400/70 hover:bg-slate-700/80 transition-all">
+                                    <span class="text-slate-100 font-bold text-sm">2 = Merit</span>
+                                    <span class="px-2.5 py-1 bg-emerald-500/40 text-emerald-200 rounded text-xs font-black border border-emerald-500/50">77-84%</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 rounded-lg bg-slate-700/50 border border-emerald-500/30 hover:border-emerald-400/70 hover:bg-slate-700/80 transition-all">
+                                    <span class="text-slate-100 font-bold text-sm">3 = Credit</span>
+                                    <span class="px-2.5 py-1 bg-emerald-500/40 text-emerald-200 rounded text-xs font-black border border-emerald-500/50">70-76%</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 rounded-lg bg-slate-700/50 border border-blue-500/30 hover:border-blue-400/70 hover:bg-slate-700/80 transition-all">
+                                    <span class="text-slate-100 font-bold text-sm">4 = Satisfactory</span>
+                                    <span class="px-2.5 py-1 bg-blue-500/40 text-blue-200 rounded text-xs font-black border border-blue-500/50">60-69%</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 rounded-lg bg-slate-700/50 border border-blue-500/30 hover:border-blue-400/70 hover:bg-slate-700/80 transition-all">
+                                    <span class="text-slate-100 font-bold text-sm">5 = Pass</span>
+                                    <span class="px-2.5 py-1 bg-blue-500/40 text-blue-200 rounded text-xs font-black border border-blue-500/50">50-59%</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 rounded-lg bg-slate-700/50 border border-rose-500/30 hover:border-rose-400/70 hover:bg-slate-700/80 transition-all">
+                                    <span class="text-slate-100 font-bold text-sm">6-9 = Fail</span>
+                                    <span class="px-2.5 py-1 bg-rose-500/40 text-rose-200 rounded text-xs font-black border border-rose-500/50">&lt;50%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Pass/Fail Rules - Purple -->
+                <div class="group relative animate-slideInUp" style="animation-delay: 0.2s;">
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-600/50 to-pink-600/30 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                    <div class="relative rounded-xl p-8 border-2 border-purple-500/60 overflow-hidden bg-gradient-to-br from-slate-800/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl h-full">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent pointer-events-none"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 shadow-lg shadow-purple-500/40">
+                                    <span class="text-xl">✓</span>
+                                </div>
+                                <h4 class="text-lg font-black text-purple-300 uppercase tracking-wider">Rules & Ranges</h4>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-4 p-4 rounded-lg bg-emerald-500/20 border-2 border-emerald-500/50 hover:border-emerald-400/70 transition-all">
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/40 flex-shrink-0 mt-0.5">
+                                        <span class="text-emerald-100 font-black">✓</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-emerald-200 font-black text-sm">PASS</p>
+                                        <p class="text-emerald-100/80 text-xs font-semibold">All 6 subjects ≤ 5</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start gap-4 p-4 rounded-lg bg-rose-500/20 border-2 border-rose-500/50 hover:border-rose-400/70 transition-all">
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-rose-500/40 flex-shrink-0 mt-0.5">
+                                        <span class="text-rose-100 font-black">✗</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-rose-200 font-black text-sm">FAIL</p>
+                                        <p class="text-rose-100/80 text-xs font-semibold">Any subject ≥ 6</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 pt-6 border-t-2 border-slate-700/50">
+                                <h5 class="text-sm font-black text-purple-300 uppercase tracking-wider mb-3">📈 Aggregates</h5>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40">
+                                        <span class="text-emerald-200 font-black text-sm">6-12</span>
+                                        <span class="text-emerald-100 text-xs font-bold">Excellent</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-blue-500/20 border border-blue-500/40">
+                                        <span class="text-blue-200 font-black text-sm">13-18</span>
+                                        <span class="text-blue-100 text-xs font-bold">Good</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-amber-500/20 border border-amber-500/40">
+                                        <span class="text-amber-200 font-black text-sm">19-24</span>
+                                        <span class="text-amber-100 text-xs font-bold">Average</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-rose-500/20 border border-rose-500/40">
+                                        <span class="text-rose-200 font-black text-sm">25+</span>
+                                        <span class="text-rose-100 text-xs font-bold">Below Avg</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Required Subjects - Pink -->
+                <div class="group relative animate-slideInUp" style="animation-delay: 0.3s;">
+                    <div class="absolute inset-0 bg-gradient-to-br from-pink-600/50 to-rose-600/30 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                    <div class="relative rounded-xl p-8 border-2 border-pink-500/60 overflow-hidden bg-gradient-to-br from-slate-800/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl h-full">
+                        <div class="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent pointer-events-none"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 shadow-lg shadow-pink-500/40">
+                                    <span class="text-xl">📚</span>
+                                </div>
+                                <h4 class="text-lg font-black text-pink-300 uppercase tracking-wider">6 Required</h4>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="p-4 rounded-lg bg-slate-700/60 border-2 border-pink-500/40 hover:border-pink-400/70 hover:bg-slate-700/80 transition-all text-center group/subject">
+                                    <p class="text-slate-100 font-black text-sm">English</p>
+                                </div>
+                                <div class="p-4 rounded-lg bg-slate-700/60 border-2 border-pink-500/40 hover:border-pink-400/70 hover:bg-slate-700/80 transition-all text-center group/subject">
+                                    <p class="text-slate-100 font-black text-sm">Mathematics</p>
+                                </div>
+                                <div class="p-4 rounded-lg bg-slate-700/60 border-2 border-pink-500/40 hover:border-pink-400/70 hover:bg-slate-700/80 transition-all text-center group/subject">
+                                    <p class="text-slate-100 font-black text-sm">Science</p>
+                                </div>
+                                <div class="p-4 rounded-lg bg-slate-700/60 border-2 border-pink-500/40 hover:border-pink-400/70 hover:bg-slate-700/80 transition-all text-center group/subject">
+                                    <p class="text-slate-100 font-black text-sm">Soc. Studies</p>
+                                </div>
+                                <div class="p-4 rounded-lg bg-slate-700/60 border-2 border-pink-500/40 hover:border-pink-400/70 hover:bg-slate-700/80 transition-all text-center col-span-2 group/subject">
+                                    <p class="text-slate-100 font-black text-sm">Indigenous Language</p>
+                                </div>
+                                <div class="p-4 rounded-lg bg-slate-700/60 border-2 border-pink-500/40 hover:border-pink-400/70 hover:bg-slate-700/80 transition-all text-center col-span-2 group/subject">
+                                    <p class="text-slate-100 font-black text-sm">Agriculture</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Results Entry Section - Gradient Border -->
+        <div class="group relative mt-16 animate-slideInUp" style="animation-delay: 0.4s;">
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-600/50 via-purple-600/40 to-pink-600/30 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div class="relative rounded-2xl p-8 border-2 border-cyan-500/60 overflow-hidden bg-gradient-to-br from-slate-800/95 via-slate-800/85 to-slate-900/95 backdrop-blur-xl shadow-2xl">
+                <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-purple-500/10 pointer-events-none"></div>
+                
+                <div class="relative z-10">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/50">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-3xl font-black text-white">Enter Unit Scores</h3>
+                            <p class="text-cyan-300 text-sm font-semibold">Real-time aggregate calculation</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-300 text-base mb-8 flex items-center gap-3 font-semibold">
+                        <svg class="w-5 h-5 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2z" clip-rule="evenodd"></path>
+                        </svg>
+                        Input units 1-9 for each subject. Aggregates calculate automatically.
+                    </p>
+                    <div id="resultsContainer" class="min-h-12"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<style>
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 0.6;
+        }
+        50% {
+            opacity: 0.4;
+        }
+    }
+
+    .animate-pulse {
+        animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .animate-slideInUp {
+        animation: slideInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        opacity: 0;
+    }
+
+    .animate-slideInDown {
+        animation: slideInDown 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        opacity: 0;
+    }
+
+    .glass-premium {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+    }
+
+    .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+    }
+
+    .results-section {
+        display: none;
+    }
+
+    .results-section.active {
+        display: block;
+        animation: slideInUp 0.5s ease-out forwards;
+    }
+
+    .overflow-x-auto {
+        overflow-x: auto;
+        border-radius: 16px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(34, 211, 238, 0.4) transparent;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar {
+        height: 10px;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-thumb {
+        background: rgba(34, 211, 238, 0.4);
+        border-radius: 6px;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+        background: rgba(34, 211, 238, 0.7);
+    }
+
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+    }
+
+    .results-table thead {
+        background: linear-gradient(90deg, rgba(30, 41, 59, 0.99) 0%, rgba(45, 56, 72, 0.99) 100%);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        box-shadow: 0 8px 24px rgba(34, 211, 238, 0.15);
+    }
+
+    .results-table th {
+        padding: 20px 16px;
+        text-align: center;
+        font-weight: 900;
+        color: #e0f2fe;
+        border-bottom: 3px solid rgba(34, 211, 238, 0.5);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        white-space: nowrap;
+        background: linear-gradient(180deg, rgba(34, 211, 238, 0.15) 0%, transparent 100%);
+    }
+
+    .results-table th:first-child {
+        text-align: center;
+        width: 5%;
+        border-radius: 16px 0 0 0;
+        background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(34, 211, 238, 0.1) 100%);
+    }
+
+    .results-table th:nth-child(2) {
+        text-align: left;
+        width: 20%;
+    }
+
+    .results-table th:last-child {
+        border-radius: 0 16px 0 0;
+    }
+
+    .results-table tbody tr {
+        border-bottom: 2px solid rgba(71, 85, 105, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(30, 41, 59, 0.4);
+    }
+
+    .results-table tbody tr:hover {
+        background: linear-gradient(90deg, rgba(34, 211, 238, 0.15) 0%, transparent 100%);
+        box-shadow: inset 0 0 24px rgba(34, 211, 238, 0.1), 0 8px 20px rgba(34, 211, 238, 0.08);
+    }
+
+    .results-table td {
+        padding: 20px 16px;
+        color: #e2e8f0;
+        text-align: center;
+        vertical-align: middle;
+        font-weight: 500;
+    }
+
+    .results-table td:first-child {
+        text-align: center;
+        font-weight: 900;
+        color: #e0f2fe;
+        background: rgba(34, 211, 238, 0.15);
+        font-size: 17px;
+    }
+
+    .results-table td:nth-child(2) {
+        text-align: left;
+        padding-left: 20px;
+    }
+
+    .student-name {
+        font-weight: 700;
+        color: #e0f2fe;
+        font-size: 16px;
+        letter-spacing: 0.3px;
+    }
+
+    .unit-input {
+        width: 76px;
+        height: 52px;
+        padding: 12px 8px;
+        border: 2.5px solid rgba(34, 211, 238, 0.4);
+        border-radius: 12px;
+        text-align: center;
+        font-weight: 800;
+        font-size: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(135deg, rgba(34, 211, 238, 0.12) 0%, rgba(34, 211, 238, 0.05) 100%);
+        color: #e0f2fe;
+    }
+
+    .unit-input::placeholder {
+        color: rgba(224, 242, 254, 0.3);
+        font-weight: 700;
+    }
+
+    .unit-input:hover {
+        border-color: rgba(34, 211, 238, 0.7);
+        background: linear-gradient(135deg, rgba(34, 211, 238, 0.2) 0%, rgba(34, 211, 238, 0.12) 100%);
+        box-shadow: 0 0 16px rgba(34, 211, 238, 0.15);
+    }
+
+    .unit-input:focus {
+        outline: none;
+        border-color: #22d3ee;
+        box-shadow: 0 0 0 5px rgba(34, 211, 238, 0.3), inset 0 0 12px rgba(34, 211, 238, 0.12);
+        background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(34, 211, 238, 0.15) 100%);
+    }
+
+    .unit-input.error {
+        border-color: #f43f5e;
+        background: linear-gradient(135deg, rgba(244, 63, 94, 0.15) 0%, rgba(244, 63, 94, 0.08) 100%);
+        color: #fda4af;
+    }
+
+    .unit-input.error:focus {
+        box-shadow: 0 0 0 5px rgba(244, 63, 94, 0.3), inset 0 0 12px rgba(244, 63, 94, 0.1);
+    }
+
+    .aggregate-cell {
+        font-weight: 800;
+        text-align: center;
+        min-width: 90px;
+        background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(34, 211, 238, 0.12) 100%);
+        border: 2px solid rgba(34, 211, 238, 0.5);
+        border-radius: 12px;
+        color: #e0f2fe;
+        font-size: 16px;
+        padding: 12px 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .aggregate-cell:hover {
+        background: linear-gradient(135deg, rgba(34, 211, 238, 0.35) 0%, rgba(34, 211, 238, 0.2) 100%);
+        border-color: rgba(34, 211, 238, 0.8);
+        box-shadow: 0 8px 20px rgba(34, 211, 238, 0.2);
+    }
+
+    .action-buttons {
+        margin-top: 32px;
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        padding-top: 28px;
+        border-top: 2.5px solid rgba(34, 211, 238, 0.2);
+    }
+
+    .btn-action {
+        padding: 16px 28px;
+        border-radius: 12px;
+        border: 2.5px solid transparent;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.11em;
+    }
+
+    .btn-validate {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.15) 100%);
+        color: #bfdbfe;
+        border: 2.5px solid rgba(59, 130, 246, 0.5);
+    }
+
+    .btn-validate:hover {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.45) 0%, rgba(59, 130, 246, 0.25) 100%);
+        border-color: rgba(59, 130, 246, 0.8);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(59, 130, 246, 0.25);
+    }
+
+    .btn-validate:active {
+        transform: translateY(-1px);
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #ecfdf5;
+        flex: 1;
+        min-width: 180px;
+        border: 2.5px solid rgba(16, 185, 129, 0.5);
+        font-weight: 800;
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-save:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 32px rgba(16, 185, 129, 0.35);
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        border-color: rgba(16, 185, 129, 0.8);
+    }
+
+    .btn-save:active {
+        transform: translateY(-1px);
+    }
+
+    .btn-reset {
+        background: linear-gradient(135deg, rgba(244, 63, 94, 0.3) 0%, rgba(244, 63, 94, 0.15) 100%);
+        color: #fda4af;
+        border: 2.5px solid rgba(244, 63, 94, 0.5);
+    }
+
+    .btn-reset:hover {
+        background: linear-gradient(135deg, rgba(244, 63, 94, 0.45) 0%, rgba(244, 63, 94, 0.25) 100%);
+        border-color: rgba(244, 63, 94, 0.8);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(244, 63, 94, 0.25);
+    }
+
+    .btn-reset:active {
+        transform: translateY(-1px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(30, 41, 59, 0.5) 100%);
+        border-radius: 16px;
+        border: 2.5px dashed rgba(34, 211, 238, 0.3);
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .empty-state p {
+        color: #cbd5e1;
+        font-size: 17px;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    /* Input number controls styling */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+
+    input[type="number"]:hover::-webkit-inner-spin-button,
+    input[type="number"]:hover::-webkit-outer-spin-button {
+        opacity: 1;
+    }
+
+    /* Select styling with enhanced appearance */
+    select {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322d3ee' stroke-width='3'%3e%3cpath d='M6 9l6 6 6-6'%3e%3c/path%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1.3em 1.3em;
+        padding-right: 2.8rem;
+    }
+
+    /* Status badge styling */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 800;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border-radius: 8px;
+        padding: 6px 12px;
+    }
+</style>
+
+<script>
+    const subjects = [
+        { name: 'English', key: 'english_units' },
+        { name: 'Mathematics', key: 'mathematics_units' },
+        { name: 'Science', key: 'science_units' },
+        { name: 'Social Studies', key: 'social_studies_units' },
+        { name: 'Language', key: 'indigenous_language_units' },
+        { name: 'Agriculture', key: 'agriculture_units' }
+    ];
+
+    let studentsData = [];
+
+    // Load students from Django template context
+    {% if students %}
+        studentsData = {{ students_json|safe }};
+        // Show the results section and hide the default empty state
+        document.addEventListener('DOMContentLoaded', function() {
+            if (studentsData.length > 0) {
+                renderResultsTable(studentsData);
+            }
+        });
+    {% endif %}
+
+    // Handle selection form submission
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectionForm = document.getElementById('selectionForm');
+        const submitBtn = selectionForm.querySelector('button[type="submit"]');
+        
+        if (selectionForm) {
+            selectionForm.addEventListener('submit', function(e) {
+                console.log('Selection form submit event fired');
+                const year = document.getElementById('academic_year').value;
+                console.log('Selected year:', year);
+                
+                if (!year) {
+                    e.preventDefault();
+                    alert('Please select an academic year');
+                    return;
+                }
+                
+                // Show loading overlay
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.id = 'loading-overlay-selection';
+                loadingOverlay.className = 'fixed inset-0 bg-gradient-to-br from-black/60 via-cyan-900/40 to-black/60 backdrop-blur-md flex items-center justify-center z-50';
+                loadingOverlay.innerHTML = `
+                    <div class="flex flex-col items-center gap-6">
+                        <div class="relative w-20 h-20">
+                            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 animate-spin"></div>
+                            <div class="absolute inset-2 rounded-full bg-slate-900"></div>
+                            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-blue-400 opacity-30 blur-xl animate-pulse"></div>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-white text-lg font-semibold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-pulse">
+                                Loading students...
+                            </p>
+                            <p class="text-cyan-300 text-xs mt-2 opacity-75">Please wait</p>
+                        </div>
+                        <div class="flex gap-2 mt-2">
+                            <div class="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style="animation-delay: 0s;"></div>
+                            <div class="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style="animation-delay: 0.2s;"></div>
+                            <div class="w-2 h-2 rounded-full bg-purple-400 animate-bounce" style="animation-delay: 0.4s;"></div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(loadingOverlay);
+                
+                console.log('Form will now submit with year:', year);
+                // Allow normal form submission to proceed
+            });
+        }
+    });
+
+    // Validation Error Modal
+    function showValidationErrorModal(errors) {
+        // Create modal overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center';
+        overlay.id = 'errorModalOverlay';
+        
+        const errorList = errors.slice(0, 5).map(e => `<li class="text-red-300 text-sm">• ${e}</li>`).join('');
+        
+        overlay.innerHTML = `
+            <div class="relative w-full max-w-md">
+                <!-- Glow background -->
+                <div class="absolute inset-0 bg-gradient-to-r from-red-600/20 via-pink-600/20 to-orange-600/20 rounded-2xl blur-2xl"></div>
+                
+                <!-- Modal content -->
+                <div class="relative rounded-2xl p-8 border-2 border-red-500/60 overflow-hidden bg-gradient-to-br from-slate-800/95 via-slate-800/90 to-slate-900/95 backdrop-blur-xl shadow-2xl">
+                    <div class="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-pink-500/5 pointer-events-none"></div>
+                    
+                    <div class="relative z-10">
+                        <!-- Header -->
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-red-500 to-pink-600 shadow-lg shadow-red-500/50">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4v2m0 4v2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-black text-white">Validation Failed</h3>
+                                <p class="text-red-300 text-xs font-semibold mt-1">Please fix the errors below</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Error List -->
+                        <div class="mb-8 max-h-48 overflow-y-auto space-y-2 bg-red-500/10 rounded-lg p-4 border border-red-500/20">
+                            <ul class="space-y-2">
+                                ${errorList}
+                                ${errors.length > 5 ? `<li class="text-yellow-300 text-sm font-semibold">... and ${errors.length - 5} more errors</li>` : ''}
+                            </ul>
+                        </div>
+                        
+                        <!-- Info -->
+                        <p class="text-gray-300 text-xs mb-6 p-3 bg-blue-500/10 rounded border border-blue-500/20">
+                            💡 Unit grades must be between 1-9. Please review and correct all highlighted fields.
+                        </p>
+                        
+                        <!-- Button -->
+                        <button onclick="document.getElementById('errorModalOverlay').remove();" class="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-bold transition-all duration-200 transform hover:scale-105 shadow-lg shadow-red-600/50 hover:shadow-red-500/50">
+                            Close & Fix Errors
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(overlay);
+        
+        // Close on backdrop click
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+            }
+        });
+    }
+
+    // Custom Save Confirmation Modal
+    function showSuccessModal(onClose) {
+        // Create modal overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center';
+        overlay.id = 'successModalOverlay';
+        
+        overlay.innerHTML = `
+            <div class="relative w-full max-w-md">
+                <!-- Glow background -->
+                <div class="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-green-600/20 to-cyan-600/20 rounded-2xl blur-2xl"></div>
+                
+                <!-- Modal content -->
+                <div class="relative rounded-2xl p-8 border-2 border-emerald-500/60 overflow-hidden bg-gradient-to-br from-slate-800/95 via-slate-800/90 to-slate-900/95 backdrop-blur-xl shadow-2xl">
+                    <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/5 pointer-events-none"></div>
+                    
+                    <div class="relative z-10">
+                        <!-- Header -->
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/50">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-black text-white">Validation Passed!</h3>
+                                <p class="text-emerald-300 text-xs font-semibold mt-1">All entries verified and valid</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Message -->
+                        <div class="mb-8 space-y-3">
+                            <p class="text-gray-100 text-sm leading-relaxed">
+                                ✓ All student unit scores are valid<br>
+                                ✓ All entries are complete<br>
+                                ✓ Ready to save to database
+                            </p>
+                        </div>
+                        
+                        <!-- Button -->
+                        <button onclick="document.getElementById('successModalOverlay').remove(); document.querySelector('button:has(svg[viewBox=\\"0 0 24 24\\"])').click();" class="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold transition-all duration-200 transform hover:scale-105 shadow-lg shadow-emerald-600/50 hover:shadow-emerald-500/50">
+                            Proceed to Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(overlay);
+        
+        // Close on backdrop click
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+                if (onClose) onClose();
+            }
+        });
+    }
+
+    function showSaveConfirmationModal(onConfirm) {
+        // Create modal overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center';
+        overlay.id = 'saveModalOverlay';
+        
+        // Count results and calculate summary
+        const rows = document.querySelectorAll('.student-row');
+        const totalStudents = rows.length;
+        let completeCount = 0;
+        
+        rows.forEach(row => {
+            const status = row.querySelector('.status-value')?.textContent || '';
+            if (!status.includes('INCOMPLETE')) completeCount++;
+        });
+        
+        overlay.innerHTML = `
+            <div class="relative w-full max-w-lg">
+                <!-- Glow background -->
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-purple-600/20 to-pink-600/20 rounded-2xl blur-2xl"></div>
+                
+                <!-- Modal content -->
+                <div class="relative rounded-2xl p-8 border-2 border-cyan-500/60 overflow-hidden bg-gradient-to-br from-slate-800/95 via-slate-800/90 to-slate-900/95 backdrop-blur-xl shadow-2xl">
+                    <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5 pointer-events-none"></div>
+                    
+                    <div class="relative z-10">
+                        <!-- Header -->
+                        <div class="flex items-center gap-4 mb-8">
+                            <div class="flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/50">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-black text-white">Ready to Save?</h3>
+                                <p class="text-cyan-300 text-sm font-semibold mt-1">Final confirmation before saving to database</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Summary cards -->
+                        <div class="grid grid-cols-2 gap-4 mb-8">
+                            <div class="rounded-lg p-4 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border-2 border-emerald-500/40">
+                                <p class="text-emerald-300 text-xs font-bold uppercase tracking-wide mb-2">Total Students</p>
+                                <p class="text-3xl font-black text-emerald-200">${totalStudents}</p>
+                            </div>
+                            <div class="rounded-lg p-4 bg-gradient-to-br from-cyan-500/20 to-cyan-600/10 border-2 border-cyan-500/40">
+                                <p class="text-cyan-300 text-xs font-bold uppercase tracking-wide mb-2">Complete</p>
+                                <p class="text-3xl font-black text-cyan-200">${completeCount}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Info message -->
+                        <div class="rounded-lg p-4 bg-blue-500/15 border-l-4 border-blue-500 mb-8">
+                            <p class="text-blue-200 text-sm font-semibold flex items-start gap-3">
+                                <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Once saved, all ${totalStudents} student results will be permanently recorded in the database. Please review carefully before confirming.</span>
+                            </p>
+                        </div>
+                        
+                        <!-- Action buttons -->
+                        <div class="flex gap-3">
+                            <button type="button" class="flex-1 py-3 px-6 rounded-lg font-bold uppercase tracking-wider bg-slate-700/40 text-slate-200 border-2 border-slate-600/50 hover:border-slate-500/70 hover:bg-slate-700/60 transition-all duration-300 text-sm cancel-btn">
+                                ✕ Go Back
+                            </button>
+                            <button type="button" class="flex-1 py-3 px-6 rounded-lg font-bold uppercase tracking-wider bg-gradient-to-r from-emerald-500 to-green-600 text-white border-2 border-emerald-400/50 hover:border-emerald-300/70 hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 text-sm flex items-center justify-center gap-2 confirm-btn">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Confirm & Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(overlay);
+        
+        // Handle buttons
+        const cancelBtn = overlay.querySelector('.cancel-btn');
+        const confirmBtn = overlay.querySelector('.confirm-btn');
+        
+        cancelBtn.addEventListener('click', () => {
+            overlay.remove();
+        });
+        
+        confirmBtn.addEventListener('click', () => {
+            overlay.remove();
+            onConfirm();
+        });
+    }
+
+    // No custom handler needed - form submits natively
+
+    // Function to calculate aggregate
+    function calculateAggregate(studentElement) {
+        const inputs = studentElement.querySelectorAll('.unit-input');
+        let total = 0;
+        let isEmpty = false;
+        
+        inputs.forEach(input => {
+            const value = parseInt(input.value) || 0;
+            if (value === 0) isEmpty = true;
+            if (value >= 1 && value <= 9) {
+                total += value;
+            }
+        });
+        
+        const aggregateCell = studentElement.querySelector('.aggregate-value');
+        const statusCell = studentElement.querySelector('.status-value');
+        
+        if (isEmpty) {
+            aggregateCell.textContent = '--';
+            statusCell.innerHTML = `
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                    ○ INCOMPLETE
+                </span>
+            `;
+            return;
+        }
+        
+        aggregateCell.textContent = total;
+        
+        // Determine status
+        const allValid = Array.from(inputs).every(input => {
+            const val = parseInt(input.value) || 0;
+            return val >= 1 && val <= 9;
+        });
+        
+        if (!allValid) {
+            statusCell.innerHTML = `
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                    ○ INCOMPLETE
+                </span>
+            `;
+            return;
+        }
+        
+        const allPassed = Array.from(inputs).every(input => {
+            const val = parseInt(input.value);
+            return val <= 5;
+        });
+        
+        if (allPassed) {
+            statusCell.innerHTML = `
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 shadow-lg shadow-emerald-500/10">
+                    ✓ PASS
+                </span>
+            `;
+        } else {
+            statusCell.innerHTML = `
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-red-500/25 text-red-300 border border-red-500/40 shadow-lg shadow-red-500/10">
+                    ✗ FAIL
+                </span>
+            `;
+        }
+    }
+
+    // Render results table
+    function renderResultsTable(students) {
+        const container = document.getElementById('resultsContainer');
+        
+        if (students.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p>No students found for the selected class.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = `
+            <div class="overflow-x-auto">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">#</th>
+                            <th style="width: 20%;">Student Name</th>
+                            <th style="width: 10%;">English</th>
+                            <th style="width: 10%;">Math</th>
+                            <th style="width: 10%;">Science</th>
+                            <th style="width: 10%;">Soc. Stud.</th>
+                            <th style="width: 10%;">Language</th>
+                            <th style="width: 10%;">Agriculture</th>
+                            <th style="width: 8%;">Total</th>
+                            <th style="width: 12%;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        students.forEach((student, index) => {
+            html += `
+                <tr id="student-${index}" class="student-row" style="animation-delay: ${index * 0.03}s;">
+                    <td>${index + 1}</td>
+                    <td class="student-name">${student.surname}, ${student.first_name}</td>
+            `;
+            
+            subjects.forEach(subject => {
+                html += `
+                    <td>
+                        <input type="number" 
+                               class="unit-input" 
+                               min="1" 
+                               max="9" 
+                               placeholder="1-9"
+                               data-subject="${subject.key}">
+                    </td>
+                `;
+            });
+            
+            html += `
+                    <td class="aggregate-cell"><span class="aggregate-value">--</span></td>
+                    <td class="aggregate-cell"><span class="status-value"><span class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide bg-blue-500/20 text-blue-300 border border-blue-500/30">INCOMPLETE</span></span></td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        
+        // Add row animation
+        document.querySelectorAll('.student-row').forEach((row, index) => {
+            row.style.animation = `slideInUp 0.4s ease-out forwards`;
+            row.style.animationDelay = `${index * 0.03}s`;
+        });
+        
+        // Add event listeners to inputs
+        document.querySelectorAll('.unit-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const val = parseInt(this.value);
+                if (val < 1 || val > 9) {
+                    this.classList.add('error');
+                } else {
+                    this.classList.remove('error');
+                }
+                const studentRow = this.closest('.student-row');
+                calculateAggregate(studentRow);
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.value === '') {
+                    this.classList.remove('error');
+                } else {
+                    const val = parseInt(this.value);
+                    if (val < 1 || val > 9) {
+                        this.classList.add('error');
+                    }
+                }
+            });
+            
+            input.addEventListener('focus', function() {
+                this.select();
+            });
+        });
+        
+        // Add action buttons
+        const actions = document.createElement('div');
+        actions.className = 'action-buttons';
+        actions.innerHTML = `
+            <button type="button" class="btn-action btn-validate" onclick="validateAllEntries()">
+                ✓ Validate All
+            </button>
+            <button type="button" class="btn-action btn-reset" onclick="resetAllEntries()">
+                ↻ Reset All
+            </button>
+            <button type="button" class="btn-action btn-save" onclick="saveAllResults()">
+                💾 Save Results
+            </button>
+        `;
+        container.appendChild(actions);
+    }
+
+    function validateAllEntries() {
+        const rows = document.querySelectorAll('.student-row');
+        let errors = [];
+        let isValid = true;
+        
+        rows.forEach((row, index) => {
+            const inputs = row.querySelectorAll('.unit-input');
+            const studentName = row.querySelector('.student-name').textContent;
+            
+            inputs.forEach((input, subIndex) => {
+                const val = parseInt(input.value);
+                
+                if (!input.value || val < 1 || val > 9) {
+                    isValid = false;
+                    input.classList.add('error');
+                    errors.push(`${studentName} - ${subjects[subIndex].name}: Invalid (must be 1-9)`);
+                } else {
+                    input.classList.remove('error');
+                }
+            });
+        });
+        
+        if (isValid) {
+            showSuccessModal();
+        } else {
+            showValidationErrorModal(errors);
+        }
+        
+        return isValid;
+    }
+
+    function resetAllEntries() {
+        if (confirm('⚠️ CLEAR ALL ENTRIES?\n\nThis will delete all data you\'ve entered for all students.\n\nThis action CANNOT be undone.\n\nContinue?')) {
+            document.querySelectorAll('.unit-input').forEach(input => {
+                input.value = '';
+                input.classList.remove('error');
+            });
+            
+            document.querySelectorAll('.student-row').forEach(row => {
+                calculateAggregate(row);
+            });
+        }
+    }
+
+    function saveAllResults() {
+        console.log('saveAllResults called');
+        if (!validateAllEntries()) {
+            console.log('Validation failed');
+            return;
+        }
+        
+        showSaveConfirmationModal(async () => {
+            console.log('Confirmation callback executed');
+            const year = document.getElementById('academic_year').value;
+            console.log('Academic year:', year);
+            const results = [];
+            
+            document.querySelectorAll('.student-row').forEach((row, index) => {
+                const inputs = row.querySelectorAll('.unit-input');
+                const studentData = {
+                    student_id: studentsData[index].id,
+                    english_units: parseInt(inputs[0].value),
+                    mathematics_units: parseInt(inputs[1].value),
+                    science_units: parseInt(inputs[2].value),
+                    social_studies_units: parseInt(inputs[3].value),
+                    indigenous_language_units: parseInt(inputs[4].value),
+                    agriculture_units: parseInt(inputs[5].value)
+                };
+                console.log(`Student ${index}:`, studentData);
+                results.push(studentData);
+            });
+            
+            console.log('Total results to save:', results.length);
+            
+            // Process results in batches of 50 to avoid timeout
+            const BATCH_SIZE = 50;
+            const totalBatches = Math.ceil(results.length / BATCH_SIZE);
+            let totalSaved = 0;
+            let totalFailed = 0;
+            const failedStudents = [];
+            
+            // Show progress modal
+            showProgressModal(0, totalBatches);
+            
+            try {
+                for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
+                    const batchStart = batchNum * BATCH_SIZE;
+                    const batchEnd = Math.min(batchStart + BATCH_SIZE, results.length);
+                    const batch = results.slice(batchStart, batchEnd);
+                    
+                    console.log(`Processing batch ${batchNum + 1}/${totalBatches} (${batch.length} results)`);
+                    
+                    // Send this batch to the server via AJAX
+                    const response = await fetch('/api/zimsec/batch-save/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value,
+                        },
+                        body: JSON.stringify({
+                            academic_year: parseInt(year),
+                            results: batch,
+                            batch: batchNum,
+                            total_batches: totalBatches,
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Batch ${batchNum + 1} failed with status ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    totalSaved += data.saved;
+                    totalFailed += data.failed;
+                    if (data.failed_students) {
+                        failedStudents.push(...data.failed_students);
+                    }
+                    
+                    console.log(`Batch ${batchNum + 1} complete: ${data.saved} saved, ${data.failed} failed`);
+                    
+                    // Update progress
+                    updateProgressModal(batchNum + 1, totalBatches, totalSaved, totalFailed);
+                    
+                    // Small delay between batches to prevent overwhelming the server
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+                
+                // All batches complete
+                hideProgressModal();
+                
+                if (totalFailed === 0) {
+                    showSuccessCompletionModal(totalSaved);
+                    // Redirect after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '{% url "zimsec_results_list" %}';
+                    }, 2000);
+                } else {
+                    showCompletionWithErrorsModal(totalSaved, totalFailed, failedStudents);
+                }
+                
+            } catch (error) {
+                console.error('Error during batch save:', error);
+                hideProgressModal();
+                showErrorModal(`Error saving results: ${error.message}`);
+            }
+        });
+    }
+    
+    function showProgressModal(currentBatch, totalBatches) {
+        const modal = document.createElement('div');
+        modal.id = 'progressModal';
+        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm';
+        modal.innerHTML = `
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-cyan-500/60 rounded-2xl p-12 max-w-md shadow-2xl shadow-cyan-500/20">
+                <h3 class="text-2xl font-black text-white mb-6 text-center">Saving Results</h3>
+                <div class="space-y-4">
+                    <div class="relative h-3 bg-slate-700 rounded-full overflow-hidden border border-cyan-500/30">
+                        <div class="progress-bar h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p class="text-center text-cyan-300 font-bold">Processing Batch <span class="batch-number">1</span> of <span class="batch-total">${totalBatches}</span></p>
+                    <p class="text-center text-slate-400 text-sm">Saved: <span class="saved-count">0</span> | Failed: <span class="failed-count">0</span></p>
+                    <p class="text-center text-slate-500 text-xs mt-4">Please do not close this page...</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    function updateProgressModal(currentBatch, totalBatches, savedCount, failedCount) {
+        const modal = document.getElementById('progressModal');
+        if (modal) {
+            const progress = (currentBatch / totalBatches) * 100;
+            modal.querySelector('.progress-bar').style.width = `${progress}%`;
+            modal.querySelector('.batch-number').textContent = currentBatch;
+            modal.querySelector('.batch-total').textContent = totalBatches;
+            modal.querySelector('.saved-count').textContent = savedCount;
+            modal.querySelector('.failed-count').textContent = failedCount;
+        }
+    }
+    
+    function hideProgressModal() {
+        const modal = document.getElementById('progressModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+    
+    function showSuccessCompletionModal(count) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm';
+        modal.innerHTML = `
+            <div class="bg-gradient-to-br from-emerald-900/90 to-slate-900 border-2 border-emerald-500/60 rounded-2xl p-12 max-w-md shadow-2xl shadow-emerald-500/20 text-center">
+                <div class="text-6xl mb-4">✓</div>
+                <h3 class="text-3xl font-black text-emerald-300 mb-4">Success!</h3>
+                <p class="text-slate-100 text-lg font-semibold mb-2">All <span class="font-black text-emerald-400">${count}</span> results saved</p>
+                <p class="text-slate-400 text-sm">Redirecting to results list...</p>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    function showCompletionWithErrorsModal(saved, failed, failedStudents) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto';
+        const studentsList = failedStudents.slice(0, 10).join(', ') + (failedStudents.length > 10 ? `... and ${failedStudents.length - 10} more` : '');
+        modal.innerHTML = `
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-amber-500/60 rounded-2xl p-12 max-w-md shadow-2xl shadow-amber-500/20 text-center m-4">
+                <div class="text-5xl mb-4">⚠️</div>
+                <h3 class="text-2xl font-black text-amber-300 mb-4">Partial Success</h3>
+                <p class="text-slate-100 mb-4">
+                    <span class="text-emerald-400 font-bold">${saved}</span> saved
+                    <br>
+                    <span class="text-red-400 font-bold">${failed}</span> failed
+                </p>
+                <p class="text-slate-400 text-sm mb-6">Failed: ${studentsList}</p>
+                <button onclick="this.closest('.fixed').remove(); window.location.href = '{% url "zimsec_results_list" %}';" class="w-full px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg transition-all">
+                    Continue
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    function showErrorModal(message) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm';
+        modal.innerHTML = `
+            <div class="bg-gradient-to-br from-red-900/90 to-slate-900 border-2 border-red-500/60 rounded-2xl p-12 max-w-md shadow-2xl shadow-red-500/20 text-center">
+                <div class="text-6xl mb-4">✗</div>
+                <h3 class="text-2xl font-black text-red-300 mb-4">Error</h3>
+                <p class="text-slate-100 font-semibold mb-6">${message}</p>
+                <button onclick="location.reload();" class="w-full px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition-all">
+                    Try Again
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+</script>
+
+{% endblock %}

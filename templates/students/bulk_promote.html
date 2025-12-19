@@ -12,16 +12,6 @@
 
         <!-- Promotion Form -->
         <div class="glass rounded-2xl p-8">
-            {% if messages %}
-            <div class="mb-4">
-                {% for message in messages %}
-                <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-500/20 text-green-400{% else %}bg-red-500/20 text-red-400{% endif %}">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
             <form method="post" action="{% url 'bulk_promote_students' %}" class="space-y-6" id="bulk-promote-form">
                 {% csrf_token %}
 

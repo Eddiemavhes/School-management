@@ -55,64 +55,68 @@
         </div>
 
         <!-- Classes Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fadeIn">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
             {% for class in classes %}
-            <div class="group class-card glass rounded-2xl border border-slate-500/20 hover:border-blue-500/40 transition-all duration-300 overflow-hidden hover:shadow-2xl hover:shadow-blue-500/20" 
+            <div class="group class-card glass rounded-2xl border border-blue-500/30 hover:border-blue-500/60 transition-all duration-300 overflow-hidden p-6" 
                  data-grade="{{ class.grade }}" data-section="{{ class.section }}" data-teacher="{{ class.teacher.full_name|default:'' }}">
-                
-                <!-- Top accent bar -->
-                <div class="h-1.5 bg-gradient-to-r 
-                           {% if class.grade == 1 %}from-blue-400 to-cyan-400
-                           {% elif class.grade == 2 %}from-emerald-400 to-teal-400
-                           {% elif class.grade == 3 %}from-yellow-400 to-amber-400
-                           {% elif class.grade == 4 %}from-orange-400 to-red-400
-                           {% elif class.grade == 5 %}from-red-400 to-pink-400
-                           {% elif class.grade == 6 %}from-purple-400 to-pink-400
-                           {% else %}from-indigo-400 to-purple-400{% endif %}"></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
 
-                <!-- Content -->
-                <div class="p-6">
-                    <!-- Header -->
-                    <div class="mb-4">
-                        <h3 class="text-3xl font-bold text-slate-100 mb-1">Grade {{ class.grade }}{{ class.section }}</h3>
-                        <p class="text-slate-400 text-sm">{{ class.academic_year }} Academic Year</p>
+                <!-- Badge Section -->
+                <div class="flex items-center justify-between mb-4">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-blue-500/20 to-teal-500/20 border border-blue-500/30 text-blue-300 text-xs font-bold uppercase tracking-wider">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M5 9V7a1 1 0 011-1h8a1 1 0 011 1v2M5 9a2 2 0 002 2h6a2 2 0 002-2m-6 4h6a2 2 0 110 4H9a2 2 0 110-4z"/></svg>
+                        Class
+                    </span>
+                    <span class="text-blue-400 text-xs font-bold">ID: {{ class.id }}</span>
+                </div>
+
+                <!-- Class Name and Year -->
+                <div class="mb-4 pb-4 border-b border-slate-700/50">
+                    <h3 class="text-2xl font-bold text-slate-100 mb-1">Grade {{ class.grade }}{{ class.section }}</h3>
+                    <p class="text-slate-400 text-sm">{{ class.academic_year }} Academic Year</p>
+                </div>
+
+                <!-- Info Grid -->
+                <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+                    <div>
+                        <p class="text-slate-500 text-xs uppercase tracking-wide">Students</p>
+                        <p class="text-slate-200 font-semibold text-lg">{{ class.student_count|default:0 }}</p>
                     </div>
-
-                    <!-- Stats -->
-                    <div class="flex items-center gap-2 mb-6 p-3 rounded-lg bg-slate-700/40 border border-slate-600/20 w-fit">
-                        <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span class="text-slate-200 font-medium">{{ class.student_count|default:0 }} Students</span>
+                    <div>
+                        <p class="text-slate-500 text-xs uppercase tracking-wide">Section</p>
+                        <p class="text-slate-200 font-semibold text-lg">{{ class.section }}</p>
                     </div>
+                </div>
 
-                    <!-- Teacher Info -->
-                    <div class="flex items-center gap-3 p-4 rounded-xl bg-slate-700/30 border border-slate-600/20 mb-6">
-                        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-400 to-teal-400 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
-                            {% if class.teacher %}
-                                {{ class.teacher.first_name|first|upper }}{{ class.teacher.surname|first|upper }}
-                            {% else %}
-                                NA
-                            {% endif %}
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-xs text-slate-400 uppercase tracking-wider">Teacher</p>
-                            <p class="font-semibold text-slate-100 truncate">{{ class.teacher.full_name|default:"Not Assigned" }}</p>
-                        </div>
-                    </div>
+                <!-- Teacher Info Box -->
+                {% if class.teacher %}
+                <div class="bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-lg p-3 mb-4 border border-slate-700/50">
+                    <p class="text-slate-500 text-xs uppercase tracking-wide mb-2">Class Teacher</p>
+                    <p class="text-slate-300 text-sm font-semibold">{{ class.teacher.full_name }}</p>
+                    {% if class.teacher.email %}
+                    <p class="text-slate-400 text-xs mt-1">{{ class.teacher.email }}</p>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-lg p-3 mb-4 border border-amber-500/20">
+                    <p class="text-slate-500 text-xs uppercase tracking-wide mb-2">Class Teacher</p>
+                    <p class="text-amber-300 text-sm font-semibold">⚠ No Teacher Assigned</p>
+                </div>
+                {% endif %}
 
-                    <!-- Action Buttons -->
-                    <div class="flex flex-col gap-2 pt-4 border-t border-slate-700/30">
-                        <div class="flex gap-2">
-                            <button type="button" onclick="viewClass({{ class.id }})" class="flex-1 px-3 py-2 rounded-lg bg-slate-700/50 hover:bg-blue-500/30 border border-slate-600/30 hover:border-blue-500/50 text-slate-300 hover:text-blue-200 transition-all font-medium text-sm">
-                                View
-                            </button>
-                            <button type="button" onclick="editClass({{ class.id }})" class="flex-1 px-3 py-2 rounded-lg bg-slate-700/50 hover:bg-teal-500/30 border border-slate-600/30 hover:border-teal-500/50 text-slate-300 hover:text-teal-200 transition-all font-medium text-sm">
-                                Edit
-                            </button>
-                        </div>
-                        <button type="button" onclick="deleteClass({{ class.id }})" class="w-full px-3 py-2 rounded-lg bg-slate-700/50 hover:bg-red-500/30 border border-slate-600/30 hover:border-red-500/50 text-slate-300 hover:text-red-200 transition-all font-medium text-sm">
-                            Delete
+                <!-- Action Buttons -->
+                <div class="flex flex-col gap-2 pt-4 border-t border-slate-600/30">
+                    <button type="button" onclick="viewClass({{ class.id }})" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-blue-300 bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        View Details
+                    </button>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="editClass({{ class.id }})" class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-slate-300 bg-slate-700/50 border border-slate-600/50 hover:bg-slate-700 transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            Edit
+                        </button>
+                        <button type="button" onclick="deleteClass({{ class.id }})" class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-red-300 bg-red-500/20 border border-red-500/30 hover:bg-red-500/30 transition-all" onclick="return confirm('Delete this class?');">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                         </button>
                     </div>
                 </div>

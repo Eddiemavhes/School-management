@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ZIMSEC Result - {{ result.student.first_name }} {{ result.student.last_name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
+    <!-- Background Gradient -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-6xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="flex justify-between items-start mb-12 animate-slideInUp">
+            <div>
+                <h1 class="text-5xl font-bold bg-gradient-to-r from-amber-300 via-orange-300 to-red-300 bg-clip-text text-transparent mb-3">📜 ZIMSEC Examination Result</h1>
+                <p class="text-slate-400 text-lg">{{ result.student.first_name }} {{ result.student.last_name }} - Academic Year {{ result.academic_year }}</p>
+            </div>
+            <a href="{% url 'zimsec_results_list' %}?year={{ result.academic_year }}" class="px-6 py-3 rounded-lg font-bold text-white bg-slate-700 hover:bg-slate-600 transition">
+                ← Back to List
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Student Information -->
+                <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.1s;">
+                    <h3 class="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-3">
+                        <div class="w-1.5 h-8 bg-gradient-to-b from-blue-400 to-cyan-400 rounded-full"></div>
+                        Student Information
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-slate-400 text-sm mb-1">Name</p>
+                            <p class="text-slate-100 font-bold">{{ result.student.first_name }} {{ result.student.last_name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-sm mb-1">Student ID</p>
+                            <p class="text-slate-100 font-bold">{{ result.student.student_id }}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-sm mb-1">Candidate Number</p>
+                            <p class="text-slate-100 font-bold">{{ result.candidate_number }}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-sm mb-1">Academic Year</p>
+                            <p class="text-slate-100 font-bold">{{ result.academic_year }}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-sm mb-1">Exam Center</p>
+                            <p class="text-slate-100 font-bold">{{ result.exam_center }}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-sm mb-1">Result Date</p>
+                            <p class="text-slate-100 font-bold">
+                                {% if result.result_date %}
+                                    {{ result.result_date|date:"d M Y" }}
+                                {% else %}
+                                    <span class="text-slate-500">Not set</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subject Results -->
+                <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.2s;">
+                    <h3 class="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-3">
+                        <div class="w-1.5 h-8 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full"></div>
+                        Subject Results
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-600/30">
+                                    <th class="pb-4 px-3 text-left text-xs font-bold uppercase text-slate-300">Subject</th>
+                                    <th class="pb-4 px-3 text-center text-xs font-bold uppercase text-slate-300">Units</th>
+                                    <th class="pb-4 px-3 text-center text-xs font-bold uppercase text-slate-300">Status</th>
+                                    <th class="pb-4 px-3 text-center text-xs font-bold uppercase text-slate-300">Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700/30">
+                                <!-- English Language -->
+                                <tr class="hover:bg-slate-700/20 transition-colors">
+                                    <td class="py-3 px-3 text-slate-300 font-bold">English Language</td>
+                                    <td class="py-3 px-3 text-center text-slate-100 font-bold">{{ result.english_units }}</td>
+                                    <td class="py-3 px-3 text-center">
+                                        {% if result.english_units <= 5 %}
+                                            <span class="px-2 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PASS</span>
+                                        {% else %}
+                                            <span class="px-2 py-1 rounded text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30">FAIL</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 px-3 text-center text-slate-400 text-xs">
+                                        {% if result.english_units == 1 %}Distinction
+                                        {% elif result.english_units == 2 %}Merit
+                                        {% elif result.english_units == 3 %}Credit
+                                        {% elif result.english_units == 4 %}Sat Pass
+                                        {% elif result.english_units == 5 %}Low Pass
+                                        {% else %}Fail{% endif %}
+                                    </td>
+                                </tr>
+
+                                <!-- Mathematics -->
+                                <tr class="hover:bg-slate-700/20 transition-colors">
+                                    <td class="py-3 px-3 text-slate-300 font-bold">Mathematics</td>
+                                    <td class="py-3 px-3 text-center text-slate-100 font-bold">{{ result.mathematics_units }}</td>
+                                    <td class="py-3 px-3 text-center">
+                                        {% if result.mathematics_units <= 5 %}
+                                            <span class="px-2 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PASS</span>
+                                        {% else %}
+                                            <span class="px-2 py-1 rounded text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30">FAIL</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 px-3 text-center text-slate-400 text-xs">
+                                        {% if result.mathematics_units == 1 %}Distinction
+                                        {% elif result.mathematics_units == 2 %}Merit
+                                        {% elif result.mathematics_units == 3 %}Credit
+                                        {% elif result.mathematics_units == 4 %}Sat Pass
+                                        {% elif result.mathematics_units == 5 %}Low Pass
+                                        {% else %}Fail{% endif %}
+                                    </td>
+                                </tr>
+
+                                <!-- General Science -->
+                                <tr class="hover:bg-slate-700/20 transition-colors">
+                                    <td class="py-3 px-3 text-slate-300 font-bold">General Science</td>
+                                    <td class="py-3 px-3 text-center text-slate-100 font-bold">{{ result.science_units }}</td>
+                                    <td class="py-3 px-3 text-center">
+                                        {% if result.science_units <= 5 %}
+                                            <span class="px-2 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PASS</span>
+                                        {% else %}
+                                            <span class="px-2 py-1 rounded text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30">FAIL</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 px-3 text-center text-slate-400 text-xs">
+                                        {% if result.science_units == 1 %}Distinction
+                                        {% elif result.science_units == 2 %}Merit
+                                        {% elif result.science_units == 3 %}Credit
+                                        {% elif result.science_units == 4 %}Sat Pass
+                                        {% elif result.science_units == 5 %}Low Pass
+                                        {% else %}Fail{% endif %}
+                                    </td>
+                                </tr>
+
+                                <!-- Social Studies -->
+                                <tr class="hover:bg-slate-700/20 transition-colors">
+                                    <td class="py-3 px-3 text-slate-300 font-bold">Social Studies</td>
+                                    <td class="py-3 px-3 text-center text-slate-100 font-bold">{{ result.social_studies_units }}</td>
+                                    <td class="py-3 px-3 text-center">
+                                        {% if result.social_studies_units <= 5 %}
+                                            <span class="px-2 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PASS</span>
+                                        {% else %}
+                                            <span class="px-2 py-1 rounded text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30">FAIL</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 px-3 text-center text-slate-400 text-xs">
+                                        {% if result.social_studies_units == 1 %}Distinction
+                                        {% elif result.social_studies_units == 2 %}Merit
+                                        {% elif result.social_studies_units == 3 %}Credit
+                                        {% elif result.social_studies_units == 4 %}Sat Pass
+                                        {% elif result.social_studies_units == 5 %}Low Pass
+                                        {% else %}Fail{% endif %}
+                                    </td>
+                                </tr>
+
+                                <!-- Indigenous Language -->
+                                <tr class="hover:bg-slate-700/20 transition-colors">
+                                    <td class="py-3 px-3 text-slate-300 font-bold">Indigenous Language</td>
+                                    <td class="py-3 px-3 text-center text-slate-100 font-bold">{{ result.indigenous_language_units }}</td>
+                                    <td class="py-3 px-3 text-center">
+                                        {% if result.indigenous_language_units <= 5 %}
+                                            <span class="px-2 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PASS</span>
+                                        {% else %}
+                                            <span class="px-2 py-1 rounded text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30">FAIL</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 px-3 text-center text-slate-400 text-xs">
+                                        {% if result.indigenous_language_units == 1 %}Distinction
+                                        {% elif result.indigenous_language_units == 2 %}Merit
+                                        {% elif result.indigenous_language_units == 3 %}Credit
+                                        {% elif result.indigenous_language_units == 4 %}Sat Pass
+                                        {% elif result.indigenous_language_units == 5 %}Low Pass
+                                        {% else %}Fail{% endif %}
+                                    </td>
+                                </tr>
+
+                                <!-- Agriculture -->
+                                <tr class="hover:bg-slate-700/20 transition-colors">
+                                    <td class="py-3 px-3 text-slate-300 font-bold">Agriculture</td>
+                                    <td class="py-3 px-3 text-center text-slate-100 font-bold">{{ result.agriculture_units }}</td>
+                                    <td class="py-3 px-3 text-center">
+                                        {% if result.agriculture_units <= 5 %}
+                                            <span class="px-2 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PASS</span>
+                                        {% else %}
+                                            <span class="px-2 py-1 rounded text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30">FAIL</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 px-3 text-center text-slate-400 text-xs">
+                                        {% if result.agriculture_units == 1 %}Distinction
+                                        {% elif result.agriculture_units == 2 %}Merit
+                                        {% elif result.agriculture_units == 3 %}Credit
+                                        {% elif result.agriculture_units == 4 %}Sat Pass
+                                        {% elif result.agriculture_units == 5 %}Low Pass
+                                        {% else %}Fail{% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-8">
+                <!-- Overall Result -->
+                <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.3s;">
+                    <h3 class="text-2xl font-bold text-slate-100 mb-6 text-center">Overall Result</h3>
+                    
+                    <div class="text-center mb-6">
+                        <span class="inline-block px-6 py-4 rounded-xl text-3xl font-bold text-white
+                            {% if result.total_aggregate <= 12 %}
+                                bg-gradient-to-r from-emerald-500 to-teal-500
+                            {% elif result.total_aggregate <= 18 %}
+                                bg-gradient-to-r from-blue-500 to-cyan-500
+                            {% elif result.total_aggregate <= 24 %}
+                                bg-gradient-to-r from-amber-500 to-orange-500
+                            {% else %}
+                                bg-gradient-to-r from-red-500 to-rose-500
+                            {% endif %}">
+                            {{ result.total_aggregate }} Units
+                        </span>
+                    </div>
+
+                    <div class="text-center mb-6">
+                        <div class="inline-block px-4 py-2 rounded-lg font-bold
+                            {% if result.overall_status == 'PASS' %}
+                                bg-emerald-500/20 text-emerald-300 border border-emerald-500/30
+                            {% else %}
+                                bg-red-500/20 text-red-300 border border-red-500/30
+                            {% endif %}">
+                            {% if result.overall_status == 'PASS' %}
+                                ✅ PASSED ALL SUBJECTS
+                            {% else %}
+                                ❌ FAILED
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-600/30 pt-6">
+                        <h6 class="text-slate-400 text-xs font-bold uppercase mb-3">Performance Level</h6>
+                        {% if result.total_aggregate <= 12 %}
+                            <p class="text-emerald-400 font-bold text-lg mb-1">EXCELLENT</p>
+                            <p class="text-slate-400 text-sm">Outstanding achievement</p>
+                        {% elif result.total_aggregate <= 18 %}
+                            <p class="text-blue-400 font-bold text-lg mb-1">GOOD PASS</p>
+                            <p class="text-slate-400 text-sm">Strong performance</p>
+                        {% elif result.total_aggregate <= 24 %}
+                            <p class="text-amber-400 font-bold text-lg mb-1">AVERAGE PASS</p>
+                            <p class="text-slate-400 text-sm">Satisfactory performance</p>
+                        {% else %}
+                            <p class="text-red-400 font-bold text-lg mb-1">BELOW AVERAGE</p>
+                            <p class="text-slate-400 text-sm">Needs improvement</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="border-t border-slate-600/30 pt-6 mt-6">
+                        <h6 class="text-slate-400 text-xs font-bold uppercase mb-3">Form 1 Placement</h6>
+                        {% if result.total_aggregate <= 12 %}
+                            <p class="text-emerald-400 font-bold mb-1">Form 1A - Science</p>
+                            <p class="text-slate-400 text-sm">High school advanced stream</p>
+                        {% elif result.total_aggregate <= 18 %}
+                            <p class="text-blue-400 font-bold mb-1">Form 1B - Science</p>
+                            <p class="text-slate-400 text-sm">Science stream</p>
+                        {% elif result.total_aggregate <= 24 %}
+                            <p class="text-amber-400 font-bold mb-1">Form 1C - Commercial</p>
+                            <p class="text-slate-400 text-sm">Commercial stream</p>
+                        {% else %}
+                            <p class="text-red-400 font-bold mb-1">Form 1D - General</p>
+                            <p class="text-slate-400 text-sm">General stream</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp" style="animation-delay: 0.4s;">
+                    <h3 class="text-lg font-bold text-slate-100 mb-4">Actions</h3>
+                    <div class="space-y-3">
+                        <a href="{% url 'zimsec_result_edit' result.id %}" class="block px-4 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 transition text-center">
+                            ✏️ Edit Result
+                        </a>
+                        <button onclick="window.print()" class="w-full px-4 py-3 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-700 transition">
+                            🖨️ Print Report Card
+                        </button>
+                        <a href="{% url 'zimsec_results_list' %}" class="block px-4 py-3 rounded-lg font-bold text-white bg-slate-700 hover:bg-slate-600 transition text-center">
+                            📋 Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style media="print">
+    button, a[class*="px"], .space-y-8 div:last-child { display: none !important; }
+    body { background-color: white !important; }
+    .glass { background: white !important; border: 1px solid #ccc !important; }
+</style>
+
+<style>
+    .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(20px);
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-slideInUp {
+        animation: slideInUp 0.6s ease-out forwards;
+    }
+</style>
+
+{% endblock %}

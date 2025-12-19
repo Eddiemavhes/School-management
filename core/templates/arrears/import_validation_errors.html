@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Validation Errors{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Error Header -->
+        <div class="mb-8 text-center">
+            <div class="flex justify-center mb-4">
+                <div class="flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-yellow-500 to-orange-600 shadow-2xl shadow-yellow-500/50">
+                    <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 4v2M7.08 6.47A9 9 0 1120.92 17.53M7.08 6.47L5.25 4.65m0 0l-1.83-1.83m1.83 1.83l1.83-1.83m0 0l1.83 1.83M20.92 17.53l1.83 1.83m0 0l1.83 1.83m-1.83-1.83l-1.83 1.83m0 0l-1.83-1.83"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            <h1 class="text-4xl font-black text-white mb-2">Validation Issues Found</h1>
+            <p class="text-yellow-300 text-lg font-semibold">Please review and fix the errors before proceeding</p>
+        </div>
+        
+        <!-- Error Details -->
+        <div class="bg-slate-800/90 backdrop-blur-xl border-2 border-red-500/30 rounded-2xl p-8 shadow-2xl mb-8">
+            
+            {% if errors %}
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-red-400 mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2"></path>
+                    </svg>
+                    ❌ {{ errors|length }} Critical Error{{ errors|pluralize }}
+                </h2>
+                
+                <div class="space-y-3 max-h-96 overflow-y-auto">
+                    {% for error in errors %}
+                    <div class="p-4 rounded-lg bg-red-500/10 border-l-4 border-red-500 text-red-300">
+                        <p class="font-semibold">{{ error }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if warnings %}
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-yellow-400 mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 4v2m0-14a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    ⚠️ {{ warnings|length }} Warning{{ warnings|pluralize }}
+                </h2>
+                
+                <div class="space-y-3 max-h-96 overflow-y-auto">
+                    {% for warning in warnings %}
+                    <div class="p-4 rounded-lg bg-yellow-500/10 border-l-4 border-yellow-500 text-yellow-300">
+                        <p class="font-semibold">{{ warning }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- How to Fix -->
+        <div class="bg-slate-800/90 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl p-8 shadow-2xl mb-8">
+            <h2 class="text-2xl font-bold text-white mb-4">💡 How to Fix</h2>
+            
+            <div class="space-y-4">
+                <div class="p-4 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                    <p class="text-cyan-300 font-semibold mb-2">1. Review Each Error</p>
+                    <p class="text-gray-300 text-sm">Read the error message carefully. It tells you what's wrong.</p>
+                </div>
+                
+                <div class="p-4 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                    <p class="text-cyan-300 font-semibold mb-2">2. Return to Data Entry</p>
+                    <p class="text-gray-300 text-sm">Go back and fix the entries (remove invalid amounts, verify student names, etc.)</p>
+                </div>
+                
+                <div class="p-4 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                    <p class="text-cyan-300 font-semibold mb-2">3. Revalidate</p>
+                    <p class="text-gray-300 text-sm">Once fixed, come back to this page and refresh. The wizard will revalidate automatically.</p>
+                </div>
+                
+                <div class="p-4 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                    <p class="text-cyan-300 font-semibold mb-2">4. Address Warnings</p>
+                    <p class="text-gray-300 text-sm">Warnings are informational only - you can proceed but be aware of the issues listed.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Common Issues -->
+        <div class="bg-slate-800/90 backdrop-blur-xl border-2 border-cyan-500/30 rounded-2xl p-8 shadow-2xl mb-8">
+            <h2 class="text-2xl font-bold text-white mb-4">🔍 Common Issues</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                
+                <div class="p-4 rounded-lg bg-slate-700/50">
+                    <p class="font-semibold text-white mb-2">❌ "Student not found"</p>
+                    <p class="text-gray-400 text-sm">Make sure the student name matches exactly. Check spelling and case.</p>
+                </div>
+                
+                <div class="p-4 rounded-lg bg-slate-700/50">
+                    <p class="font-semibold text-white mb-2">❌ "Invalid amount"</p>
+                    <p class="text-gray-400 text-sm">Amount must be a positive number. No letters or special characters (except decimal point).</p>
+                </div>
+                
+                <div class="p-4 rounded-lg bg-slate-700/50">
+                    <p class="font-semibold text-white mb-2">❌ "Duplicate entry"</p>
+                    <p class="text-gray-400 text-sm">You've already added this student to the batch. Edit the existing entry instead.</p>
+                </div>
+                
+                <div class="p-4 rounded-lg bg-slate-700/50">
+                    <p class="font-semibold text-white mb-2">❌ "Student is deleted"</p>
+                    <p class="text-gray-400 text-sm">The student record has been deleted. Cannot add arrears for deleted students.</p>
+                </div>
+                
+                <div class="p-4 rounded-lg bg-slate-700/50">
+                    <p class="font-semibold text-white mb-2">⚠️ "Large amount"</p>
+                    <p class="text-gray-400 text-sm">The amount is unusually large. Verify it's correct before proceeding.</p>
+                </div>
+                
+                <div class="p-4 rounded-lg bg-slate-700/50">
+                    <p class="font-semibold text-white mb-2">⚠️ "Student already has arrears"</p>
+                    <p class="text-gray-400 text-sm">This student already has an arrears record. You may want to update instead.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex gap-4 flex-wrap">
+            <a href="{% url 'arrears_import_manual_entry' batch_id=batch.batch_id %}" class="flex-1 min-w-64 py-3 px-6 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold transition-all duration-200 transform hover:scale-105 shadow-lg text-center">
+                ← Go Back to Manual Entry
+            </a>
+            
+            <a href="{% url 'arrears_import_start' %}" class="flex-1 min-w-64 py-3 px-6 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold transition-all duration-200 transform hover:scale-105 shadow-lg text-center">
+                ← Try Different Import Method
+            </a>
+            
+            <a href="{% url 'admin_dashboard' %}" class="flex-1 min-w-64 py-3 px-6 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-bold transition-all text-center">
+                Cancel & Go Home
+            </a>
+        </div>
+        
+        <!-- Info Box -->
+        <div class="mt-8 p-6 rounded-lg bg-blue-500/10 border border-blue-500/30">
+            <h3 class="text-blue-300 font-bold mb-2">💡 Tip</h3>
+            <p class="text-gray-300 text-sm">
+                If you're having trouble, try the <strong>Bulk Upload</strong> method instead. 
+                Download the CSV template, fill it in slowly and carefully, then upload. 
+                The system will catch errors and show you exactly what needs fixing.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
