@@ -5,16 +5,39 @@ Advanced analytical tools and comparison features
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
-from scipy import stats as scipy_stats
+from django.shortcuts import redirect
+from django.contrib import messages
+
+# Try to import scipy and numpy, but make them optional
+try:
+    from scipy import stats as scipy_stats
+    SCIPY_AVAILABLE = True
+except ImportError:
+    SCIPY_AVAILABLE = False
+    scipy_stats = None
+
+try:
+    import numpy as np
+    NUMPY_AVAILABLE = True
+except ImportError:
+    NUMPY_AVAILABLE = False
+    np = None
+
 from core.models.zimsec import ZimsecResults
 from core.models import Class
-import numpy as np
 import json
 
 
 class ComparisonView(LoginRequiredMixin, TemplateView):
     """Advanced comparison mode for ZIMSEC data"""
     template_name = 'zimsec/comparison_advanced.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        """Check if scipy is available before processing"""
+        if not SCIPY_AVAILABLE or not NUMPY_AVAILABLE:
+            messages.error(request, "Advanced analytics not available. Please contact administrator.")
+            return redirect('admin_dashboard')
+        return super().dispatch(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -259,6 +282,13 @@ class PredictionView(LoginRequiredMixin, TemplateView):
     """Predictive forecasting for 2028 and beyond"""
     template_name = 'zimsec/predictions.html'
     
+    def dispatch(self, request, *args, **kwargs):
+        """Check if scipy is available before processing"""
+        if not SCIPY_AVAILABLE or not NUMPY_AVAILABLE:
+            messages.error(request, "Advanced analytics not available. Please contact administrator.")
+            return redirect('admin_dashboard')
+        return super().dispatch(request, *args, **kwargs)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
@@ -269,6 +299,7 @@ class PredictionView(LoginRequiredMixin, TemplateView):
         
         # Get historical data - only for years that have actual ZIMSEC results
         all_years = sorted(set(ZimsecResults.objects.filter(academic_year__isnull=False).values_list('academic_year', flat=True).distinct()))
+        
         
         # If we have less than 2 years, we can't do meaningful predictions
         if len(all_years) < 1:
@@ -423,6 +454,13 @@ class PredictionView(LoginRequiredMixin, TemplateView):
 class StatisticalTestsView(LoginRequiredMixin, TemplateView):
     """Perform statistical tests on ZIMSEC data"""
     template_name = 'zimsec/statistical_tests.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        """Check if scipy is available before processing"""
+        if not SCIPY_AVAILABLE or not NUMPY_AVAILABLE:
+            messages.error(request, "Advanced analytics not available. Please contact administrator.")
+            return redirect('admin_dashboard')
+        return super().dispatch(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
         """Handle statistical test requests"""
