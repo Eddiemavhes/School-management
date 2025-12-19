@@ -3,6 +3,21 @@ from django.dispatch import receiver
 from .models import TeacherAssignmentHistory, Class, Student
 from .models.academic import Payment, AcademicTerm
 
+@receiver(post_save, sender=Student)
+def create_student_balance_on_enrollment(sender, instance, created, **kwargs):
+    """Automatically create StudentBalance when a student is enrolled in current term"""
+    from .models.fee import StudentBalance
+    from .models.academic import AcademicTerm
+    
+    if created or instance.current_class:  # Created or class assigned
+        current_term = AcademicTerm.get_current_term()
+        if current_term:
+            try:
+                # Initialize/get student balance for current term
+                StudentBalance.initialize_term_balance(instance, current_term)
+            except Exception as e:
+                print(f"Error creating StudentBalance for new student {instance}: {e}")
+
 @receiver(post_save, sender=Payment)
 def update_student_balance_on_payment(sender, instance, created, **kwargs):
     """Update StudentBalance.amount_paid when a payment is recorded"""
