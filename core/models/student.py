@@ -333,7 +333,7 @@ class Student(models.Model):
         Does NOT include future terms that haven't become current yet.
         This ensures students aren't charged for terms they haven't reached.
         """
-        from .fee import StudentBalance
+        from .fee import StudentBalance, TermFee
         from .academic import AcademicTerm
         
         # Try to get current term first
@@ -345,6 +345,14 @@ class Student(models.Model):
             ).first()
             if current_balance:
                 return float(current_balance.current_balance)
+            
+            # No StudentBalance yet, but check if student is active and current term has a fee
+            if self.is_active:
+                try:
+                    term_fee = TermFee.objects.get(term=current_term)
+                    return float(term_fee.amount)  # Student owes the term fee
+                except TermFee.DoesNotExist:
+                    pass
         
         # If no current term balance, get the most recent term balance from past terms
         latest_balance = StudentBalance.objects.filter(
