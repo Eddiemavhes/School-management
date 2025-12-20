@@ -53,7 +53,16 @@ def dashboard(request):
     arrears_import_completed = ArrearsImportBatch.objects.filter(
         status__in=['IMPORTED', 'READY', 'VALIDATING']
     ).exists()
+    
+    # DEBUG: Log the values
+    import sys
+    print(f"DEBUG: current_term = {current_term}", file=sys.stderr)
+    print(f"DEBUG: current_term.term = {current_term.term if current_term else 'None'}", file=sys.stderr)
+    print(f"DEBUG: arrears_import_completed = {arrears_import_completed}", file=sys.stderr)
+    print(f"DEBUG: ArrearsImportBatch.objects.all().count() = {ArrearsImportBatch.objects.all().count()}", file=sys.stderr)
+    
     is_system_new = (current_term and current_term.term == 1 and not arrears_import_completed)
+    print(f"DEBUG: is_system_new = {is_system_new}", file=sys.stderr)
 
     context = {
         'recent_movements': recent_movements,
