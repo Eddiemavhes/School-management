@@ -6,7 +6,7 @@ from ..models.class_model import Class
 from ..models.payment import Payment
 from ..models.student_movement import StudentMovement
 from ..models.academic import AcademicTerm
-from ..models.fee import StudentBalance
+from ..models.arrears_import import ArrearsImportBatch
 from django.utils import timezone
 from datetime import timedelta
 
@@ -48,10 +48,12 @@ def dashboard(request):
     # Get current term and academic year
     current_term = AcademicTerm.get_current_term()
     
-    # Check if system is new AND we're in Term 1 (only show arrears import in Term 1 of fresh system)
-    # Once Term 2 starts, arrears import is no longer available
-    is_system_new = (not StudentBalance.objects.exists() and 
-                     current_term and current_term.term == 1)
+    # Check if system is in Term 1 AND no arrears import has been attempted yet
+    # Show arrears import only in Term 1 before any import batch has been created
+    arrears_import_completed = ArrearsImportBatch.objects.filter(
+        status__in=['IMPORTED', 'READY', 'VALIDATING']
+    ).exists()
+    is_system_new = (current_term and current_term.term == 1 and not arrears_import_completed)
 
     context = {
         'recent_movements': recent_movements,
