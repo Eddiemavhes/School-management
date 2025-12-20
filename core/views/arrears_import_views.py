@@ -14,6 +14,7 @@ from core.models import (
     ArrearsImportEntry,
     StudentArrearsRecord,
     AcademicYear,
+    AcademicTerm,
     Student,
     StudentBalance,
 )
@@ -39,10 +40,15 @@ def is_staff_or_admin(user):
 def arrears_import_wizard_start(request):
     """Phase 1: Initialize arrears import - select year and method"""
     
-    # Check if system is new (no students with data yet)
-    # Only allow arrears import if there are no StudentBalance records yet (system is fresh)
-    if StudentBalance.objects.exists():
-        # messages.error(request, 'Arrears import is only available for new system setup. Your system already has student balance data.')
+    # Only allow arrears import in Term 1 and before any import batch has been attempted
+    current_term = AcademicTerm.get_current_term()
+    if not current_term or current_term.term != 1:
+        # Not in Term 1, redirect to dashboard
+        return redirect('dashboard')
+    
+    # Check if any arrears import batch exists (completed or in progress)
+    if ArrearsImportBatch.objects.exists():
+        # Arrears import has already been attempted, redirect to dashboard
         return redirect('dashboard')
     
     if request.method == 'POST':
