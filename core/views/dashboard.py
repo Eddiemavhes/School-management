@@ -48,8 +48,10 @@ def dashboard(request):
     # Get current term and academic year
     current_term = AcademicTerm.get_current_term()
     
-    # Check if system is new (no StudentBalance records yet - perfect for arrears import)
-    is_system_new = not StudentBalance.objects.exists()
+    # Check if system is new AND we're in Term 1 (only show arrears import in Term 1 of fresh system)
+    # Once Term 2 starts, arrears import is no longer available
+    is_system_new = (not StudentBalance.objects.exists() and 
+                     current_term and current_term.term == 1)
 
     context = {
         'recent_movements': recent_movements,
