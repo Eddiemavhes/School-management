@@ -6,6 +6,7 @@ from ..models.class_model import Class
 from ..models.payment import Payment
 from ..models.student_movement import StudentMovement
 from ..models.academic import AcademicTerm
+from ..models.fee import StudentBalance
 from django.utils import timezone
 from datetime import timedelta
 
@@ -46,6 +47,9 @@ def dashboard(request):
 
     # Get current term and academic year
     current_term = AcademicTerm.get_current_term()
+    
+    # Check if system is new (no StudentBalance records yet - perfect for arrears import)
+    is_system_new = not StudentBalance.objects.exists()
 
     context = {
         'recent_movements': recent_movements,
@@ -56,6 +60,7 @@ def dashboard(request):
         'class_distribution': class_distribution,
         'payment_stats': payment_stats,
         'current_term': current_term,
+        'is_system_new': is_system_new,
     }
     
     return render(request, 'dashboard/dashboard.html', context)
