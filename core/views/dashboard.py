@@ -50,7 +50,9 @@ def dashboard(request):
     
     # Show arrears import button only in Term 1 when no relevant arrears import batch exists
     # Treat only in-progress/complete statuses as blocking: VALIDATING, READY, IMPORTED
-    arrears_import_completed = ArrearsImportBatch.objects.filter(status__in=['VALIDATING', 'READY', 'IMPORTED']).exists()
+    blocking_statuses = ['VALIDATING', 'READY', 'IMPORTED']
+    arrears_import_completed = ArrearsImportBatch.objects.filter(status__in=blocking_statuses).exists()
+    blocking_count = ArrearsImportBatch.objects.filter(status__in=blocking_statuses).count()
     is_system_new = (current_term is not None and int(current_term.term) == 1 and not arrears_import_completed)
 
     context = {
@@ -63,6 +65,7 @@ def dashboard(request):
         'payment_stats': payment_stats,
         'current_term': current_term,
         'is_system_new': is_system_new,
+        'arrears_blocking_count': blocking_count,
     }
     
     return render(request, 'dashboard/dashboard.html', context)

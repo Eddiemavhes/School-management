@@ -145,6 +145,17 @@
                     </svg>
                     Quick Actions
                 </h2>
+                <!-- VISIBLE DEBUG: show why arrears import may be hidden -->
+                <div class="mb-4 p-3 rounded-lg bg-white/5 text-xs text-slate-300">
+                    <strong>DEBUG:</strong>
+                    {% if current_term %}
+                        Current term: {{ current_term.get_term_display }} (term={{ current_term.term }})
+                    {% else %}
+                        Current term: None
+                    {% endif %}
+                    &nbsp;|&nbsp; Blocking batches: {{ arrears_blocking_count|default:0 }}
+                    &nbsp;|&nbsp; is_system_new: {{ is_system_new }}
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {% if is_system_new %}
                     <a href="{% url 'arrears_import_start' %}" class="group glass bg-white/5 p-5 rounded-2xl hover:bg-gradient-to-br hover:from-purple-500/15 hover:to-blue-500/15 transition-all duration-300 border border-white/10 hover:border-purple-500/30">
