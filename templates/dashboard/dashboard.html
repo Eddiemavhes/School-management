@@ -145,19 +145,7 @@
                     </svg>
                     Quick Actions
                 </h2>
-                <!-- VISIBLE DEBUG: show why arrears import may be hidden -->
-                <div class="mb-4 p-3 rounded-lg bg-white/5 text-xs text-slate-300">
-                    <strong>DEBUG:</strong>
-                    {% if current_term %}
-                        Current term: {{ current_term.get_term_display }} (term={{ current_term.term }})
-                    {% else %}
-                        Current term: None
-                    {% endif %}
-                    &nbsp;|&nbsp; Blocking batches: {{ arrears_blocking_count|default:0 }}
-                    &nbsp;|&nbsp; arrears_import_completed: {% if debug_arrears_import_completed %}True{% else %}False{% endif %}
-                    &nbsp;|&nbsp; current_term.term: {{ debug_current_term_term }}
-                    &nbsp;|&nbsp; is_system_new: {% if is_system_new %}True{% else %}False{% endif %}
-                </div>
+                <!-- Quick actions — display Arrears Import only when `is_system_new` is True -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {% comment %} Show arrears import button when system is in first term AND no blocking batches for current academic year. This mirrors dashboard logic. {% endcomment %}
                     {% if is_system_new %}

@@ -103,11 +103,6 @@ def dashboard(request):
         'payment_stats': payment_stats,
         'current_term': current_term,
         'is_system_new': is_system_new,
-        'arrears_blocking_count': blocking_count,
-        # debug helpers (visible in template)
-        'debug_arrears_import_completed': arrears_import_completed_bool,
-        'debug_current_term_term': getattr(current_term, 'term', None),
-        'debug_term_number': term_number,
     }
     
     return render(request, 'dashboard/dashboard.html', context)
