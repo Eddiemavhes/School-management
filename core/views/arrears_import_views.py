@@ -43,7 +43,8 @@ def arrears_import_wizard_start(request):
     # Only allow arrears import in Term 1 before any import batch has been created
     current_term = AcademicTerm.get_current_term()
     
-    if not current_term or int(current_term.term) != 1 or ArrearsImportBatch.objects.exists():
+    # Block only if current term is not Term 1 or a non-draft batch exists (VALIDATING/READY/IMPORTED)
+    if not current_term or int(current_term.term) != 1 or ArrearsImportBatch.objects.filter(status__in=['VALIDATING', 'READY', 'IMPORTED']).exists():
         messages.warning(request, "Arrears import is only allowed in the first term and before any arrears import has been done.")
         return redirect('admin_dashboard')
     
