@@ -43,7 +43,7 @@ def arrears_import_wizard_start(request):
     # Only allow arrears import in Term 1 before any import batch has been created
     current_term = AcademicTerm.get_current_term()
     
-    if not current_term or current_term.term != 1:
+    if not current_term or int(current_term.term) != 1:
         messages.warning(request, "Arrears import is only allowed in the first term.")
         return redirect('admin_dashboard')
     
