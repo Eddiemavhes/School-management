@@ -67,11 +67,31 @@ def dashboard(request):
             blocking_count = ArrearsImportBatch.objects.filter(status__in=blocking_statuses).count()
             arrears_import_completed = ArrearsImportBatch.objects.filter(status__in=blocking_statuses).exists()
 
-    # Ensure boolean value and avoid surprises from non-bool types
-    try:
-        is_system_new = bool(current_term is not None and int(current_term.term) == 1 and not bool(arrears_import_completed))
-    except Exception:
-        is_system_new = False
+    # Robustly compute is_system_new handling various term/flag representations
+    def _to_bool(val):
+        if isinstance(val, bool):
+            return val
+        if val is None:
+            return False
+        s = str(val).strip().lower()
+        return s in ('1', 'true', 't', 'yes', 'y')
+
+    arrears_import_completed_bool = _to_bool(arrears_import_completed)
+
+    # Determine term number robustly
+    term_number = None
+    if current_term is not None:
+        term_val = getattr(current_term, 'term', None)
+        try:
+            term_number = int(term_val)
+        except Exception:
+            # fallback for values like 'First Term' or 'First'
+            if isinstance(term_val, str) and term_val.strip().lower().startswith('first'):
+                term_number = 1
+            else:
+                term_number = None
+
+    is_system_new = bool(current_term is not None and term_number == 1 and not arrears_import_completed_bool)
 
     context = {
         'recent_movements': recent_movements,
@@ -85,8 +105,9 @@ def dashboard(request):
         'is_system_new': is_system_new,
         'arrears_blocking_count': blocking_count,
         # debug helpers (visible in template)
-        'debug_arrears_import_completed': bool(arrears_import_completed),
+        'debug_arrears_import_completed': arrears_import_completed_bool,
         'debug_current_term_term': getattr(current_term, 'term', None),
+        'debug_term_number': term_number,
     }
     
     return render(request, 'dashboard/dashboard.html', context)
