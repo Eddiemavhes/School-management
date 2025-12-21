@@ -146,6 +146,7 @@
                     Quick Actions
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% if is_system_new %}
                     <a href="{% url 'arrears_import_start' %}" class="group glass bg-white/5 p-5 rounded-2xl hover:bg-gradient-to-br hover:from-purple-500/15 hover:to-blue-500/15 transition-all duration-300 border border-white/10 hover:border-purple-500/30">
                         <div class="flex items-center gap-4">
                             <div class="p-3 rounded-xl bg-purple-500/20 group-hover:bg-purple-500/30 transition-colors">
@@ -159,6 +160,7 @@
                             </div>
                         </div>
                     </a>
+                    {% endif %}
 
                     <a href="{% url 'student_list' %}" class="group glass bg-white/5 p-5 rounded-2xl hover:bg-gradient-to-br hover:from-blue-500/15 hover:to-cyan-500/15 transition-all duration-300 border border-white/10 hover:border-blue-500/30">
                         <div class="flex items-center gap-4">
