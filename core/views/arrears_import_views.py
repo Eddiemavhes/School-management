@@ -40,15 +40,11 @@ def is_staff_or_admin(user):
 def arrears_import_wizard_start(request):
     """Phase 1: Initialize arrears import - select year and method"""
     
-    # Only allow arrears import in Term 1 before any import batch has been created
+    # Only allow arrears import in Term 1
     current_term = AcademicTerm.get_current_term()
     
     if not current_term or int(current_term.term) != 1:
         messages.warning(request, "Arrears import is only allowed in the first term.")
-        return redirect('admin_dashboard')
-    
-    if ArrearsImportBatch.objects.exists():
-        messages.warning(request, "Arrears have already been imported. This operation can only be done once per academic year.")
         return redirect('admin_dashboard')
     
     if request.method == 'POST':
