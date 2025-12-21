@@ -48,27 +48,23 @@ def dashboard(request):
     # Get current term and academic year
     current_term = AcademicTerm.get_current_term()
     
-    # Check if system is in Term 1 AND no arrears import has been attempted yet
-    # Show arrears import only in Term 1 before any import batch has been created
-    arrears_import_completed = ArrearsImportBatch.objects.filter(
-        status__in=['IMPORTED', 'READY', 'VALIDATING']
-    ).exists()
-    
-    # DEBUG: Log the values
+    # DEBUG: Log all the information
     import sys
     all_terms = list(AcademicTerm.objects.all().values('id', 'academic_year', 'term', 'is_current'))
-    print(f"DEBUG: All AcademicTerms: {all_terms}", file=sys.stderr)
-    print(f"DEBUG: current_term = {current_term}", file=sys.stderr)
+    print(f"\n{'='*60}", file=sys.stderr)
+    print(f"ARREARS IMPORT DEBUG", file=sys.stderr)
+    print(f"{'='*60}", file=sys.stderr)
+    print(f"All AcademicTerms in DB: {all_terms}", file=sys.stderr)
+    print(f"current_term object: {current_term}", file=sys.stderr)
     if current_term:
-        print(f"DEBUG: current_term.term = {current_term.term} (type: {type(current_term.term)})", file=sys.stderr)
-        print(f"DEBUG: current_term.term == 1: {current_term.term == 1}", file=sys.stderr)
-        print(f"DEBUG: int(current_term.term) == 1: {int(current_term.term) == 1}", file=sys.stderr)
-    print(f"DEBUG: arrears_import_completed = {arrears_import_completed}", file=sys.stderr)
-    print(f"DEBUG: ArrearsImportBatch.objects.all().count() = {ArrearsImportBatch.objects.all().count()}", file=sys.stderr)
+        print(f"  - term value: {current_term.term} (type: {type(current_term.term).__name__})", file=sys.stderr)
+        print(f"  - is_current: {current_term.is_current}", file=sys.stderr)
+    print(f"ArrearsImportBatch count: {ArrearsImportBatch.objects.count()}", file=sys.stderr)
+    print(f"{'='*60}\n", file=sys.stderr)
     
-    is_system_new = (current_term and int(current_term.term) == 1 and not arrears_import_completed)
-    print(f"DEBUG: is_system_new = {is_system_new}", file=sys.stderr)
-    print(f"DEBUG: Condition breakdown: current_term={bool(current_term)}, term==1={int(current_term.term)==1 if current_term else False}, not completed={not arrears_import_completed}", file=sys.stderr)
+    # For now, just check Term 1 - no ArrearsImportBatch check
+    is_system_new = (current_term is not None and int(current_term.term) == 1)
+    print(f"is_system_new = {is_system_new}", file=sys.stderr)
 
     context = {
         'recent_movements': recent_movements,
