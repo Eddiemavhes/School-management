@@ -59,9 +59,9 @@ def arrears_import_wizard_start(request):
     print(f"{'='*60}\n", file=sys.stderr)
     
     # Only allow arrears import in Term 1 and before any import batch has been attempted
-    if not current_term or current_term.term != 1:
+    if not current_term or int(current_term.term) != 1:
         # Not in Term 1, redirect to dashboard
-        print(f"REDIRECTING: current_term={current_term}, term check failed", file=sys.stderr)
+        print(f"REDIRECTING: current_term={current_term}, term={current_term.term if current_term else None}, int(term)={int(current_term.term) if current_term else None}", file=sys.stderr)
         return redirect('admin_dashboard')
     
     # Check if any arrears import batch exists (completed or in progress)

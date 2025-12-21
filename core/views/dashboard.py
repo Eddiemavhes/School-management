@@ -51,6 +51,22 @@ def dashboard(request):
     # Show arrears import button only in Term 1 when no import batch has been created yet
     arrears_import_completed = ArrearsImportBatch.objects.exists()
     is_system_new = (current_term is not None and int(current_term.term) == 1 and not arrears_import_completed)
+    
+    # Debug logging
+    import sys
+    all_terms = list(AcademicTerm.objects.all().values('id', 'academic_year', 'term', 'is_current'))
+    print(f"\n{'='*60}", file=sys.stderr)
+    print(f"DASHBOARD DEBUG", file=sys.stderr)
+    print(f"{'='*60}", file=sys.stderr)
+    print(f"All AcademicTerms: {all_terms}", file=sys.stderr)
+    print(f"current_term: {current_term}", file=sys.stderr)
+    if current_term:
+        print(f"  - term value: {current_term.term} (type: {type(current_term.term).__name__})", file=sys.stderr)
+        print(f"  - int(term): {int(current_term.term)}", file=sys.stderr)
+        print(f"  - int(term) == 1: {int(current_term.term) == 1}", file=sys.stderr)
+    print(f"ArrearsImportBatch.exists(): {arrears_import_completed}", file=sys.stderr)
+    print(f"is_system_new: {is_system_new}", file=sys.stderr)
+    print(f"{'='*60}\n", file=sys.stderr)
 
     context = {
         'recent_movements': recent_movements,
