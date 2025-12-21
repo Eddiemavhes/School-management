@@ -56,13 +56,19 @@ def dashboard(request):
     
     # DEBUG: Log the values
     import sys
+    all_terms = list(AcademicTerm.objects.all().values('id', 'academic_year', 'term', 'is_current'))
+    print(f"DEBUG: All AcademicTerms: {all_terms}", file=sys.stderr)
     print(f"DEBUG: current_term = {current_term}", file=sys.stderr)
-    print(f"DEBUG: current_term.term = {current_term.term if current_term else 'None'}", file=sys.stderr)
+    if current_term:
+        print(f"DEBUG: current_term.term = {current_term.term} (type: {type(current_term.term)})", file=sys.stderr)
+        print(f"DEBUG: current_term.term == 1: {current_term.term == 1}", file=sys.stderr)
+        print(f"DEBUG: int(current_term.term) == 1: {int(current_term.term) == 1}", file=sys.stderr)
     print(f"DEBUG: arrears_import_completed = {arrears_import_completed}", file=sys.stderr)
     print(f"DEBUG: ArrearsImportBatch.objects.all().count() = {ArrearsImportBatch.objects.all().count()}", file=sys.stderr)
     
-    is_system_new = (current_term and current_term.term == 1 and not arrears_import_completed)
+    is_system_new = (current_term and int(current_term.term) == 1 and not arrears_import_completed)
     print(f"DEBUG: is_system_new = {is_system_new}", file=sys.stderr)
+    print(f"DEBUG: Condition breakdown: current_term={bool(current_term)}, term==1={int(current_term.term)==1 if current_term else False}, not completed={not arrears_import_completed}", file=sys.stderr)
 
     context = {
         'recent_movements': recent_movements,
