@@ -67,7 +67,11 @@ def dashboard(request):
             blocking_count = ArrearsImportBatch.objects.filter(status__in=blocking_statuses).count()
             arrears_import_completed = ArrearsImportBatch.objects.filter(status__in=blocking_statuses).exists()
 
-    is_system_new = (current_term is not None and int(current_term.term) == 1 and not arrears_import_completed)
+    # Ensure boolean value and avoid surprises from non-bool types
+    try:
+        is_system_new = bool(current_term is not None and int(current_term.term) == 1 and not bool(arrears_import_completed))
+    except Exception:
+        is_system_new = False
 
     context = {
         'recent_movements': recent_movements,
@@ -80,6 +84,9 @@ def dashboard(request):
         'current_term': current_term,
         'is_system_new': is_system_new,
         'arrears_blocking_count': blocking_count,
+        # debug helpers (visible in template)
+        'debug_arrears_import_completed': bool(arrears_import_completed),
+        'debug_current_term_term': getattr(current_term, 'term', None),
     }
     
     return render(request, 'dashboard/dashboard.html', context)
