@@ -48,23 +48,8 @@ def dashboard(request):
     # Get current term and academic year
     current_term = AcademicTerm.get_current_term()
     
-    # DEBUG: Log all the information
-    import sys
-    all_terms = list(AcademicTerm.objects.all().values('id', 'academic_year', 'term', 'is_current'))
-    print(f"\n{'='*60}", file=sys.stderr)
-    print(f"ARREARS IMPORT DEBUG", file=sys.stderr)
-    print(f"{'='*60}", file=sys.stderr)
-    print(f"All AcademicTerms in DB: {all_terms}", file=sys.stderr)
-    print(f"current_term object: {current_term}", file=sys.stderr)
-    if current_term:
-        print(f"  - term value: {current_term.term} (type: {type(current_term.term).__name__})", file=sys.stderr)
-        print(f"  - is_current: {current_term.is_current}", file=sys.stderr)
-    print(f"ArrearsImportBatch count: {ArrearsImportBatch.objects.count()}", file=sys.stderr)
-    print(f"{'='*60}\n", file=sys.stderr)
-    
-    # For now, just check Term 1 - no ArrearsImportBatch check
-    is_system_new = (current_term is not None and int(current_term.term) == 1)
-    print(f"is_system_new = {is_system_new}", file=sys.stderr)
+    # Always show arrears import button for now - debugging why it wasn't showing
+    is_system_new = True
 
     context = {
         'recent_movements': recent_movements,
