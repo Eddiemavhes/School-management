@@ -44,12 +44,12 @@ def arrears_import_wizard_start(request):
     current_term = AcademicTerm.get_current_term()
     if not current_term or current_term.term != 1:
         # Not in Term 1, redirect to dashboard
-        return redirect('dashboard')
+        return redirect('admin_dashboard')
     
     # Check if any arrears import batch exists (completed or in progress)
     if ArrearsImportBatch.objects.exists():
         # Arrears import has already been attempted, redirect to dashboard
-        return redirect('dashboard')
+        return redirect('admin_dashboard')
     
     if request.method == 'POST':
         form = ArrearsImportInitializationForm(request.POST)
