@@ -479,16 +479,16 @@
         <div class="bg-slate-900/80 backdrop-filter">
             <div class="mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                 <!-- Logo with School Name -->
-                <a href="/" class="flex items-center gap-2 sm:gap-3 group min-w-0">
-                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-blue-400 to-teal-400 flex items-center justify-center text-white font-bold text-sm sm:text-lg group-hover:shadow-lg group-hover:shadow-blue-500/50 transition-all flex-shrink-0">
+                <a href="/" class="flex items-center gap-2 sm:gap-4 group min-w-0 hover:opacity-80 transition-opacity">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-400 via-cyan-400 to-teal-400 flex items-center justify-center text-white font-bold text-base sm:text-xl group-hover:shadow-xl group-hover:shadow-blue-500/40 transition-all flex-shrink-0 shadow-lg">
                         A
                     </div>
                     <div class="flex flex-col min-w-0 hidden sm:block">
-                        <span class="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent truncate">AcademiaFlow</span>
+                        <span class="text-base sm:text-2xl font-black bg-gradient-to-r from-blue-200 via-cyan-200 to-teal-200 bg-clip-text text-transparent truncate leading-tight">AcademiaFlow</span>
                         {% load custom_tags %}
                         {% school_name_tag as school_name %}
                         {% if school_name %}
-                        <span class="text-xs sm:text-sm text-slate-300 font-medium truncate">{{ school_name }}</span>
+                        <span class="text-xs sm:text-sm text-slate-400 font-semibold truncate tracking-wide">{{ school_name }}</span>
                         {% endif %}
                     </div>
                 </a>
