@@ -51,8 +51,22 @@ def dashboard(request):
     # Show arrears import button only in Term 1 when no relevant arrears import batch exists
     # Treat only in-progress/complete statuses as blocking: VALIDATING, READY, IMPORTED
     blocking_statuses = ['VALIDATING', 'READY', 'IMPORTED']
-    arrears_import_completed = ArrearsImportBatch.objects.filter(status__in=blocking_statuses).exists()
-    blocking_count = ArrearsImportBatch.objects.filter(status__in=blocking_statuses).count()
+    blocking_count = 0
+    arrears_import_completed = False
+
+    if current_term is not None:
+        # Only consider batches for the same academic year (and optionally same starting_term)
+        try:
+            current_year = current_term.academic_year
+            blocking_qs = ArrearsImportBatch.objects.filter(academic_year=current_year, status__in=blocking_statuses)
+            # Prefer batches targeting this starting term, but any batch for the year should block
+            blocking_count = blocking_qs.count()
+            arrears_import_completed = blocking_qs.exists()
+        except Exception:
+            # Fallback to global check if anything unexpected happens
+            blocking_count = ArrearsImportBatch.objects.filter(status__in=blocking_statuses).count()
+            arrears_import_completed = ArrearsImportBatch.objects.filter(status__in=blocking_statuses).exists()
+
     is_system_new = (current_term is not None and int(current_term.term) == 1 and not arrears_import_completed)
 
     context = {
