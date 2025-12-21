@@ -47,6 +47,10 @@ def dashboard(request):
 
     # Get current term and academic year
     current_term = AcademicTerm.get_current_term()
+    
+    # Show arrears import button only in Term 1 when no arrears import batch has been created yet
+    arrears_import_completed = ArrearsImportBatch.objects.exists()
+    is_system_new = (current_term is not None and int(current_term.term) == 1 and not arrears_import_completed)
 
     context = {
         'recent_movements': recent_movements,
