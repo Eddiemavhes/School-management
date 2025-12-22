@@ -176,10 +176,25 @@ def reset_system_data(request):
                             cursor.execute("SELECT pg_catalog.setval(pg_get_serial_sequence(%s, 'id'), 1, false)", [tbl])
                         except Exception:
                             logger.debug('Could not reset seq for %s', tbl)
-                # MySQL: rely on AUTO_INCREMENT reset via DELETE + ALTER TABLE if needed
+                elif 'mysql' in db_engine.lower() or 'mariadb' in db_engine.lower():
+                    # Reset AUTO_INCREMENT for common tables
+                    ai_tables = ['core_student', 'core_payment', 'core_class', 'core_academicterm']
+                    for tbl in ai_tables:
+                        try:
+                            cursor.execute(f"ALTER TABLE {tbl} AUTO_INCREMENT = 1")
+                        except Exception:
+                            logger.debug('Could not reset AUTO_INCREMENT for %s', tbl)
+                else:
+                    logger.debug('DB engine not recognized for sequence reset: %s', db_engine)
         except Exception as e:
             logger.exception('Failed to reset DB sequences')
             errors.append(str(e))
+
+        # Log the reset summary
+        try:
+            logger.info('System reset performed by %s; before=%s; errors=%s', request.user.email if hasattr(request.user, 'email') else str(request.user), stats_before, errors)
+        except Exception:
+            logger.debug('Could not write detailed reset log')
 
         # Verify admin data is intact
         admin_count = Administrator.objects.filter(is_teacher=False).count()
