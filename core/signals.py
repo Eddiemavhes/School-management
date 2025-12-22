@@ -304,7 +304,7 @@ def create_student_balance_on_enrollment(sender, instance, created, **kwargs):
                     StudentBalance.objects.create(
                         student=instance,
                         term=current_term,
-                        term_fee=term_fee.amount,
+                        term_fee_record=term_fee,
                         previous_arrears=0,  # New student has no previous arrears
                         amount_paid=0
                     )
