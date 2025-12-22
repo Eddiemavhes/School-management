@@ -321,49 +321,35 @@
     </div>
 </div>
 
-<!-- Confirmation Modal -->
-<div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-xl hidden flex items-center justify-center z-50 animate-fadeIn">
-    <div class="group relative rounded-2xl overflow-hidden max-w-md w-full mx-4 shadow-2xl">
-        <!-- Animated Background -->
-        <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
-        <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-red-500/20 to-transparent rounded-full blur-3xl opacity-50"></div>
-        
-        <div class="relative border border-slate-500/30 backdrop-blur-xl p-8 bg-slate-900/80">
-            <div class="flex items-center gap-4 mb-6">
-                <span class="text-5xl">⚠️</span>
-                <h3 class="text-2xl font-black text-slate-100">Confirm Action</h3>
-            </div>
-            
-            <p class="text-slate-300 mb-6 leading-relaxed font-medium text-sm" id="confirmMessage"></p>
-            
-            <div class="space-y-4 mb-8">
-                <div id="itemsList" class="bg-slate-800/50 rounded-lg p-4 border border-slate-500/20 max-h-48 overflow-y-auto">
-                    <!-- Dynamically populated -->
+<!-- Confirmation Modal (styled) -->
+<div id="confirmModal" class="fixed inset-0 bg-black/60 backdrop-blur-md hidden flex items-center justify-center z-50">
+    <div class="relative max-w-2xl w-full mx-4">
+        <div class="bg-gradient-to-tr from-slate-900/90 to-slate-800/90 rounded-3xl shadow-2xl overflow-hidden border border-slate-700/40">
+            <div class="flex items-start gap-6 p-8">
+                <div class="flex-shrink-0">
+                    <div class="w-20 h-20 rounded-full bg-red-600/20 border border-red-600/30 flex items-center justify-center">
+                        <svg class="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4m0 4h.01"/></svg>
+                    </div>
                 </div>
-                
-                <div class="bg-red-500/10 rounded-lg p-4 border border-red-500/30">
-                    <p class="text-xs font-bold text-red-300 mb-2">
-                        <strong>🔒 WARNING:</strong> This action <span class="font-black">CANNOT BE UNDONE</span>
-                    </p>
-                    <p class="text-xs text-red-300">
-                        Admin and superuser credentials will be <span class="font-bold text-emerald-400">PRESERVED</span>
-                    </p>
+
+                <div class="flex-1">
+                    <h3 class="text-2xl font-extrabold text-slate-100">Confirm Full System Reset</h3>
+                    <p id="confirmMessage" class="mt-2 text-slate-300 text-sm leading-relaxed"></p>
+
+                    <div id="itemsList" class="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        <!-- items injected here -->
+                    </div>
+
+                    <div class="mt-6 bg-red-700/5 border border-red-700/20 rounded-lg p-4">
+                        <p class="text-sm font-semibold text-red-300">This action <span class="font-black">CANNOT BE UNDONE</span></p>
+                        <p class="text-xs text-slate-400 mt-1">Admin and superuser accounts will be preserved. All other data will be deleted.</p>
+                    </div>
                 </div>
             </div>
-            
-            <div class="flex gap-3">
-                <button onclick="closeModal()" class="flex-1 group/btn px-4 py-3 relative overflow-hidden rounded-lg text-slate-200 font-bold transition-all border border-slate-600/50">
-                    <div class="absolute inset-0 bg-slate-700/30 group-hover/btn:bg-slate-700/60 transition-all"></div>
-                    <div class="relative flex items-center justify-center gap-2">
-                        <span>✗</span> Cancel
-                    </div>
-                </button>
-                <button id="confirmBtn" onclick="executeAction()" class="flex-1 group/btn relative overflow-hidden rounded-lg px-4 py-3 font-bold text-white transition-all shadow-lg">
-                    <div class="absolute inset-0 bg-gradient-to-r from-red-600 to-pink-600 group-hover/btn:from-red-700 group-hover/btn:to-pink-700 transition-all"></div>
-                    <div class="relative flex items-center justify-center gap-2">
-                        <span>✓</span> Confirm & Delete
-                    </div>
-                </button>
+
+            <div class="flex items-center gap-4 p-6 bg-gradient-to-t from-black/20 to-transparent border-t border-slate-700/20">
+                <button onclick="closeModal()" class="flex-1 px-5 py-3 rounded-xl bg-slate-800/60 border border-slate-600/40 text-slate-200 font-semibold hover:bg-slate-800/80 transition">Cancel</button>
+                <button id="confirmBtn" onclick="executeAction()" class="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold shadow-lg">Confirm & Delete</button>
             </div>
         </div>
     </div>
