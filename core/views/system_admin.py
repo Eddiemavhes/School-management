@@ -11,6 +11,10 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.hashers import make_password
 from django.db import connection
+from django.db import transaction
+import logging
+
+logger = logging.getLogger(__name__)
 
 from core.models.administrator import Administrator
 from core.models.student import Student
@@ -112,74 +116,89 @@ def reset_system_data(request):
             'school_details': SchoolDetails.objects.count(),
             'teachers': Administrator.objects.filter(is_teacher=True).count(),
         }
-        
-        # STEP 1: Disable foreign key constraints
-        with connection.cursor() as cursor:
-            if 'mysql' in db_engine.lower():
-                cursor.execute("SET FOREIGN_KEY_CHECKS=0")
-            elif 'postgresql' in db_engine.lower():
-                cursor.execute("SET CONSTRAINTS ALL DEFERRED")
-            elif 'sqlite' in db_engine.lower():
-                cursor.execute("PRAGMA foreign_keys=OFF")
-        
-        # STEP 2: Delete teachers (they are NOT system admins) using ORM
+
+        # Perform deletions using ORM within a transaction to ensure consistency
+        errors = []
         try:
-            Administrator.objects.filter(is_teacher=True).delete()
-        except Exception as e:
-            print(f"Error deleting teachers: {e}")
-        
-        # STEP 3: Delete all other non-admin data using raw SQL (in dependency order)
-        with connection.cursor() as cursor:
-            tables_to_delete = [
-                'core_zimsecresults',
-                'core_grade7statistics',
-                'core_studentmovement',
-                'core_payment',
-                'core_studentbalance',
-                'core_termfee',
-                'core_student',
-                'core_class',
-                'core_academicterm',
-                'core_schooldetails',
-                'core_academicyear',
-                'core_arrearsimportentry',
-                'core_arrearsimportbatch',
-            ]
-            
-            for table in tables_to_delete:
+            with transaction.atomic():
+                # Delete non-admin teacher accounts
+                Administrator.objects.filter(is_teacher=True).delete()
+
+                # Delete arrears import entries and batches
+                from core.models.arrears_import import ArrearsImportEntry, ArrearsImportBatch
+                ArrearsImportEntry.objects.all().delete()
+                ArrearsImportBatch.objects.all().delete()
+
+                # ZIMSEC and statistics
                 try:
-                    cursor.execute(f"DELETE FROM {table}")
-                except Exception as e:
-                    print(f"Error deleting {table}: {e}")
-        
-        # STEP 4: Reset auto-increment for SQLite
-        if 'sqlite' in db_engine.lower():
+                    from core.models.zimsecresults import ZimsecResults
+                    ZimsecResults.objects.all().delete()
+                except Exception:
+                    logger.debug('No ZimsecResults model or table present')
+
+                try:
+                    from core.models.grade7statistics import Grade7Statistics
+                    Grade7Statistics.objects.all().delete()
+                except Exception:
+                    logger.debug('No Grade7Statistics model or table present')
+
+                # Student movements, payments, balances
+                from core.models.student_movement import StudentMovement
+                StudentMovement.objects.all().delete()
+                Payment.objects.all().delete()
+                StudentBalance.objects.all().delete()
+
+                # Term fees and students
+                TermFee.objects.all().delete()
+                Student.objects.all().delete()
+
+                # Classes, terms, school details, years
+                Class.objects.all().delete()
+                AcademicTerm.objects.all().delete()
+                SchoolDetails.objects.all().delete()
+                AcademicYear.objects.all().delete()
+
+        except Exception as e:
+            logger.exception('Exception during system reset')
+            errors.append(str(e))
+
+        # Reset DB sequences for PostgreSQL or sqlite auto-increment
+        try:
             with connection.cursor() as cursor:
-                cursor.execute("UPDATE sqlite_sequence SET seq=0 WHERE name IN ('core_student', 'core_payment', 'core_class')")
-        
-        # STEP 5: Re-enable foreign key constraints
-        with connection.cursor() as cursor:
-            if 'mysql' in db_engine.lower():
-                cursor.execute("SET FOREIGN_KEY_CHECKS=1")
-            elif 'postgresql' in db_engine.lower():
-                cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
-            elif 'sqlite' in db_engine.lower():
-                cursor.execute("PRAGMA foreign_keys=ON")
-        
-        # STEP 6: Verify admin data is intact (teachers should be gone)
+                if 'sqlite' in db_engine.lower():
+                    cursor.execute("PRAGMA writable_schema = 1")
+                    # Update sqlite_sequence to 0 for common tables if present
+                    cursor.execute("UPDATE sqlite_sequence SET seq=0 WHERE name IN ('core_student','core_payment','core_class')")
+                elif 'postgresql' in db_engine.lower():
+                    seq_tables = ['core_student', 'core_payment', 'core_class', 'core_academicterm']
+                    for tbl in seq_tables:
+                        try:
+                            cursor.execute("SELECT pg_catalog.setval(pg_get_serial_sequence(%s, 'id'), 1, false)", [tbl])
+                        except Exception:
+                            logger.debug('Could not reset seq for %s', tbl)
+                # MySQL: rely on AUTO_INCREMENT reset via DELETE + ALTER TABLE if needed
+        except Exception as e:
+            logger.exception('Failed to reset DB sequences')
+            errors.append(str(e))
+
+        # Verify admin data is intact
         admin_count = Administrator.objects.filter(is_teacher=False).count()
         superuser_count = Administrator.objects.filter(is_superuser=True, is_teacher=False).count()
         teacher_count = Administrator.objects.filter(is_teacher=True).count()
-        
-        return JsonResponse({
-            'success': True,
-            'message': 'System reset completed successfully. All teachers deleted.',
+
+        result = {
+            'success': True if not errors else False,
+            'message': 'System reset completed' if not errors else 'System reset completed with errors',
             'stats_deleted': stats_before,
             'admins_remaining': admin_count,
             'superusers_remaining': superuser_count,
             'teachers_deleted': stats_before['teachers'],
             'teachers_remaining': teacher_count,
-        })
+            'errors': errors,
+        }
+
+        status_code = 200 if not errors else 500
+        return JsonResponse(result, status=status_code)
         
     except Exception as e:
         return JsonResponse({
