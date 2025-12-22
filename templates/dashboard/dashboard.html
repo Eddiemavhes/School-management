@@ -164,6 +164,13 @@
                     </a>
                     {% endif %}
 
+                    {# Superuser shortcut: allow admins to access Arrears Import regardless of term/blocking batches #}
+                    {% if request.user.is_superuser %}
+                    <a href="{% url 'arrears_import_start' %}" class="group glass bg-white/3 p-3 rounded-lg border border-white/8 text-xs text-slate-300 hover:bg-white/5 transition-all">
+                        Admin: Arrears Import
+                    </a>
+                    {% endif %}
+
                     <a href="{% url 'student_list' %}" class="group glass bg-white/5 p-5 rounded-2xl hover:bg-gradient-to-br hover:from-blue-500/15 hover:to-cyan-500/15 transition-all duration-300 border border-white/10 hover:border-blue-500/30">
                         <div class="flex items-center gap-4">
                             <div class="p-3 rounded-xl bg-blue-500/20 group-hover:bg-blue-500/30 transition-colors">
