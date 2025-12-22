@@ -467,8 +467,10 @@ function executeAction() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // capture the action before clearing it in closeModal()
+            const performedAction = currentAction;
             closeModal();
-            showSuccessMessage(currentAction, data);
+            showSuccessMessage(performedAction, data);
             setTimeout(() => location.reload(), 2000);
         } else {
             closeModal();
