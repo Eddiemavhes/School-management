@@ -133,20 +133,15 @@ class ArrearsImportService:
                     # Apply to current term balance
                     starting_term = batch.starting_term or batch.academic_year.terms.filter(term=1).first()
                     
-                    # Get or create StudentBalance for starting term
-                    balance, balance_created = StudentBalance.objects.get_or_create(
-                        student=entry.student,
-                        term=starting_term,
-                        defaults={
-                            'term_fee': Decimal('0'),  # Default to 0, will be set by admin
-                            'previous_arrears': final_amount,
-                        }
-                    )
-                    
-                    if not balance_created:
-                        # Update previous_arrears
-                        balance.previous_arrears += final_amount
-                        balance.save(update_fields=['previous_arrears'])
+                    # Initialize or get StudentBalance for starting term using model helper
+                    balance = StudentBalance.initialize_term_balance(entry.student, starting_term)
+
+                    if balance is None:
+                        raise ValidationError(f"Cannot create or initialize balance for {entry.student.full_name}")
+
+                    # Add this imported arrears amount to previous_arrears
+                    balance.previous_arrears = (balance.previous_arrears or Decimal('0')) + final_amount
+                    balance.save(update_fields=['previous_arrears'])
                     
                     # Mark entry as imported
                     entry.is_imported = True
