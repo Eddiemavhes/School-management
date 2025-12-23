@@ -352,10 +352,10 @@ class StudentPaymentHistoryView(LoginRequiredMixin, DetailView):
         for balance in all_balances:
             # Get all payments for this term
             term_payments = all_payments.filter(term=balance.term)
-            
+
             # Add to running totals
-                term_total_due = balance.term_fee + balance.previous_arrears
-                running_total_due += term_total_due
+            term_total_due = balance.term_fee + balance.previous_arrears
+            running_total_due += term_total_due
             running_total_paid += balance.amount_paid
             
             # Check for credits (overpayment)
@@ -387,7 +387,7 @@ class StudentPaymentHistoryView(LoginRequiredMixin, DetailView):
             })
         
         # Calculate summary statistics
-            total_ever_due = sum((Decimal(str(b.term_fee)) + Decimal(str(b.previous_arrears))) for b in all_balances) if all_balances else Decimal('0')
+        total_ever_due = sum((Decimal(str(b.term_fee)) + Decimal(str(b.previous_arrears))) for b in all_balances) if all_balances else Decimal('0')
         # Use StudentBalance amount_paid instead of Payment records (more reliable)
         total_ever_paid = sum([Decimal(str(b.amount_paid)) for b in all_balances]) if all_balances else Decimal('0')
         
