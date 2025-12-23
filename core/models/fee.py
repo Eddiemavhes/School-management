@@ -307,6 +307,20 @@ class StudentBalance(models.Model):
             raise ValidationError("Term fee has not been set for this term")
 
         previous_arrears = cls.calculate_arrears(student, term)
+
+        # Include any arrears records that were imported and applied to this term
+        try:
+            from core.models.arrears_import import StudentArrearsRecord
+            from django.db.models import Sum
+            applied_sum = StudentArrearsRecord.objects.filter(
+                student=student,
+                is_applied_to_balance=True,
+                applied_to_term=term
+            ).aggregate(total=Sum('total_arrears'))['total'] or Decimal('0')
+        except Exception:
+            applied_sum = Decimal('0')
+
+        previous_arrears = (previous_arrears or Decimal('0')) + (applied_sum or Decimal('0'))
         
         # CRITICAL FIX: Always charge the full term fee
         # The 'previous_arrears' field handles credits (negative values)
@@ -343,10 +357,23 @@ class StudentBalance(models.Model):
         # ISSUE: When Term 3 becomes current, Term 2's payment may not be processed yet
         # causing calculate_arrears() to return wrong value during initial creation.
         # SOLUTION: Always recalculate and verify after get_or_create
-        recalculated_arrears = cls.calculate_arrears(student, term)
-        
-        if balance.previous_arrears != recalculated_arrears:
-            # Arrears changed - need to update the record
+        # Recalculate arrears including any applied/imported arrears for this term
+        try:
+            from core.models.arrears_import import StudentArrearsRecord
+            from django.db.models import Sum
+            applied_sum = StudentArrearsRecord.objects.filter(
+                student=student,
+                is_applied_to_balance=True,
+                applied_to_term=term
+            ).aggregate(total=Sum('total_arrears'))['total'] or Decimal('0')
+        except Exception:
+            applied_sum = Decimal('0')
+
+        recalculated_arrears = (cls.calculate_arrears(student, term) or Decimal('0')) + (applied_sum or Decimal('0'))
+
+        # Only increase previous_arrears automatically — do not overwrite a larger imported value
+        current_prev = balance.previous_arrears or Decimal('0')
+        if recalculated_arrears > current_prev:
             balance.previous_arrears = recalculated_arrears
             balance.save(update_fields=['previous_arrears'])
             
