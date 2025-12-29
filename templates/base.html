@@ -496,7 +496,7 @@
         </div>
         
         <!-- Content -->
-        <div class="relative z-10 mx-auto px-4 sm:px-6 py-5 sm:py-7">
+        <div class="relative z-10 mx-auto px-4 sm:px-6 py-5 sm:py-7 flex justify-between items-center">
             <a href="/" class="inline-flex items-center gap-4 sm:gap-6 group">
                 <!-- Premium Icon with multiple layers -->
                 <div class="relative flex-shrink-0">
@@ -538,6 +538,74 @@
                     {% endif %}
                 </div>
             </a>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg hover:bg-slate-700/50 transition-colors" aria-label="Toggle menu">
+                <svg class="w-6 h-6 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+
+            <!-- Desktop Navigation Links -->
+            <div class="hidden lg:flex items-center gap-1">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'admin_dashboard' %}" class="nav-link">Dashboard</a>
+                    <a href="{% url 'class_list' %}" class="nav-link">Classes</a>
+                    <a href="{% url 'teacher_list' %}" class="nav-link">Teachers</a>
+                    <a href="{% url 'student_list' %}" class="nav-link">Students</a>
+                    
+                    <!-- Finance Dropdown -->
+                    <div class="relative group">
+                        <button class="nav-link flex items-center gap-1">
+                            <span>Finance</span>
+                            <svg class="w-4 h-4 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="absolute left-0 mt-0 w-56 rounded-xl shadow-2xl bg-slate-800 ring-1 ring-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
+                            <a href="{% url 'fee_dashboard' %}" class="dropdown-link">Fee Dashboard</a>
+                            <a href="{% url 'payment_list' %}" class="dropdown-link">Payment History</a>
+                            <a href="{% url 'payment_create' %}" class="dropdown-link">Record Payment</a>
+                        </div>
+                    </div>
+
+                    <!-- Settings Dropdown -->
+                    <div class="relative group">
+                        <button class="nav-link flex items-center gap-1">
+                            <span>Settings</span>
+                            <svg class="w-4 h-4 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="absolute right-0 mt-0 w-56 rounded-xl shadow-2xl bg-slate-800 ring-1 ring-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
+                            <a href="{% url 'school_details' %}" class="dropdown-link">School Details</a>
+                            <a href="{% url 'admin_settings' %}" class="dropdown-link">School Settings</a>
+                            <a href="{% url 'admin_profile' %}" class="dropdown-link">Profile</a>
+                        </div>
+                    </div>
+
+                    <!-- ZIMSEC Dropdown -->
+                    <div class="relative group">
+                        <button class="nav-link flex items-center gap-1">
+                            <span>ZIMSEC</span>
+                            <svg class="w-4 h-4 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="absolute right-0 mt-0 w-64 rounded-xl shadow-2xl bg-slate-800 ring-1 ring-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
+                            <a href="{% url 'zimsec_entry' %}" class="dropdown-link">Results Entry</a>
+                            <a href="{% url 'zimsec_results_list' %}" class="dropdown-link">View Results</a>
+                            <a href="{% url 'grade7_statistics' %}" class="dropdown-link">Statistics</a>
+                            <a href="{% url 'year_comparison' %}" class="dropdown-link">Compare Years</a>
+                        </div>
+                    </div>
+
+                    <div class="w-px h-6 bg-slate-600/50 mx-2"></div>
+                    <a href="{% url 'logout' %}" class="nav-link text-red-400 hover:text-red-300">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="login-nav-btn">Login</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
     
