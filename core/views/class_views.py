@@ -42,6 +42,7 @@ def class_detail(request, pk):
 @login_required
 def class_create(request):
     from ..models.academic_year import AcademicYear
+    from ..forms.class_form import ClassForm
     
     if request.method == 'GET':
         # Get current active year
@@ -62,7 +63,9 @@ def class_create(request):
             })
         
         # Render HTML template for browser access
+        form = ClassForm()
         context = {
+            'form': form,
             'available_teachers': available_teachers,
             'active_year': active_year,
         }
@@ -114,6 +117,7 @@ def class_create(request):
 @login_required
 def class_edit(request, pk):
     from ..models.academic_year import AcademicYear
+    from ..forms.class_form import ClassForm
     
     class_obj = get_object_or_404(Class, pk=pk)
     
@@ -139,7 +143,9 @@ def class_edit(request, pk):
             })
         
         # Render HTML template for browser access
+        form = ClassForm(instance=class_obj)
         context = {
+            'form': form,
             'class': class_obj,
             'available_teachers': available_teachers,
         }
