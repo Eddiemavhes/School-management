@@ -3,13 +3,13 @@ from ..models.class_model import Class
 from ..models.administrator import Administrator
 
 class ClassForm(forms.ModelForm):
-    # Explicitly declare grade field to ensure choices are picked up from model
+    # Explicitly declare grade field to ensure ECD choice is included
     grade = forms.ChoiceField(
         choices=Class.GRADE_CHOICES,
         widget=forms.Select(attrs={
             'class': 'mt-1 block w-full px-4 py-3 rounded-xl border-0 bg-white bg-opacity-50 backdrop-blur-sm shadow-lg focus:ring-2 focus:ring-teal-500 focus:bg-opacity-70 transition-all duration-200 text-gray-700',
         }),
-        help_text='Choose the grade level for this class (ECDA → ECDB → Grade 1-7)'
+        help_text='Choose the grade level (ECD → Grade 1-7)'
     )
     
     class Meta:
@@ -18,7 +18,7 @@ class ClassForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Refresh grade choices from model (ensures ECDA/ECDB are included)
+        # Refresh grade choices from model (ensures ECD is included)
         self.fields['grade'].choices = Class.GRADE_CHOICES
         
         # Only show teachers for the teacher field

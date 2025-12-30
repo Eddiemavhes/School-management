@@ -4,10 +4,9 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 class Class(models.Model):
-    # Grade choices now include ECDA and ECDB (pre-primary)
+    # Grade choices: ECD (Early Childhood Development) + Grades 1-7
     GRADE_CHOICES = [
-        ('ECDA', 'ECDA (Early Childhood A)'),
-        ('ECDB', 'ECDB (Early Childhood B)'),
+        ('ECD', 'ECD (Early Childhood Development)'),
     ] + [(i, f'Grade {i}') for i in range(1, 8)]
     SECTION_CHOICES = [('A', 'A'), ('B', 'B')]
     

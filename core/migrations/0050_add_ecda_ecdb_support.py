@@ -1,4 +1,4 @@
-# Generated migration to add ECDA and ECDB support
+# Generated migration to add ECD (Early Childhood Development) support
 
 from django.db import migrations, models
 
@@ -15,8 +15,7 @@ class Migration(migrations.Migration):
             name='grade',
             field=models.CharField(
                 choices=[
-                    ('ECDA', 'ECDA (Early Childhood A)'),
-                    ('ECDB', 'ECDB (Early Childhood B)'),
+                    ('ECD', 'ECD (Early Childhood Development)'),
                     ('1', 'Grade 1'),
                     ('2', 'Grade 2'),
                     ('3', 'Grade 3'),

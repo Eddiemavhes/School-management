@@ -267,7 +267,7 @@ class Student(models.Model):
         """Get the next class for student progression.
         
         Progression path:
-        ECDA → ECDB → Grade 1 → Grade 2 → ... → Grade 7
+        ECD (A/B) → Grade 1 → Grade 2 → ... → Grade 7
         
         Returns: Class object or None if student is in Grade 7 (final grade)
         """
@@ -278,10 +278,9 @@ class Student(models.Model):
         next_section = self.current_class.section
         next_year = self.current_class.academic_year + 1
         
-        # Define progression map
+        # Define progression map - ECD moves to Grade 1
         progression_map = {
-            'ECDA': 'ECDB',
-            'ECDB': '1',
+            'ECD': '1',
             '1': '2',
             '2': '3',
             '3': '4',

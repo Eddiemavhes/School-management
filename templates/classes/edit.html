@@ -34,8 +34,7 @@
                     <label class="block text-sm font-semibold text-slate-200 mb-3">Grade</label>
                     <select name="grade" required class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-600/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                         <option value="">Select a grade...</option>
-                        <option value="ECDA" {% if class.grade == 'ECDA' %}selected{% endif %}>ECDA (Early Childhood A)</option>
-                        <option value="ECDB" {% if class.grade == 'ECDB' %}selected{% endif %}>ECDB (Early Childhood B)</option>
+                        <option value="ECD" {% if class.grade == 'ECD' %}selected{% endif %}>ECD (Early Childhood Development)</option>
                         <option value="1" {% if class.grade|stringformat:'s' == '1' %}selected{% endif %}>Grade 1</option>
                         <option value="2" {% if class.grade|stringformat:'s' == '2' %}selected{% endif %}>Grade 2</option>
                         <option value="3" {% if class.grade|stringformat:'s' == '3' %}selected{% endif %}>Grade 3</option>
