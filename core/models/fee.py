@@ -5,18 +5,25 @@ from django.db.models import Sum, Q
 from django.core.exceptions import ValidationError
 
 class TermFee(models.Model):
-    """Model to store the base fee amount for each term"""
+    """Model to store the base fee amount for each term, separated by grade level"""
+    # Grade level choices: ECD is separate from primary (Grade 1-7)
+    GRADE_LEVEL_CHOICES = [
+        ('ECD', 'Early Childhood Development (ECD)'),
+        ('PRIMARY', 'Primary (Grades 1-7)'),
+    ]
+    
     term = models.ForeignKey('AcademicTerm', on_delete=models.PROTECT)
+    grade_level = models.CharField(max_length=10, choices=GRADE_LEVEL_CHOICES, default='PRIMARY')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['term']
-        ordering = ['-term__academic_year', '-term__term']
+        unique_together = ['term', 'grade_level']
+        ordering = ['-term__academic_year', '-term__term', 'grade_level']
 
     def __str__(self):
-        return f"{self.term} - {self.amount}"
+        return f"{self.term} ({self.get_grade_level_display()}) - ${self.amount}"
 
     def clean(self):
         """Comprehensive TermFee validation"""
@@ -98,8 +105,35 @@ class StudentBalance(models.Model):
             # Otherwise allow it - student enrolled mid-term but term is still active/ongoing
     
     def save(self, *args, **kwargs):
+        # Auto-assign correct TermFee based on student's grade if not already set
+        if not self.term_fee_record and self.student.current_class:
+            self.term_fee_record = self.get_appropriate_term_fee()
         self.full_clean()
         super().save(*args, **kwargs)
+    
+    def get_appropriate_term_fee(self):
+        """Get the correct TermFee for this student based on their class grade.
+        
+        Returns:
+            TermFee: ECD fees for ECD students, PRIMARY fees for Grade 1-7 students
+        """
+        if not self.student.current_class:
+            raise ValidationError("Student must have a current class to determine appropriate fee")
+        
+        # Determine grade level from student's current class
+        student_grade = self.student.current_class.grade
+        if student_grade == 'ECD':
+            grade_level = 'ECD'
+        else:
+            grade_level = 'PRIMARY'  # Grades 1-7 all use PRIMARY fees
+        
+        try:
+            return TermFee.objects.get(term=self.term, grade_level=grade_level)
+        except TermFee.DoesNotExist:
+            raise ValidationError(
+                f"No fee configured for {grade_level} students in {self.term}. "
+                f"Please create a TermFee record in admin."
+            )
     
     @property
     def term_fee(self):
