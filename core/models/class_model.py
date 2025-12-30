@@ -4,10 +4,14 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 class Class(models.Model):
-    GRADE_CHOICES = [(i, f'Grade {i}') for i in range(1, 8)]
+    # Grade choices now include ECDA and ECDB (pre-primary)
+    GRADE_CHOICES = [
+        ('ECDA', 'ECDA (Early Childhood A)'),
+        ('ECDB', 'ECDB (Early Childhood B)'),
+    ] + [(i, f'Grade {i}') for i in range(1, 8)]
     SECTION_CHOICES = [('A', 'A'), ('B', 'B')]
     
-    grade = models.IntegerField(choices=GRADE_CHOICES, validators=[MinValueValidator(1), MaxValueValidator(7)])
+    grade = models.CharField(max_length=4, choices=GRADE_CHOICES)
     section = models.CharField(max_length=1, choices=SECTION_CHOICES)
     academic_year = models.IntegerField(
         validators=[MinValueValidator(2020)],
@@ -29,7 +33,7 @@ class Class(models.Model):
         ordering = ['grade', 'section']
 
     def __str__(self):
-        return f"Grade {self.grade}{self.section}"
+        return f"{self.get_grade_display()}{self.section}"
 
     def clean(self):
         """Validate class data"""
@@ -43,7 +47,7 @@ class Class(models.Model):
             if existing_class:
                 raise ValidationError(
                     f"Teacher {self.teacher.full_name} is already assigned to "
-                    f"{existing_class.grade}{existing_class.section} in {self.academic_year}. "
+                    f"{existing_class.get_grade_display()}{existing_class.section} in {self.academic_year}. "
                     f"A teacher can only teach one class per academic year."
                 )
         

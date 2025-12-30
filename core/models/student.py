@@ -263,7 +263,88 @@ class Student(models.Model):
         today = timezone.now().date()
         return (today - self.date_of_birth).days // 365
 
-    def get_current_term_payments(self):
+    def get_next_class(self):
+        """Get the next class for student progression.
+        
+        Progression path:
+        ECDA → ECDB → Grade 1 → Grade 2 → ... → Grade 7
+        
+        Returns: Class object or None if student is in Grade 7 (final grade)
+        """
+        if not self.current_class:
+            return None
+        
+        current_grade = self.current_class.grade
+        next_section = self.current_class.section
+        next_year = self.current_class.academic_year + 1
+        
+        # Define progression map
+        progression_map = {
+            'ECDA': 'ECDB',
+            'ECDB': '1',
+            '1': '2',
+            '2': '3',
+            '3': '4',
+            '4': '5',
+            '5': '6',
+            '6': '7',
+            '7': None,  # Grade 7 is final, no progression
+        }
+        
+        next_grade = progression_map.get(str(current_grade))
+        
+        if not next_grade:
+            return None  # No progression for Grade 7
+        
+        # Try to find the next class (same section by default)
+        try:
+            next_class = Class.objects.get(
+                grade=next_grade,
+                section=next_section,
+                academic_year=next_year
+            )
+            return next_class
+        except Class.DoesNotExist:
+            # If section doesn't exist, try to get any available class of that grade
+            try:
+                next_class = Class.objects.filter(
+                    grade=next_grade,
+                    academic_year=next_year
+                ).first()
+                return next_class
+            except:
+                return None
+    
+    def promote_to_next_class(self, next_year=None):
+        """Promote student to the next class.
+        
+        Args:
+            next_year: Academic year for the next class (auto-calculated if not provided)
+        
+        Returns:
+            tuple: (success: bool, message: str, new_class: Class or None)
+        """
+        if not self.current_class:
+            return False, "Student has no current class assigned", None
+        
+        if next_year is None:
+            next_year = self.current_class.academic_year + 1
+        
+        next_class = self.get_next_class()
+        
+        if not next_class:
+            return False, "Student cannot progress further (likely in Grade 7)", None
+        
+        # Update student's class
+        old_class = self.current_class
+        self.current_class = next_class
+        
+        try:
+            self.save()
+            return True, f"Student promoted from {old_class} to {next_class}", next_class
+        except Exception as e:
+            return False, f"Error promoting student: {str(e)}", None
+    
         """Get total payments made for the current term"""
         current_term = AcademicTerm.get_current_term()
         return self.payments.filter(
