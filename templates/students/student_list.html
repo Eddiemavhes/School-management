@@ -70,15 +70,15 @@
                         <option value="unpaid" {% if request.GET.balance == 'unpaid' %}selected{% endif %}>Outstanding</option>
                     </select>
                 </div>
-                <button type="submit" class="w-full md:w-auto px-6 py-2.5 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 hover:shadow-xl hover:shadow-blue-500/30 transition-all">
+                <button type="submit" class="px-4 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 hover:shadow-xl hover:shadow-blue-500/30 transition-all text-sm">
                     Search
                 </button>
-                <a href="{% url 'student_list' %}" class="w-full md:w-auto px-6 py-2.5 rounded-lg font-semibold text-white bg-slate-700 hover:bg-slate-600 transition-all text-center">
+                <a href="{% url 'student_list' %}" class="px-4 py-2 rounded-lg font-semibold text-white bg-slate-700 hover:bg-slate-600 transition-all text-center text-sm">
                     Clear
                 </a>
             </form>
             <div class="flex flex-col md:flex-row gap-4 items-center">
-                <button type="button" id="addStudentBtn" class="w-full md:w-auto px-6 py-2.5 rounded-lg font-semibold text-white bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 hover:shadow-xl hover:shadow-emerald-500/30 transition-all transform hover:scale-105 active:scale-95 inline-flex items-center justify-center gap-2">
+                <button type="button" id="addStudentBtn" class="px-5 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 hover:shadow-xl hover:shadow-emerald-500/30 transition-all transform hover:scale-105 active:scale-95 inline-flex items-center justify-center gap-2 text-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     Add Student
                 </button>

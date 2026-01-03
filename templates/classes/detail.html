@@ -25,6 +25,16 @@
                     </svg>
                     Edit Class
                 </button>
+                    {% if class_obj.grade == 'ECD' %}
+                        <div class="mt-2">
+                            {% if class_obj.ecd_profile.premium %}
+                                <span class="inline-block bg-yellow-400 text-black px-2 py-1 rounded">Premium ECD</span>
+                            {% else %}
+                                <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded">ECD</span>
+                            {% endif %}
+                            <span class="ml-3 text-sm text-gray-600">Capacity: {{ class_obj.ecd_profile.capacity|default:'N/A' }}</span>
+                        </div>
+                    {% endif %}
                 {% if class.can_be_deleted %}
                 <button onclick="showDeleteConfirmation({{ class.id }})" 
                         class="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg transition-colors flex items-center gap-2">
