@@ -4,7 +4,8 @@ from .views.student_movement import (
     promote_student,
     demote_student,
     transfer_student,
-    bulk_promote_students
+    bulk_promote_students,
+    class_transfers
 )
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     path('students/<int:student_id>/demote/', demote_student, name='demote_student'),
     path('students/<int:student_id>/transfer/', transfer_student, name='transfer_student'),
     path('students/bulk-promote/', bulk_promote_students, name='bulk_promote_students'),
+    path('students/transfers/', class_transfers, name='class_transfers'),
 ]

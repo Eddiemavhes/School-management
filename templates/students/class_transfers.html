@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Class Transfers - School Management{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">Class Transfers</h1>
+                    <p class="text-slate-400 mt-2">Transfer students between classes</p>
+                </div>
+                <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700/40 hover:bg-slate-700/60 text-slate-200 font-medium transition-all border border-slate-600/50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back
+                </a>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-4 rounded-lg {% if message.tags %}bg-{{ message.tags }}-500/20 border border-{{ message.tags }}-500/30 text-{{ message.tags }}-300{% else %}bg-blue-500/20 border border-blue-500/30 text-blue-300{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Transfer Form -->
+            <div class="lg:col-span-2">
+                <div class="glass rounded-2xl p-6 border border-slate-500/20">
+                    <h2 class="text-xl font-semibold text-white mb-6">Transfer a Student</h2>
+                    
+                    <form method="POST" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <!-- Student Selection -->
+                        <div>
+                            <label for="student_id" class="block text-sm font-medium text-slate-200 mb-2">
+                                Select Student
+                                <span class="text-red-400">*</span>
+                            </label>
+                            <select name="student_id" id="student_id" required class="w-full bg-slate-700/40 border border-slate-600/50 rounded-lg px-4 py-3 text-slate-100 focus:border-blue-500/60 focus:outline-none transition">
+                                <option value="">-- Choose a student --</option>
+                                {% for student in students %}
+                                    <option value="{{ student.id }}" data-current-class="{{ student.current_class.id }}" data-current-class-name="{{ student.current_class.name }}">
+                                        {{ student.full_name }} ({{ student.current_class.name }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Current Class Display -->
+                        <div id="currentClassDiv" class="hidden">
+                            <label class="block text-sm font-medium text-slate-200 mb-2">Current Class</label>
+                            <div class="bg-slate-700/20 border border-slate-600/30 rounded-lg px-4 py-3 text-slate-300">
+                                <span id="currentClassName">--</span>
+                            </div>
+                        </div>
+
+                        <!-- New Class Selection -->
+                        <div>
+                            <label for="new_class_id" class="block text-sm font-medium text-slate-200 mb-2">
+                                Transfer to Class
+                                <span class="text-red-400">*</span>
+                            </label>
+                            <select name="new_class_id" id="new_class_id" required class="w-full bg-slate-700/40 border border-slate-600/50 rounded-lg px-4 py-3 text-slate-100 focus:border-blue-500/60 focus:outline-none transition">
+                                <option value="">-- Choose a class --</option>
+                                {% for class in classes %}
+                                    <option value="{{ class.id }}" data-class-name="{{ class.name }}">
+                                        {{ class.name }} (Year {{ class.academic_year }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Transfer Reason -->
+                        <div>
+                            <label for="reason" class="block text-sm font-medium text-slate-200 mb-2">
+                                Reason for Transfer
+                            </label>
+                            <textarea name="reason" id="reason" rows="4" placeholder="e.g., Parent request, class balancing, etc." class="w-full bg-slate-700/40 border border-slate-600/50 rounded-lg px-4 py-3 text-slate-100 focus:border-blue-500/60 focus:outline-none transition"></textarea>
+                        </div>
+
+                        <!-- Warning Alert -->
+                        <div id="warningAlert" class="hidden p-4 rounded-lg bg-amber-500/20 border border-amber-500/30">
+                            <p class="text-sm text-amber-300 flex items-center gap-2">
+                                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 0v2m0-6v-2m0 0V7a2 2 0 012-2h2.586a1 1 0 00.707-.293l-2.414-2.414a1 1 0 00-.707-.293h-3.172a2 2 0 00-2 2v2m4 0a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                <span id="warningText">Please select different student and class</span>
+                            </p>
+                        </div>
+
+                        <!-- Financial Info -->
+                        <div id="arrearInfo" class="hidden p-4 rounded-lg bg-blue-500/20 border border-blue-500/30">
+                            <p class="text-sm text-blue-300">
+                                <span class="font-semibold">Note:</span> Student's current arrears/balance will be preserved during transfer.
+                            </p>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="flex gap-3 pt-4">
+                            <button type="submit" id="submitBtn" class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/40 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m0 0l4 4m10-4v12m0 0l4-4m0 0l-4-4"/>
+                                </svg>
+                                Transfer Student
+                            </button>
+                            <a href="{% url 'class_transfers' %}" class="px-6 py-3 bg-slate-700/40 hover:bg-slate-700/60 text-slate-200 rounded-lg font-semibold transition-all border border-slate-600/50">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Sidebar -->
+            <div class="space-y-4">
+                <!-- Stats Card -->
+                <div class="glass rounded-2xl p-6 border border-slate-500/20">
+                    <h3 class="text-lg font-semibold text-white mb-4">Transfer Statistics</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400">Total Students</span>
+                            <span class="text-2xl font-bold text-blue-400">{{ students.count }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400">Available Classes</span>
+                            <span class="text-2xl font-bold text-emerald-400">{{ classes.count }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Card -->
+                <div class="glass rounded-2xl p-6 border border-slate-500/20">
+                    <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        How It Works
+                    </h3>
+                    <ul class="space-y-2 text-sm text-slate-300">
+                        <li class="flex gap-2">
+                            <span class="text-blue-400 font-bold flex-shrink-0">1.</span>
+                            <span>Select the student you want to transfer</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-blue-400 font-bold flex-shrink-0">2.</span>
+                            <span>Choose the target class</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-blue-400 font-bold flex-shrink-0">3.</span>
+                            <span>Add a reason (optional)</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-blue-400 font-bold flex-shrink-0">4.</span>
+                            <span>Click Transfer to complete</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Important Notes -->
+                <div class="glass rounded-2xl p-6 border border-amber-500/20 bg-amber-500/5">
+                    <h3 class="text-lg font-semibold text-amber-300 mb-4">Important</h3>
+                    <ul class="space-y-2 text-sm text-amber-200">
+                        <li class="flex gap-2">
+                            <span class="text-amber-400">•</span>
+                            <span>Cannot transfer to the same class</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-amber-400">•</span>
+                            <span>Financial records are preserved</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-amber-400">•</span>
+                            <span>A movement record is automatically created</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const studentSelect = document.getElementById('student_id');
+    const newClassSelect = document.getElementById('new_class_id');
+    const currentClassDiv = document.getElementById('currentClassDiv');
+    const currentClassName = document.getElementById('currentClassName');
+    const warningAlert = document.getElementById('warningAlert');
+    const warningText = document.getElementById('warningText');
+    const arrearInfo = document.getElementById('arrearInfo');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Show current class when student is selected
+    studentSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.value) {
+            const currentClass = selectedOption.dataset.currentClassName;
+            currentClassName.textContent = currentClass;
+            currentClassDiv.classList.remove('hidden');
+            arrearInfo.classList.remove('hidden');
+            validateTransfer();
+        } else {
+            currentClassDiv.classList.add('hidden');
+            arrearInfo.classList.add('hidden');
+            warningAlert.classList.add('hidden');
+            submitBtn.disabled = true;
+        }
+    });
+
+    // Validate transfer on class selection change
+    newClassSelect.addEventListener('change', validateTransfer);
+
+    function validateTransfer() {
+        const studentId = studentSelect.value;
+        const newClassId = newClassSelect.value;
+
+        if (!studentId || !newClassId) {
+            submitBtn.disabled = true;
+            warningAlert.classList.add('hidden');
+            return;
+        }
+
+        const studentOption = studentSelect.options[studentSelect.selectedIndex];
+        const currentClassId = studentOption.dataset.currentClass;
+
+        if (currentClassId === newClassId) {
+            warningText.textContent = '❌ Student is already in this class';
+            warningAlert.classList.remove('hidden');
+            submitBtn.disabled = true;
+        } else {
+            warningAlert.classList.add('hidden');
+            submitBtn.disabled = false;
+        }
+    }
+</script>
+{% endblock %}

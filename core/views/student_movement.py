@@ -534,3 +534,84 @@ def transfer_student(request, student_id):
     except Exception as e:
         transaction.set_rollback(True)
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def class_transfers(request):
+    """Display and manage class transfers for students."""
+    
+    if request.method == 'GET':
+        # Get all active students with current classes
+        students = Student.objects.select_related('current_class').filter(
+            is_active=True,
+            current_class__isnull=False
+        ).order_by('full_name')
+        
+        # Get all available classes
+        classes = Class.objects.all().order_by('academic_year', 'grade', 'section')
+        
+        return render(request, 'students/class_transfers.html', {
+            'students': students,
+            'classes': classes
+        })
+    
+    if request.method == 'POST':
+        student_id = request.POST.get('student_id')
+        new_class_id = request.POST.get('new_class_id')
+        reason = request.POST.get('reason', '')
+        
+        if not student_id or not new_class_id:
+            messages.error(request, 'Student and class are required')
+            return redirect('class_transfers')
+        
+        try:
+            student = Student.objects.get(pk=student_id)
+            new_class = Class.objects.get(pk=new_class_id)
+            old_class = student.current_class
+            
+            # Don't allow transfer to same class
+            if old_class.id == new_class.id:
+                messages.warning(request, f'{student.full_name} is already in {new_class.name}')
+                return redirect('class_transfers')
+            
+            # Record current financial state
+            current_arrears = student.previous_term_arrears + student.current_term_balance
+            
+            # Create movement record
+            with transaction.atomic():
+                movement = StudentMovement(
+                    student=student,
+                    from_class=old_class,
+                    to_class=new_class,
+                    movement_type='TRANSFER',
+                    moved_by=request.user,
+                    reason=reason,
+                    previous_arrears=current_arrears,
+                    preserved_arrears=current_arrears
+                )
+                
+                # Validate movement
+                try:
+                    movement.full_clean()
+                except ValidationError as e:
+                    transaction.set_rollback(True)
+                    messages.error(request, f'Transfer error: {", ".join(e.messages)}')
+                    return redirect('class_transfers')
+                
+                # Save movement
+                movement.save()
+                
+                # Update student's class
+                student.current_class = new_class
+                student.save()
+                
+                messages.success(request, f'Successfully transferred {student.full_name} to {new_class.name}')
+        
+        except Student.DoesNotExist:
+            messages.error(request, 'Student not found')
+        except Class.DoesNotExist:
+            messages.error(request, 'Class not found')
+        except Exception as e:
+            messages.error(request, f'Error during transfer: {str(e)}')
+        
+        return redirect('class_transfers')
