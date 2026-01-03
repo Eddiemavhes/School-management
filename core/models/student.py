@@ -120,6 +120,24 @@ class Student(models.Model):
                     f"Cannot assign student to {self.current_class}. "
                     f"Academic year {self.current_class.academic_year} is invalid."
                 )
+            # If this is an ECD class, enforce capacity and premium constraints
+            try:
+                if str(self.current_class.grade) == 'ECD':
+                    from .ecd import ECDClassProfile
+                    profile = getattr(self.current_class, 'ecd_profile', None)
+                    if profile:
+                        # Count students excluding self (in case of edits)
+                        current_count = self.current_class.students.exclude(pk=self.pk).count()
+                        if profile.capacity and current_count >= profile.capacity:
+                            raise ValidationError(
+                                f"Cannot assign student to {self.current_class}: class is at full capacity ({profile.capacity})."
+                            )
+            except ValidationError:
+                # Re-raise validation errors for capacity
+                raise
+            except Exception:
+                # Any unexpected issues loading ECD profile should not block enrollment
+                pass
     
     def _validate_date_of_birth(self):
         """Validation 2: Date of birth must be valid (age 4-25, not in future)"""

@@ -138,7 +138,22 @@ class StudentBalance(models.Model):
     @property
     def term_fee(self):
         """Dynamically get current term fee from TermFee record"""
-        return self.term_fee_record.amount
+        base = self.term_fee_record.amount
+
+        # If the student is in an ECD class, include any per-class ECD fees for this term
+        try:
+            if self.student and self.student.current_class and self.student.current_class.grade == 'ECD':
+                # Sum any ECDClassFee records for this class and term
+                from .ecd import ECDClassFee
+                extras = ECDClassFee.objects.filter(cls=self.student.current_class, term=self.term).aggregate(total=models.Sum('amount'))['total']
+                if extras:
+                    from decimal import Decimal
+                    base = base + Decimal(str(extras))
+        except Exception:
+            # If anything goes wrong here, fall back to base fee to avoid blocking billing
+            pass
+
+        return base
     
     @property
     def total_due(self):
@@ -308,7 +323,13 @@ class StudentBalance(models.Model):
         # should NOT get new term fees. They only carry forward their arrears.
         # This is to prevent Grade 7 students from accumulating unlimited fees if they don't pay.
         if term.term == 1 and student.current_class:  # First term of new year
-            if int(student.current_class.grade) >= 7:  # Grade 7 or higher
+            # Only numeric grades are considered for the Grade 7 rule; skip for ECD
+            try:
+                grade_int = int(student.current_class.grade)
+            except Exception:
+                grade_int = None
+
+            if grade_int and grade_int >= 7:  # Grade 7 or higher
                 # Check if there's a balance from the previous academic year
                 previous_year_last_balance = cls.objects.filter(
                     student=student,

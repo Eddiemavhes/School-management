@@ -268,8 +268,8 @@ def bulk_promote_students(request):
         for student in students:
             if student.current_class and student.current_class.grade:
                 next_grade = student.current_class.grade + 1
-                current_year = student.current_class.academic_year
-                next_year = current_year + 1
+                class_year = student.current_class.academic_year
+                next_year = class_year + 1
                 
                 if next_grade < 8:
                     # Show the next grade they will move to with the actual next year

@@ -142,6 +142,13 @@ def reset_system_data(request):
                 except Exception:
                     logger.debug('No Grade7Statistics model or table present')
 
+                # ZIMSEC results must be deleted before students (protected foreign key)
+                try:
+                    from core.models.zimsec import ZimsecResults
+                    ZimsecResults.objects.all().delete()
+                except Exception:
+                    logger.debug('No ZimsecResults model or table present')
+
                 # Student movements, payments, balances
                 from core.models.student_movement import StudentMovement
                 StudentMovement.objects.all().delete()

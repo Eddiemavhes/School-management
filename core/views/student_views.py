@@ -114,6 +114,7 @@ class StudentDetailView(LoginRequiredMixin, DetailView):
             student=student,
             term=current_term
         ).first()
+        context['current_balance'] = current_balance
         
         # Calculate payment progress for CURRENT TERM ONLY
         if current_balance:

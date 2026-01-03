@@ -45,15 +45,13 @@
                         </div>
                         <div class="bg-slate-700/30 rounded-lg p-4">
                             <p class="text-sm text-slate-300 font-bold mb-2">Fee Breakdown (current term)</p>
-                            {% with balance=student.balances.filter(term__is_current=True).first %}
-                                {% if balance %}
-                                    <p class="text-sm text-slate-300">Base term fee: <strong>${{ balance.term_fee_record.amount|floatformat:2 }}</strong></p>
-                                    <p class="text-sm text-slate-300">Total fee (including ECD extras): <strong>${{ balance.term_fee|floatformat:2 }}</strong></p>
-                                    <p class="text-sm text-slate-300">Previous arrears: <strong>${{ balance.previous_arrears|floatformat:2 }}</strong></p>
-                                {% else %}
-                                    <p class="text-sm text-slate-300">No balance record for the current term yet.</p>
-                                {% endif %}
-                            {% endwith %}
+                            {% if current_balance %}
+                                <p class="text-sm text-slate-300">Base term fee: <strong>${{ current_balance.term_fee_record.amount|floatformat:2 }}</strong></p>
+                                <p class="text-sm text-slate-300">Total fee (including ECD extras): <strong>${{ current_balance.term_fee|floatformat:2 }}</strong></p>
+                                <p class="text-sm text-slate-300">Previous arrears: <strong>${{ current_balance.previous_arrears|floatformat:2 }}</strong></p>
+                            {% else %}
+                                <p class="text-sm text-slate-300">No balance record for the current term yet.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
