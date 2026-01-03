@@ -267,15 +267,20 @@ def bulk_promote_students(request):
         # Calculate next class for each student
         for student in students:
             if student.current_class and student.current_class.grade:
-                next_grade = student.current_class.grade + 1
-                class_year = student.current_class.academic_year
-                next_year = class_year + 1
-                
-                if next_grade < 8:
-                    # Show the next grade they will move to with the actual next year
-                    student.next_class = f"Grade {next_grade}{student.current_class.section} ({next_year})"
-                else:
-                    student.next_class = "Graduating"
+                try:
+                    # Grade is now a string, convert to int for comparison
+                    current_grade = int(student.current_class.grade) if student.current_class.grade != 'ECD' else 0
+                    next_grade = current_grade + 1
+                    class_year = student.current_class.academic_year
+                    next_year = class_year + 1
+                    
+                    if next_grade < 8:
+                        # Show the next grade they will move to with the actual next year
+                        student.next_class = f"Grade {next_grade}{student.current_class.section} ({next_year})"
+                    else:
+                        student.next_class = "Graduating"
+                except (ValueError, TypeError):
+                    student.next_class = "No class assigned"
             else:
                 student.next_class = "No class assigned"
 
@@ -320,6 +325,12 @@ def bulk_promote_students(request):
                         errors.append(f'{student.full_name} - Invalid class data')
                         continue
                     
+                    # Skip ECD students - they don't get promoted
+                    if old_class.grade == 'ECD':
+                        failed += 1
+                        errors.append(f'{student.full_name} - Cannot promote ECD students')
+                        continue
+                    
                     # Check if student is already in Grade 7 (highest grade) - GRADUATE them
                     if int(old_class.grade) >= 7:
                         # Graduate the student instead of promoting
@@ -353,7 +364,7 @@ def bulk_promote_students(request):
                         continue
                     
                     next_grade = int(old_class.grade) + 1
-                    next_year = int(old_class.academic_year) + 1
+                    next_year = old_class.academic_year + 1
                     
                     # Auto-create the next year if it doesn't exist
                     from ..models.academic_year import AcademicYear
@@ -367,8 +378,9 @@ def bulk_promote_students(request):
                     )
                     
                     # Find the next grade class in the next academic year
+                    # Convert next_grade int back to string for lookup
                     next_class = Class.objects.filter(
-                        grade=next_grade,
+                        grade=str(next_grade),
                         section=old_class.section,
                         academic_year=next_year
                     ).first()
@@ -376,7 +388,7 @@ def bulk_promote_students(request):
                     # If same section doesn't exist, auto-create it
                     if not next_class:
                         next_class, _ = Class.objects.get_or_create(
-                            grade=next_grade,
+                            grade=str(next_grade),
                             section=old_class.section,
                             academic_year=next_year
                         )
@@ -422,7 +434,6 @@ def bulk_promote_students(request):
                         # Initialize balance for the first term of the new year (only for non-graduating students)
                         if next_grade < 8:
                             from ..models.fee import StudentBalance, TermFee
-                            from ..models.academic import AcademicTerm
                             
                             first_term = AcademicTerm.objects.filter(
                                 academic_year=next_year,
