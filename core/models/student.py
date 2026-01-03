@@ -82,6 +82,9 @@ class Student(models.Model):
     objects = ActiveStudentManager()  # Default - excludes deleted
     all_students = AllStudentsManager()  # Includes deleted - for audit
 
+    # Cache for overall_balance to avoid multiple queries
+    _overall_balance_cache = None
+
     class Meta:
         ordering = ['surname', 'first_name']
         indexes = [
@@ -430,25 +433,45 @@ class Student(models.Model):
         
         Does NOT include future terms that haven't become current yet.
         This ensures students aren't charged for terms they haven't reached.
+        
+        Note: Uses instance-level caching to avoid multiple queries in a single request.
         """
+        # Return cached value if available
+        if self._overall_balance_cache is not None:
+            return self._overall_balance_cache
+        
         from .fee import StudentBalance, TermFee
         from .academic import AcademicTerm
+        
+        result = 0.0
         
         # Try to get current term first
         current_term = AcademicTerm.get_current_term()
         if current_term:
-            current_balance = StudentBalance.objects.filter(
-                student=self,
-                term=current_term
-            ).first()
+            # Check prefetched data first if available
+            if hasattr(self, '_prefetched_objects_cache') and 'balances' in self._prefetched_objects_cache:
+                current_balance = next(
+                    (b for b in self.balances.all() if b.term_id == current_term.id),
+                    None
+                )
+            else:
+                current_balance = StudentBalance.objects.filter(
+                    student=self,
+                    term=current_term
+                ).first()
+            
             if current_balance:
-                return float(current_balance.current_balance)
+                result = float(current_balance.current_balance)
+                self._overall_balance_cache = result
+                return result
             
             # No StudentBalance yet, but check if student is active and current term has a fee
             if self.is_active:
                 try:
                     term_fee = TermFee.objects.get(term=current_term)
-                    return float(term_fee.amount)  # Student owes the term fee
+                    result = float(term_fee.amount)  # Student owes the term fee
+                    self._overall_balance_cache = result
+                    return result
                 except TermFee.DoesNotExist:
                     pass
         

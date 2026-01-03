@@ -124,8 +124,17 @@ def check_grade7_alumni_status(sender, instance, created, **kwargs):
     
     student = instance.student
     
-    # Only check Grade 7 students
-    if not student.current_class or int(student.current_class.grade) != 7:
+    # Only check Grade 7 students (handle both string 'ECD' and numeric grades)
+    if not student.current_class:
+        return
+    
+    try:
+        grade = int(student.current_class.grade)
+    except (ValueError, TypeError):
+        # Not a numeric grade (e.g., 'ECD'), skip alumni check
+        return
+    
+    if grade != 7:
         return
     
     # Only check if still active (not already archived)

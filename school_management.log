@@ -303,3 +303,50 @@ Traceback (most recent call last):
                    ^^^^^^^^^^^^
 UnboundLocalError: cannot access local variable 'AcademicTerm' where it is not associated with a value
 ERROR 2026-01-03 17:09:12,590 basehttp 22932 27968 "GET /students/bulk-promote/ HTTP/1.1" 500 75264
+WARNING 2026-01-03 17:45:10,461 log 30552 14904 Method Not Allowed (POST): /settings/
+WARNING 2026-01-03 17:45:10,476 basehttp 30552 14904 "POST /settings/ HTTP/1.1" 405 0
+WARNING 2026-01-03 17:51:51,387 log 30552 14904 Bad Request: /classes/create/
+WARNING 2026-01-03 17:51:51,391 basehttp 30552 14904 "POST /classes/create/ HTTP/1.1" 400 62
+WARNING 2026-01-03 17:53:20,465 log 30552 14904 Bad Request: /classes/create/
+WARNING 2026-01-03 17:53:20,468 basehttp 30552 14904 "POST /classes/create/ HTTP/1.1" 400 62
+ERROR 2026-01-03 18:34:04,932 log 30552 31124 Internal Server Error: /students/bulk-promote/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\student_movement.py", line 261, in bulk_promote_students
+    current_term = AcademicTerm.get_current_term()
+                   ^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'AcademicTerm' where it is not associated with a value
+ERROR 2026-01-03 18:34:04,939 basehttp 30552 31124 "GET /students/bulk-promote/ HTTP/1.1" 500 75326
+WARNING 2026-01-03 18:39:56,497 log 30552 30192 Not Found: /favicon.ico
+WARNING 2026-01-03 18:39:56,500 basehttp 30552 30192 "GET /favicon.ico HTTP/1.1" 404 28835
+ERROR 2026-01-03 18:53:51,668 log 30552 17392 Internal Server Error: /students/bulk-promote/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\student_movement.py", line 261, in bulk_promote_students
+    current_term = AcademicTerm.get_current_term()
+                   ^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'AcademicTerm' where it is not associated with a value
+ERROR 2026-01-03 18:53:51,672 basehttp 30552 17392 "GET /students/bulk-promote/ HTTP/1.1" 500 75190
+ERROR 2026-01-03 18:59:21,370 log 30552 17392 Internal Server Error: /students/bulk-promote/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\student_movement.py", line 261, in bulk_promote_students
+    current_term = AcademicTerm.get_current_term()
+                   ^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'AcademicTerm' where it is not associated with a value
+ERROR 2026-01-03 18:59:21,376 basehttp 30552 17392 "GET /students/bulk-promote/ HTTP/1.1" 500 75314

@@ -17,7 +17,8 @@ class StudentListView(LoginRequiredMixin, ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = Student.objects.filter(is_archived=False)  # Exclude archived/alumni students
+        # Optimize queryset with select_related to prevent N+1 queries
+        queryset = Student.objects.filter(is_archived=False).select_related('current_class')  # Exclude archived/alumni students
         search_query = self.request.GET.get('search', '')
         class_filter = self.request.GET.get('class', '')
         sex_filter = self.request.GET.get('sex', '')
@@ -98,6 +99,10 @@ class StudentDetailView(LoginRequiredMixin, DetailView):
     model = Student
     template_name = 'students/student_detail.html'
     context_object_name = 'student'
+    
+    def get_queryset(self):
+        # Optimize by selecting related objects to prevent N+1 queries
+        return Student.objects.select_related('current_class').prefetch_related('balances')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -109,11 +114,21 @@ class StudentDetailView(LoginRequiredMixin, DetailView):
         context['payment_history'] = all_payments
         context['current_term'] = current_term
         
-        # Get StudentBalance for current term
-        current_balance = StudentBalance.objects.filter(
-            student=student,
-            term=current_term
-        ).first()
+        # Get StudentBalance for current term (use prefetched data when possible)
+        current_balance = None
+        if current_term and hasattr(student, '_prefetched_objects_cache') and 'balances' in student._prefetched_objects_cache:
+            # Use prefetched data
+            current_balance = next(
+                (b for b in student.balances.all() if b.term_id == current_term.id),
+                None
+            )
+        else:
+            # Fallback to direct query if prefetch not available
+            current_balance = StudentBalance.objects.filter(
+                student=student,
+                term=current_term
+            ).select_related('term_fee_record').first()
+        
         context['current_balance'] = current_balance
         
         # Calculate payment progress for CURRENT TERM ONLY
@@ -253,10 +268,11 @@ class GraduatedWithArrearsListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         # Students who are GRADUATED but NOT ARCHIVED (have outstanding arrears)
+        # Optimize with select_related to prevent N+1 queries
         queryset = Student.objects.filter(
             status='GRADUATED',
             is_archived=False
-        ).order_by('-date_enrolled')
+        ).select_related('current_class').order_by('-date_enrolled')
         
         search_query = self.request.GET.get('search', '')
         
@@ -296,7 +312,8 @@ class ArchivedStudentsListView(LoginRequiredMixin, ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = Student.objects.filter(is_archived=True).order_by('-date_enrolled')
+        # Optimize with select_related to prevent N+1 queries
+        queryset = Student.objects.filter(is_archived=True).select_related('current_class').order_by('-date_enrolled')
         search_query = self.request.GET.get('search', '')
         
         if search_query:
@@ -316,7 +333,8 @@ class ArchivedStudentDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('archived_students')
     
     def get_queryset(self):
-        return Student.objects.filter(is_archived=True)
+        # Optimize with select_related to prevent N+1 queries
+        return Student.objects.filter(is_archived=True).select_related('current_class')
     
     def delete(self, request, *args, **kwargs):
         student = self.get_object()

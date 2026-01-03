@@ -4,10 +4,17 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 class Class(models.Model):
-    # Grade choices: ECD (Early Childhood Development) + Grades 1-7
+    # Grade choices: ECD (Early Childhood Development) + Grades 1-7 (as strings for consistency)
     GRADE_CHOICES = [
         ('ECD', 'ECD (Early Childhood Development)'),
-    ] + [(i, f'Grade {i}') for i in range(1, 8)]
+        ('1', 'Grade 1'),
+        ('2', 'Grade 2'),
+        ('3', 'Grade 3'),
+        ('4', 'Grade 4'),
+        ('5', 'Grade 5'),
+        ('6', 'Grade 6'),
+        ('7', 'Grade 7'),
+    ]
     SECTION_CHOICES = [('A', 'A'), ('B', 'B')]
     
     grade = models.CharField(max_length=4, choices=GRADE_CHOICES)

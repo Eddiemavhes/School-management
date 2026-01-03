@@ -447,8 +447,8 @@ class FeeDashboardView(LoginRequiredMixin, ListView):
         total_collected = Payment.objects.filter(term=current_term).aggregate(
             total=Sum('amount'))['total'] or 0
         
-        # Total outstanding (current balance) = sum of all current_balance amounts
-        total_outstanding = sum(max(0, b.term_fee + b.previous_arrears - b.amount_paid) for b in balances) or 0
+        # Total outstanding = sum of all current_balance amounts from StudentBalance model
+        total_outstanding = sum(b.current_balance for b in balances if b.current_balance > 0) or 0
         
         context.update({
             'current_term': current_term,
