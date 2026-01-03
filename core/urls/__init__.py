@@ -27,7 +27,7 @@ from core.views.settings_views import (
 from core.views.class_api import get_available_classes
 from core.views.student_movement import (
     student_movement_history, promote_student, 
-    demote_student, bulk_promote_students
+    demote_student, bulk_promote_students, class_transfers
 )
 from core.views.step10_academic_management import (
     update_term_fee_api, update_term_dates_api, FeeConfigurationView, create_terms_api, activate_first_term_api
@@ -107,6 +107,7 @@ urlpatterns = [
     path('students/<int:student_id>/promote/', promote_student, name='promote_student'),
     path('students/<int:student_id>/demote/', demote_student, name='demote_student'),
     path('students/bulk-promote/', bulk_promote_students, name='bulk_promote_students'),
+    path('students/transfers/', class_transfers, name='class_transfers'),
     
     # Payment and Fee Management URLs
     path('fees/', FeeDashboardView.as_view(), name='fee_dashboard'),

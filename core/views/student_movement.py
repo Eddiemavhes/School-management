@@ -545,7 +545,7 @@ def class_transfers(request):
         students = Student.objects.select_related('current_class').filter(
             is_active=True,
             current_class__isnull=False
-        ).order_by('full_name')
+        ).order_by('surname', 'first_name')
         
         # Get all available classes
         classes = Class.objects.all().order_by('academic_year', 'grade', 'section')

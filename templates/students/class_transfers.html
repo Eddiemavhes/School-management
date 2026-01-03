@@ -13,7 +13,7 @@
                     <h1 class="text-3xl font-bold text-white">Class Transfers</h1>
                     <p class="text-slate-400 mt-2">Transfer students between classes</p>
                 </div>
-                <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700/40 hover:bg-slate-700/60 text-slate-200 font-medium transition-all border border-slate-600/50">
+                <a href="{% url 'admin_dashboard' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700/40 hover:bg-slate-700/60 text-slate-200 font-medium transition-all border border-slate-600/50">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
@@ -50,7 +50,7 @@
                                 <option value="">-- Choose a student --</option>
                                 {% for student in students %}
                                     <option value="{{ student.id }}" data-current-class="{{ student.current_class.id }}" data-current-class-name="{{ student.current_class.name }}">
-                                        {{ student.full_name }} ({{ student.current_class.name }})
+                                        {{ student.first_name }} {{ student.surname }} ({{ student.current_class.name }})
                                     </option>
                                 {% endfor %}
                             </select>
