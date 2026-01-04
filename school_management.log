@@ -556,3 +556,186 @@ Traceback (most recent call last):
     raise NoReverseMatch(msg)
 django.urls.exceptions.NoReverseMatch: Reverse for 'dashboard' not found. 'dashboard' is not a valid view function or pattern name.
 ERROR 2026-01-03 19:38:08,860 basehttp 32620 12480 "GET /students/transfers/ HTTP/1.1" 500 171607
+WARNING 2026-01-04 14:21:46,169 log 14192 14868 Not Found: /favicon.ico
+WARNING 2026-01-04 14:21:46,185 basehttp 14192 14868 "GET /favicon.ico HTTP/1.1" 404 29111
+ERROR 2026-01-04 14:22:13,054 log 14192 16008 Internal Server Error: /api/reset-system/
+ERROR 2026-01-04 14:22:13,059 basehttp 14192 16008 "POST /api/reset-system/ HTTP/1.1" 500 383
+WARNING 2026-01-04 14:22:56,846 log 14192 16888 Bad Request: /classes/create/
+WARNING 2026-01-04 14:22:56,848 basehttp 14192 16888 "POST /classes/create/ HTTP/1.1" 400 64
+ERROR 2026-01-04 14:23:44,177 log 14192 16888 Internal Server Error: /api/clear-students/
+ERROR 2026-01-04 14:23:44,180 basehttp 14192 16888 "POST /api/clear-students/ HTTP/1.1" 500 90
+ERROR 2026-01-04 14:23:50,647 log 14192 16888 Internal Server Error: /api/clear-payments/
+ERROR 2026-01-04 14:23:50,649 basehttp 14192 16888 "POST /api/clear-payments/ HTTP/1.1" 500 90
+ERROR 2026-01-04 14:25:14,535 log 14192 3852 Internal Server Error: /api/reset-system/
+ERROR 2026-01-04 14:25:14,539 basehttp 14192 3852 "POST /api/reset-system/ HTTP/1.1" 500 382
+WARNING 2026-01-04 14:25:31,411 log 14192 3852 Forbidden (CSRF token missing.): /classes/3/delete/
+WARNING 2026-01-04 14:25:31,441 basehttp 14192 3852 "POST /classes/3/delete/ HTTP/1.1" 403 2491
+WARNING 2026-01-04 14:25:35,530 log 14192 3852 Forbidden (CSRF token missing.): /classes/5/delete/
+WARNING 2026-01-04 14:25:35,551 basehttp 14192 3852 "POST /classes/5/delete/ HTTP/1.1" 403 2491
+WARNING 2026-01-04 14:25:39,920 log 14192 3852 Forbidden (CSRF token missing.): /classes/4/delete/
+WARNING 2026-01-04 14:25:39,993 basehttp 14192 3852 "POST /classes/4/delete/ HTTP/1.1" 403 2491
+WARNING 2026-01-04 14:26:02,987 log 14192 3852 Forbidden (CSRF token missing.): /classes/4/delete/
+WARNING 2026-01-04 14:26:03,053 basehttp 14192 3852 "POST /classes/4/delete/ HTTP/1.1" 403 2491
+ERROR 2026-01-04 14:26:37,022 log 14192 3852 Internal Server Error: /students/10/delete/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\views\generic\base.py", line 144, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\views\generic\edit.py", line 258, in post
+    return self.form_valid(form)
+           ~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\views\generic\edit.py", line 264, in form_valid
+    self.object.delete()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\base.py", line 1281, in delete
+    return collector.delete()
+           ~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\deletion.py", line 507, in delete
+    signals.post_delete.send(
+    ~~~~~~~~~~~~~~~~~~~~~~~~^
+        sender=model,
+        ^^^^^^^^^^^^^
+    ...<2 lines>...
+        origin=self.origin,
+        ^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\dispatch\dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+  File "C:\Users\Admin\Desktop\School management\core\signals.py", line 171, in check_alumni_status_on_payment_delete
+    if not student.current_class or int(student.current_class.grade) != 7:
+                                    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'ECD'
+ERROR 2026-01-04 14:26:37,034 basehttp 14192 3852 "POST /students/10/delete/ HTTP/1.1" 500 110005
+WARNING 2026-01-04 15:46:54,512 log 1492 4376 Not Found: /favicon.ico
+WARNING 2026-01-04 15:46:54,514 basehttp 1492 4376 "GET /favicon.ico HTTP/1.1" 404 29111
+ERROR 2026-01-04 15:47:16,346 log 1492 3744 Internal Server Error: /api/reset-system/
+ERROR 2026-01-04 15:47:16,348 basehttp 1492 3744 "POST /api/reset-system/ HTTP/1.1" 500 382
+WARNING 2026-01-04 15:53:57,731 log 1492 3744 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-01-04 15:53:57,732 basehttp 1492 3744 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 29222
+WARNING 2026-01-04 15:54:11,602 log 1492 3744 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-01-04 15:54:11,604 basehttp 1492 3744 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 29222
+WARNING 2026-01-04 15:54:27,381 log 1492 3744 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-01-04 15:54:27,383 basehttp 1492 3744 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 29222
+WARNING 2026-01-04 15:54:37,291 log 1492 3744 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-01-04 15:54:37,293 basehttp 1492 3744 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 29222
+WARNING 2026-01-04 15:54:43,475 log 1492 3744 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-01-04 15:54:43,477 basehttp 1492 3744 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 29222
+ERROR 2026-01-04 16:36:15,066 log 1492 3712 Internal Server Error: /api/reset-system/
+ERROR 2026-01-04 16:36:15,068 basehttp 1492 3712 "POST /api/reset-system/ HTTP/1.1" 500 383
+ERROR 2026-01-04 16:55:55,833 log 1492 2912 Internal Server Error: /arrears-import/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\arrears_import_views.py", line 72, in arrears_import_wizard_start
+    batch = ArrearsImportService.create_import_batch(
+        academic_year=academic_year,
+    ...<2 lines>...
+        starting_term=starting_term
+    )
+  File "C:\Users\Admin\Desktop\School management\core\services\arrears_import_service.py", line 30, in create_import_batch
+    starting_term=starting_term or academic_year.terms.filter(term=1).first()
+                                   ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AcademicYear' object has no attribute 'terms'
+ERROR 2026-01-04 16:55:55,846 basehttp 1492 2912 "POST /arrears-import/ HTTP/1.1" 500 86523
+ERROR 2026-01-04 16:56:01,774 log 1492 2912 Internal Server Error: /arrears-import/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\arrears_import_views.py", line 72, in arrears_import_wizard_start
+    batch = ArrearsImportService.create_import_batch(
+        academic_year=academic_year,
+    ...<2 lines>...
+        starting_term=starting_term
+    )
+  File "C:\Users\Admin\Desktop\School management\core\services\arrears_import_service.py", line 30, in create_import_batch
+    starting_term=starting_term or academic_year.terms.filter(term=1).first()
+                                   ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AcademicYear' object has no attribute 'terms'
+ERROR 2026-01-04 16:56:01,784 basehttp 1492 2912 "POST /arrears-import/ HTTP/1.1" 500 86529
+ERROR 2026-01-04 16:59:45,185 log 1492 2912 Internal Server Error: /arrears-import/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\arrears_import_views.py", line 72, in arrears_import_wizard_start
+    batch = ArrearsImportService.create_import_batch(
+        academic_year=academic_year,
+    ...<2 lines>...
+        starting_term=starting_term
+    )
+  File "C:\Users\Admin\Desktop\School management\core\services\arrears_import_service.py", line 30, in create_import_batch
+    starting_term=starting_term or academic_year.terms.filter(term=1).first()
+                                   ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AcademicYear' object has no attribute 'terms'
+ERROR 2026-01-04 16:59:45,193 basehttp 1492 2912 "POST /arrears-import/ HTTP/1.1" 500 86508
+ERROR 2026-01-04 17:02:16,405 log 1492 2912 Internal Server Error: /arrears-import/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\arrears_import_views.py", line 85, in arrears_import_wizard_start
+    return redirect('arrears_import_copy_previous', batch_id=batch.batch_id)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\shortcuts.py", line 51, in redirect
+    resolve_url(to, *args, **kwargs),
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\shortcuts.py", line 184, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'arrears_import_copy_previous' not found. 'arrears_import_copy_previous' is not a valid view function or pattern name.
+ERROR 2026-01-04 17:02:16,417 basehttp 1492 2912 "POST /arrears-import/ HTTP/1.1" 500 102500
+ERROR 2026-01-04 17:03:03,409 log 1492 2912 Internal Server Error: /arrears-import/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\arrears_import_views.py", line 72, in arrears_import_wizard_start
+    batch = ArrearsImportService.create_import_batch(
+        academic_year=academic_year,
+    ...<2 lines>...
+        starting_term=starting_term
+    )
+  File "C:\Users\Admin\Desktop\School management\core\services\arrears_import_service.py", line 30, in create_import_batch
+    starting_term=starting_term or academic_year.terms.filter(term=1).first()
+                                   ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AcademicYear' object has no attribute 'terms'
+ERROR 2026-01-04 17:03:03,419 basehttp 1492 2912 "POST /arrears-import/ HTTP/1.1" 500 86523

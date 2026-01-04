@@ -23,11 +23,18 @@ class ArrearsImportService:
     @staticmethod
     def create_import_batch(academic_year, import_method, user, starting_term=None):
         """Create a new arrears import batch"""
+        from ..models.academic import AcademicTerm
+        
+        # Get the starting term for this academic year
+        if not starting_term and academic_year:
+            year_value = academic_year.year if hasattr(academic_year, 'year') else academic_year
+            starting_term = AcademicTerm.objects.filter(academic_year=year_value, term=1).first()
+        
         batch = ArrearsImportBatch.objects.create(
             academic_year=academic_year,
             import_method=import_method,
             created_by=user,
-            starting_term=starting_term or academic_year.terms.filter(term=1).first()
+            starting_term=starting_term
         )
         logger.info(f"Created arrears import batch {batch.batch_id} by {getattr(user, 'username', str(user))}")
         return batch

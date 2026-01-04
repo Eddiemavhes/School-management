@@ -82,7 +82,8 @@ def arrears_import_wizard_start(request):
             elif import_method == 'BULK_UPLOAD':
                 return redirect('arrears_import_bulk_upload', batch_id=batch.batch_id)
             else:
-                return redirect('arrears_import_copy_previous', batch_id=batch.batch_id)
+                # COPY_PREVIOUS method - redirect to summary
+                return redirect('arrears_import_summary', batch_id=batch.batch_id)
     else:
         form = ArrearsImportInitializationForm()
     

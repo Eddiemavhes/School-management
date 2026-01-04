@@ -167,8 +167,16 @@ def check_alumni_status_on_payment_delete(sender, instance, **kwargs):
     
     student = instance.student
     
-    # Only check Grade 7 students
-    if not student.current_class or int(student.current_class.grade) != 7:
+    # Only check Grade 7 students (skip ECD grades)
+    if not student.current_class or student.current_class.grade == 'ECD':
+        return
+    
+    try:
+        grade = int(student.current_class.grade)
+    except (ValueError, TypeError):
+        return
+    
+    if grade != 7:
         return
     
     try:
