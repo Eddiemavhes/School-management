@@ -167,8 +167,8 @@ def check_alumni_status_on_payment_delete(sender, instance, **kwargs):
     
     student = instance.student
     
-    # Only check Grade 7 students (skip ECD grades)
-    if not student.current_class or student.current_class.grade == 'ECD':
+    # Only check Grade 7 students (skip ECDA and ECDB grades)
+    if not student.current_class or student.current_class.grade in ['ECDA', 'ECDB']:
         return
     
     try:

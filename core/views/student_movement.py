@@ -325,10 +325,11 @@ def bulk_promote_students(request):
                         errors.append(f'{student.full_name} - Invalid class data')
                         continue
                     
-                    # Skip ECD students - they don't get promoted
-                    if old_class.grade == 'ECD':
+                    # Skip ECDA/ECDB students - they follow special progression
+                    # ECDA → ECDB (same year) → Grade 1 (next year)
+                    if old_class.grade in ['ECDA', 'ECDB']:
                         failed += 1
-                        errors.append(f'{student.full_name} - Cannot promote ECD students')
+                        errors.append(f'{student.full_name} - ECDA/ECDB students need special handling')
                         continue
                     
                     # Check if student is already in Grade 7 (highest grade) - GRADUATE them

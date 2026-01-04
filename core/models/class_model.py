@@ -4,9 +4,10 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 class Class(models.Model):
-    # Grade choices: ECD (Early Childhood Development) + Grades 1-7 (as strings for consistency)
+    # Grade choices: ECDA, ECDB (Early Childhood Development) + Grades 1-7 (as strings for consistency)
     GRADE_CHOICES = [
-        ('ECD', 'ECD (Early Childhood Development)'),
+        ('ECDA', 'ECDA (Early Childhood Development A - Age 4-5)'),
+        ('ECDB', 'ECDB (Early Childhood Development B - Age 5-6)'),
         ('1', 'Grade 1'),
         ('2', 'Grade 2'),
         ('3', 'Grade 3'),
