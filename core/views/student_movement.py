@@ -551,10 +551,22 @@ def class_transfers(request):
         # Get all available classes
         classes = Class.objects.all().order_by('academic_year', 'grade', 'section')
         
-        return render(request, 'students/class_transfers.html', {
+        context = {
             'students': students,
-            'classes': classes
-        })
+            'classes': classes,
+            'has_students': students.exists(),
+            'has_classes': classes.exists(),
+        }
+        
+        # Show info message if no data
+        if not students or not classes:
+            from django.contrib import messages
+            if not classes:
+                messages.info(request, '📚 No classes found. Please create classes in the Classes section first.')
+            if not students:
+                messages.info(request, '👥 No students found. Please add students to classes first.')
+        
+        return render(request, 'students/class_transfers.html', context)
     
     if request.method == 'POST':
         student_id = request.POST.get('student_id')

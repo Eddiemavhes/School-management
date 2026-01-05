@@ -31,6 +31,37 @@
             {% endfor %}
         {% endif %}
 
+        <!-- Empty State -->
+        {% if not has_students or not has_classes %}
+        <div class="rounded-2xl p-8 border-2 border-dashed border-slate-600/50 bg-slate-800/50 text-center">
+            <svg class="w-16 h-16 mx-auto text-slate-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a2 2 0 01-1.414.586h-2.538a2 2 0 01-1.414-.586l-2.414-2.414A1 1 0 003.586 13H2"/>
+            </svg>
+            <h3 class="text-xl font-semibold text-white mb-2">No Data Available</h3>
+            <p class="text-slate-400 mb-6">
+                {% if not has_classes and not has_students %}
+                    Please create classes and add students first.
+                {% elif not has_classes %}
+                    Please create classes first before transferring students.
+                {% else %}
+                    Please add students to classes first.
+                {% endif %}
+            </p>
+            <div class="flex gap-3 justify-center">
+                {% if not has_classes %}
+                <a href="{% url 'class_create' %}" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all">
+                    Create Classes
+                </a>
+                {% endif %}
+                {% if not has_students %}
+                <a href="{% url 'student_registration' %}" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-all">
+                    Add Students
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Transfer Form -->
             <div class="lg:col-span-2">
@@ -242,4 +273,5 @@
         }
     }
 </script>
+{% endif %}
 {% endblock %}
