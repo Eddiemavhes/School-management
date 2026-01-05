@@ -17,14 +17,26 @@ def class_list(request):
     current_year = AcademicYear.objects.filter(is_active=True).first()
     active_year = current_year.year if current_year else timezone.now().year
     
-    # Only get classes for the active year
-    classes = Class.objects.filter(academic_year=active_year).select_related('teacher').all()
-    available_teachers = Class.get_available_teachers(active_year)
+    # Get all available academic years for filtering
+    all_years = AcademicYear.objects.order_by('-year')
+    
+    # Allow filtering by academic year via query parameter
+    selected_year = request.GET.get('year', str(active_year))
+    try:
+        selected_year = int(selected_year)
+    except (ValueError, TypeError):
+        selected_year = active_year
+    
+    # Get classes for selected year
+    classes = Class.objects.filter(academic_year=selected_year).select_related('teacher').all()
+    available_teachers = Class.get_available_teachers(selected_year)
     
     context = {
         'classes': classes,
         'available_teachers': available_teachers,
         'active_year': active_year,
+        'selected_year': selected_year,
+        'all_years': all_years,
     }
     return render(request, 'classes/list.html', context)
 
@@ -49,16 +61,19 @@ def class_create(request):
         current_year = AcademicYear.objects.filter(is_active=True).first()
         active_year = current_year.year if current_year else timezone.now().year
         
-        available_teachers = Class.get_available_teachers(active_year)
+        # Get all available academic years (not just active)
+        all_years = AcademicYear.objects.order_by('-year')
         
         # Check if it's an API request
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            selected_year = int(request.GET.get('year', active_year))
+            available_teachers = Class.get_available_teachers(selected_year)
             available_teacher_list = [
                 {'id': t.id, 'name': t.full_name} 
                 for t in available_teachers
             ]
             return JsonResponse({
-                'academic_year': active_year,
+                'academic_year': selected_year,
                 'available_teachers': available_teacher_list
             })
         
@@ -66,8 +81,8 @@ def class_create(request):
         form = ClassForm()
         context = {
             'form': form,
-            'available_teachers': available_teachers,
             'active_year': active_year,
+            'all_years': all_years,
         }
         return render(request, 'classes/create.html', context)
     

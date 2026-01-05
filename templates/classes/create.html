@@ -107,9 +107,26 @@
                     </select>
                     <p class="text-xs text-slate-500 mt-2">You can assign a teacher later if needed</p>
                 </div>
-                
-                <!-- Hidden Academic Year Field -->
-                <input type="hidden" name="academic_year" value="{{ active_year }}">
+                <!-- Academic Year Selection -->
+                <div class="mb-8">
+                    <label for="academic_year" class="block text-sm font-bold text-slate-200 mb-3">
+                        <span class="inline-flex items-center gap-2">
+                            <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M5.5 12a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.3A4.5 4.5 0 1113.5 12z"/></svg>
+                            Academic Year
+                        </span>
+                        <span class="text-red-400 ml-1">*</span>
+                    </label>
+                    <select id="academic_year" name="academic_year" required class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-600/50 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all placeholder-slate-500 hover:border-slate-600 cursor-pointer">
+                        <option value="" class="text-slate-600">Select an academic year...</option>
+                        {% for year in all_years %}
+                        <option value="{{ year.year }}" {% if year.year == active_year %}selected{% endif %}>
+                            {{ year.year }} ({{ year.start_date|date:"M d" }} - {{ year.end_date|date:"M d, Y" }})
+                            {% if year.is_active %}🟢 Active{% elif year.is_completed %}🔴 Completed{% else %}⚪ Pending{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <p class="text-xs text-slate-500 mt-2">Select which academic year this class belongs to. You can create classes for any year, not just the active one.</p>
+                </div>
 
                 <!-- Error Message -->
                 <div id="errorMessage" class="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 hidden animate-slideInUp">

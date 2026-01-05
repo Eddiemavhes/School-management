@@ -18,11 +18,7 @@ class StudentForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Filter current_class to only show classes from the active academic year
-        active_year = AcademicYear.objects.filter(is_active=True).first()
-        if active_year:
-            self.fields['current_class'].queryset = self.fields['current_class'].queryset.filter(
-                academic_year=active_year.year
-            )
+        # Allow selecting classes from any academic year, not just the active one
+        # This lets users work with non-active years (pending/created years)
         # Make the class field required
         self.fields['current_class'].required = True
