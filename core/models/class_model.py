@@ -78,6 +78,11 @@ class Class(models.Model):
         return self.students.count()
 
     @property
+    def name(self):
+        """Return formatted class name like 'Grade 1A (2026)'"""
+        return f"Grade {self.grade}{self.section} ({self.academic_year})"
+
+    @property
     def teacher_initials(self):
         if not self.teacher:
             return "NT"  # No Teacher
