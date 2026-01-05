@@ -961,3 +961,24 @@ Traceback (most recent call last):
     raise NoReverseMatch(msg)
 django.urls.exceptions.NoReverseMatch: Reverse for 'student_registration' not found. 'student_registration' is not a valid view function or pattern name.
 ERROR 2026-01-05 22:26:48,474 basehttp 16672 18588 "GET /students/transfers/ HTTP/1.1" 500 190305
+ERROR 2026-01-05 22:40:27,754 log 22144 12140 Internal Server Error: /students/transfers/
+Traceback (most recent call last):
+  File "C:\Users\Admin\Desktop\School management\core\views\student_movement.py", line 621, in class_transfers
+    messages.success(request, f'Successfully transferred {student.full_name} to {new_class.name}')
+    ^^^^^^^^
+UnboundLocalError: cannot access local variable 'messages' where it is not associated with a value
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\student_movement.py", line 628, in class_transfers
+    messages.error(request, f'Error during transfer: {str(e)}')
+    ^^^^^^^^
+UnboundLocalError: cannot access local variable 'messages' where it is not associated with a value
+ERROR 2026-01-05 22:40:27,769 basehttp 22144 12140 "POST /students/transfers/ HTTP/1.1" 500 81934

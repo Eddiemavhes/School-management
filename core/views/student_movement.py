@@ -540,6 +540,7 @@ def transfer_student(request, student_id):
 @login_required
 def class_transfers(request):
     """Display and manage class transfers for students."""
+    from django.contrib import messages
     
     if request.method == 'GET':
         # Get all active students with current classes
@@ -560,7 +561,6 @@ def class_transfers(request):
         
         # Show info message if no data
         if not students or not classes:
-            from django.contrib import messages
             if not classes:
                 messages.info(request, '📚 No classes found. Please create classes in the Classes section first.')
             if not students:
