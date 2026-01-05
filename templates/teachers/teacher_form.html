@@ -80,7 +80,6 @@
                         🎓 Specialization
                     </label>
                     <input type="text" name="{{ form.specialization.name }}" id="{{ form.specialization.id_for_label }}"
-                           placeholder="e.g., Mathematics, English, Science"
                            value="{{ form.specialization.value|default:'' }}"
                            class="w-full px-4 py-3 rounded-lg bg-white/10 border {% if form.specialization.errors %}border-red-500/50{% else %}border-indigo-500/30{% endif %} text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all hover:border-indigo-500/50">
                     {% for error in form.specialization.errors %}
@@ -93,7 +92,6 @@
                         📚 Qualification
                     </label>
                     <input type="text" name="{{ form.qualification.name }}" id="{{ form.qualification.id_for_label }}"
-                           placeholder="e.g., Bachelor's, Master's, PhD"
                            value="{{ form.qualification.value|default:'' }}"
                            class="w-full px-4 py-3 rounded-lg bg-white/10 border {% if form.qualification.errors %}border-red-500/50{% else %}border-indigo-500/30{% endif %} text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all hover:border-indigo-500/50">
                     {% for error in form.qualification.errors %}
