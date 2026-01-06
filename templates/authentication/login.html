@@ -860,37 +860,4 @@
     </div>
 </div>
 
-<!-- Loading Spinner -->
-<div id="loading-spinner" class="hidden fixed inset-0 bg-gradient-to-br from-black/60 via-indigo-900/40 to-black/60 backdrop-blur-md flex items-center justify-center z-50">
-    <div class="flex flex-col items-center gap-6">
-        <div class="relative w-20 h-20">
-            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-spin"></div>
-            <div class="absolute inset-2 rounded-full bg-slate-900"></div>
-            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-400 to-pink-400 opacity-30 blur-xl animate-pulse"></div>
-        </div>
-        <p class="text-white text-lg font-semibold">Signing in...</p>
-    </div>
-</div>
-
-<script>
-const form = document.querySelector('form');
-if (form) {
-    form.addEventListener('submit', function(e) {
-        const spinner = document.getElementById('loading-spinner');
-        if (spinner) {
-            spinner.classList.remove('hidden');
-        }
-    });
-}
-
-window.addEventListener('pageshow', function(event) {
-    if (event.persisted) {
-        const spinner = document.getElementById('loading-spinner');
-        if (spinner) {
-            spinner.classList.add('hidden');
-        }
-    }
-});
-</script>
-
 {% endblock %}
