@@ -982,3 +982,5 @@ Traceback (most recent call last):
     ^^^^^^^^
 UnboundLocalError: cannot access local variable 'messages' where it is not associated with a value
 ERROR 2026-01-05 22:40:27,769 basehttp 22144 12140 "POST /students/transfers/ HTTP/1.1" 500 81934
+WARNING 2026-01-06 11:20:54,179 log 11968 12408 Not Found: /favicon.ico
+WARNING 2026-01-06 11:20:54,181 basehttp 11968 12408 "GET /favicon.ico HTTP/1.1" 404 29111
