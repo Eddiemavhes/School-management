@@ -1,67 +1,136 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}School Details - School Management System{% endblock %}
+{% block title %}School Details - Premium Configuration{% endblock %}
 
 {% block content %}
-<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
-    <!-- Background Gradient -->
-    <div class="fixed inset-0 z-0 pointer-events-none">
-        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
+<style>
+    .premium-card {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    .premium-input {
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .premium-input:focus {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(99, 102, 241, 0.5);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    .premium-input::placeholder {
+        color: rgba(148, 163, 184, 0.6);
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    
+    .section-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+        border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-in {
+        animation: slideInUp 0.6s ease-out;
+    }
+</style>
+
+<div class="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-900">
+    <!-- Animated Background Orbs -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
     </div>
 
-    <div class="max-w-4xl mx-auto relative z-10">
-        <!-- Header -->
-        <div class="mb-8 animate-slideInUp">
-            <a href="/settings/" class="inline-flex items-center text-blue-400 hover:text-blue-300 mb-4 transition-colors">
+    <div class="max-w-5xl mx-auto relative z-10">
+        <!-- Premium Header -->
+        <div class="mb-12 animate-in">
+            <a href="/settings/" class="inline-flex items-center text-blue-400 hover:text-blue-300 mb-6 transition-all hover:translate-x-1">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
                 Back to Settings
             </a>
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent mb-2">School Details</h1>
-            <p class="text-gray-300">Configure your school information that will be displayed in the system</p>
+            <div class="space-y-2">
+                <h1 class="text-5xl font-black bg-gradient-to-r from-blue-300 via-cyan-300 to-teal-300 bg-clip-text text-transparent">School Details</h1>
+                <p class="text-slate-400 text-lg">Configure your institution's core information and identity</p>
+            </div>
         </div>
 
-        <!-- Form Card -->
-        <div class="glass rounded-2xl p-8 border border-slate-500/20 animate-slideInUp">
-            <form method="POST" action="{% url 'school_details' %}" class="space-y-8">
+        <!-- Premium Form Card -->
+        <div class="premium-card rounded-3xl p-10 animate-in" style="animation-delay: 0.1s;">
+            <form method="POST" action="{% url 'school_details' %}" class="space-y-10">
                 {% csrf_token %}
 
                 <!-- Errors -->
                 {% if form.non_field_errors %}
                     {% for error in form.non_field_errors %}
-                    <div class="p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400">
+                    <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 backdrop-blur-sm">
                         {{ error }}
                     </div>
                     {% endfor %}
                 {% endif %}
 
                 <!-- Section 1: Basic Information -->
-                <div class="border-b border-slate-600/50 pb-6">
-                    <h2 class="text-2xl font-bold text-white mb-6">Basic Information</h2>
+                <div class="border-b border-slate-700/50 pb-8">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5.5m0 0H9m11 0v-7a6 6 0 00-6-6h-1.5a6 6 0 00-6 6v7m12 0h.01M3 21h18" />
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">Basic Information</h2>
+                    </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- School Name -->
                         <div class="md:col-span-2">
-                            <label for="{{ form.school_name.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                            <label for="{{ form.school_name.id_for_label }}" class="block text-sm font-semibold text-slate-200 mb-3">
                                 School Name *
                             </label>
-                            <input type="text" name="school_name" {% if form.instance.school_name and form.instance.school_name != 'Your School Name' %}value="{{ form.instance.school_name }}"{% endif %} required 
+                            <input type="text" name="school_name" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" {% if form.instance.school_name and form.instance.school_name != 'Your School Name' %}value="{{ form.instance.school_name }}"{% endif %} required 
                                 placeholder="Enter school name"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                   >
                             {% if form.school_name.errors %}
-                                <p class="text-red-400 text-sm mt-1">{{ form.school_name.errors.0 }}</p>
+                                <p class="text-red-400 text-sm mt-2">{{ form.school_name.errors.0 }}</p>
                             {% endif %}
                         </div>
 
                         <!-- School Type -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 School Type
                             </label>
-                            <select name="school_type" class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                            <select name="school_type" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all">
                                 <option value="PRIMARY" {% if form.instance.school_type == 'PRIMARY' %}selected{% endif %}>Primary School</option>
                                 <option value="SECONDARY" {% if form.instance.school_type == 'SECONDARY' %}selected{% endif %}>Secondary School</option>
                                 <option value="HIGHER_SECONDARY" {% if form.instance.school_type == 'HIGHER_SECONDARY' %}selected{% endif %}>Higher Secondary School</option>
@@ -71,152 +140,173 @@
 
                         <!-- Established Year -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 Established Year
                             </label>
-                            <input type="number" name="established_year" value="{{ form.instance.established_year|default:'' }}" 
+                            <input type="number" name="established_year" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" value="{{ form.instance.established_year|default:'' }}" 
                                    placeholder="e.g., 2005"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                    min="1950" max="2099">
                         </div>
 
                         <!-- School Motto -->
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 School Motto
                             </label>
-                            <input type="text" name="school_motto" {% if form.instance.school_motto and form.instance.school_motto != 'Quality Education for All' %}value="{{ form.instance.school_motto }}"{% endif %} 
+                            <input type="text" name="school_motto" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" {% if form.instance.school_motto and form.instance.school_motto != 'Quality Education for All' %}value="{{ form.instance.school_motto }}"{% endif %} 
                                 placeholder="Enter school motto"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                   >
                         </div>
                     </div>
                 </div>
 
                 <!-- Section 2: Contact Information -->
-                <div class="border-b border-slate-600/50 pb-6">
-                    <h2 class="text-2xl font-bold text-white mb-6">Contact Information</h2>
+                <div class="border-b border-slate-700/50 pb-8">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">Contact Information</h2>
+                    </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Principal Name -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 Principal Name
                             </label>
-                            <input type="text" name="principal_name" value="{{ form.instance.principal_name|default:'' }}" 
+                            <input type="text" name="principal_name" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" value="{{ form.instance.principal_name|default:'' }}" 
                                    placeholder="e.g., Mr. John Smith"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                   >
                         </div>
 
                         <!-- Email -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 Email Address
                             </label>
-                            <input type="email" name="email" {% if form.instance.email and form.instance.email != 'school@example.com' %}value="{{ form.instance.email }}"{% endif %} 
+                            <input type="email" name="email" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" {% if form.instance.email and form.instance.email != 'school@example.com' %}value="{{ form.instance.email }}"{% endif %} 
                                 placeholder="Enter email address"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                   >
                         </div>
 
                         <!-- Phone -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 Primary Phone
                             </label>
-                            <input type="tel" name="phone" {% if form.instance.phone and form.instance.phone != '+1-XXX-XXX-XXXX' %}value="{{ form.instance.phone }}"{% endif %} 
+                            <input type="tel" name="phone" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" {% if form.instance.phone and form.instance.phone != '+1-XXX-XXX-XXXX' %}value="{{ form.instance.phone }}"{% endif %} 
                                 placeholder="Enter phone number"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                   >
                         </div>
 
                         <!-- Alternate Phone -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 Alternate Phone
                             </label>
-                            <input type="tel" name="alternate_phone" value="{{ form.instance.alternate_phone|default:'' }}" 
+                            <input type="tel" name="alternate_phone" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" value="{{ form.instance.alternate_phone|default:'' }}" 
                                    placeholder="e.g., +263-4-XXX-XXXX"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                   >
                         </div>
                     </div>
                 </div>
 
                 <!-- Section 3: Address Information -->
-                <div class="border-b border-slate-600/50 pb-6">
-                    <h2 class="text-2xl font-bold text-white mb-6">Address Information</h2>
+                <div class="border-b border-slate-700/50 pb-8">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">Address Information</h2>
+                    </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Street Address -->
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 Street Address
                             </label>
-                            <input type="text" name="street_address" value="{{ form.instance.street_address|default:'' }}" 
+                            <input type="text" name="street_address" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" value="{{ form.instance.street_address|default:'' }}" 
                                    placeholder="e.g., 123 Main Street"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                   >
                         </div>
 
                         <!-- City -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 City
                             </label>
-                            <input type="text" name="city" value="{{ form.instance.city|default:'' }}" 
+                            <input type="text" name="city" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" value="{{ form.instance.city|default:'' }}" 
                                    placeholder="e.g., Harare"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                   >
                         </div>
 
                         <!-- State -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 State/Province
                             </label>
-                            <input type="text" name="state" value="{{ form.instance.state|default:'' }}" 
+                            <input type="text" name="state" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" value="{{ form.instance.state|default:'' }}" 
                                    placeholder="e.g., Harare Province"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                   >
                         </div>
 
                         <!-- Country -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 Country
                             </label>
-                            <input type="text" name="country" value="{{ form.instance.country|default:'' }}" 
+                            <input type="text" name="country" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" value="{{ form.instance.country|default:'' }}" 
                                    placeholder="e.g., Zimbabwe"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                   >
                         </div>
                     </div>
                 </div>
 
                 <!-- Section 4: Registration & Affiliation -->
-                <div class="pb-6">
-                    <h2 class="text-2xl font-bold text-white mb-6">Registration & Affiliation</h2>
+                <div class="pb-8">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">Registration & Affiliation</h2>
+                    </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Board Affiliation -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 Board Affiliation
                             </label>
-                            <input type="text" name="board_affiliation" value="{{ form.instance.board_affiliation|default:'' }}" 
+                            <input type="text" name="board_affiliation" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" value="{{ form.instance.board_affiliation|default:'' }}" 
                                    placeholder="e.g., Ministry of Education"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                   >
                         </div>
 
                         <!-- Registration Number -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 Registration Number
                             </label>
-                            <input type="text" name="registration_number" value="{{ form.instance.registration_number|default:'' }}" 
+                            <input type="text" name="registration_number" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all" value="{{ form.instance.registration_number|default:'' }}" 
                                    placeholder="e.g., REG-2005-0001"
-                                   class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                   >
                         </div>
 
                         <!-- Working Days -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">
                                 Working Days Per Week
                             </label>
-                            <select name="working_days_per_week" class="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                            <select name="working_days_per_week" class="premium-input w-full px-4 py-3 rounded-xl text-white focus:outline-none transition-all">
                                 <option value="5" {% if form.instance.working_days_per_week == 5 %}selected{% endif %}>5 Days</option>
                                 <option value="6" {% if form.instance.working_days_per_week == 6 %}selected{% endif %}>6 Days</option>
                             </select>
@@ -225,11 +315,11 @@
                 </div>
 
                 <!-- Form Actions -->
-                <div class="flex gap-4 pt-6 border-t border-slate-600/50">
-                    <button type="submit" class="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg hover:shadow-xl">
+                <div class="flex gap-4 pt-8 border-t border-slate-700/50">
+                    <button type="submit" class="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 text-white font-semibold hover:from-blue-600 hover:via-purple-600 hover:to-cyan-600 transition-all shadow-lg hover:shadow-2xl hover:shadow-blue-500/30 transform hover:scale-105 active:scale-95">
                         Save School Details
                     </button>
-                    <a href="/settings/" class="flex-1 px-6 py-3 rounded-lg bg-slate-700/50 border border-slate-600 text-slate-300 font-medium hover:bg-slate-700 transition-all text-center">
+                    <a href="/settings/" class="flex-1 px-6 py-3 rounded-xl bg-slate-700/30 border border-slate-600/50 text-slate-300 font-medium hover:bg-slate-700/50 transition-all text-center hover:text-slate-200">
                         Cancel
                     </a>
                 </div>
