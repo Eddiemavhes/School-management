@@ -62,7 +62,7 @@ LOGOUT_REDIRECT_URL = 'login'
 # Session settings
 SESSION_COOKIE_AGE = 28800  # 8 hours (instead of 1 hour)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session longer
-SESSION_SAVE_EVERY_REQUEST = True  # Update session timeout on every request
+SESSION_SAVE_EVERY_REQUEST = False  # avoid writing session to DB on every request (reduces DB writes)
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Password validation
