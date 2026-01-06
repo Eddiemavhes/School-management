@@ -48,28 +48,28 @@
                 {% csrf_token %}
                 
                 <!-- Email Field -->
-                <div>
-                    <label for="id_username" class="text-slate-300 text-sm font-semibold block mb-2 uppercase tracking-wide">Email Address</label>
-                    <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 hover:border-slate-600 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-all duration-200">
-                        <svg class="w-5 h-5 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="group">
+                    <label for="id_username" class="text-slate-300 text-xs font-bold block mb-3 uppercase tracking-widest">Email Address</label>
+                    <div class="flex items-center gap-3 px-5 py-3.5 rounded-xl bg-gradient-to-br from-slate-800/80 to-slate-900/60 border border-slate-700/50 hover:border-indigo-500/30 focus-within:border-indigo-500/80 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-lg hover:shadow-indigo-500/10 transition-all duration-300">
+                        <svg class="w-5 h-5 text-indigo-400 flex-shrink-0 transition-colors duration-300 group-focus-within:text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                         </svg>
                         <input type="email" name="username" id="id_username" required 
-                               class="w-full bg-transparent text-white placeholder-slate-500 focus:outline-none transition-all duration-200"
-                               placeholder="Enter your email">
+                               class="w-full bg-transparent text-white placeholder-slate-600 focus:outline-none transition-all duration-200 text-sm"
+                               placeholder="admin@school.com">
                     </div>
                 </div>
                 
                 <!-- Password Field -->
-                <div>
-                    <label for="id_password" class="text-slate-300 text-sm font-semibold block mb-2 uppercase tracking-wide">Password</label>
-                    <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 hover:border-slate-600 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-all duration-200">
-                        <svg class="w-5 h-5 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="group">
+                    <label for="id_password" class="text-slate-300 text-xs font-bold block mb-3 uppercase tracking-widest">Password</label>
+                    <div class="flex items-center gap-3 px-5 py-3.5 rounded-xl bg-gradient-to-br from-slate-800/80 to-slate-900/60 border border-slate-700/50 hover:border-indigo-500/30 focus-within:border-indigo-500/80 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-lg hover:shadow-indigo-500/10 transition-all duration-300">
+                        <svg class="w-5 h-5 text-indigo-400 flex-shrink-0 transition-colors duration-300 group-focus-within:text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                         </svg>
                         <input type="password" name="password" id="id_password" required 
-                               class="w-full bg-transparent text-white placeholder-slate-500 focus:outline-none transition-all duration-200"
-                               placeholder="Enter your password">
+                               class="w-full bg-transparent text-white placeholder-slate-600 focus:outline-none transition-all duration-200 text-sm"
+                               placeholder="••••••••">
                     </div>
                 </div>
                 
@@ -81,8 +81,15 @@
                 </div>
                 
                 <!-- Sign In Button -->
-                <button type="submit" id="signin-btn" class="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-lg font-semibold transition-all duration-200 transform hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95 uppercase tracking-wide mt-6">
-                    Sign In
+                <button type="submit" id="signin-btn" class="w-full py-3.5 px-6 bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 hover:from-indigo-600 hover:via-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:shadow-2xl hover:shadow-indigo-500/30 active:scale-95 uppercase tracking-widest text-sm mt-8 relative overflow-hidden group">
+                    <span class="relative z-10 flex items-center justify-center gap-2">
+                        <span>Sign In</span>
+                        <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
+                    </span>
+                    <!-- Shimmer effect -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                 </button>
             </form>
         </div>
