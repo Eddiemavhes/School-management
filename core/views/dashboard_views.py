@@ -15,15 +15,24 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         current_term = AcademicTerm.get_current_term()
 
-        # Student Statistics
-        context['total_students'] = Student.objects.count()
-        context['active_students'] = Student.objects.filter(is_active=True).count()
+        # Student Statistics - use single aggregation query instead of multiple .count() calls
+        student_stats = Student.objects.aggregate(
+            total=Count('id'),
+            active=Count('id', filter=Q(is_active=True))
+        )
+        context['total_students'] = student_stats['total'] or 0
+        context['active_students'] = student_stats['active'] or 0
         context['inactive_students'] = context['total_students'] - context['active_students']
 
-        # Teacher and Class Statistics
-        context['total_classes'] = Class.objects.count()
-        context['total_teachers'] = Administrator.objects.filter(is_teacher=True).count()
-        context['assigned_teachers'] = Administrator.objects.filter(is_teacher=True, is_active=True).count()
+        # Teacher and Class Statistics - batch query
+        teacher_stats = Administrator.objects.aggregate(
+            total=Count('id', filter=Q(is_teacher=True)),
+            active=Count('id', filter=Q(is_teacher=True, is_active=True))
+        )
+        class_count = Class.objects.count()
+        context['total_classes'] = class_count
+        context['total_teachers'] = teacher_stats['total'] or 0
+        context['assigned_teachers'] = teacher_stats['active'] or 0
         context['unassigned_teachers'] = context['total_teachers'] - context['assigned_teachers']
 
         # Fee Collection Statistics - use StudentBalance (including arrears)
@@ -42,16 +51,20 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
             if total_due > 0 else 0
         )
 
-        # Arrears Calculations
+        # Arrears Calculations - combine with prefetch for better performance
         students_with_arrears = StudentBalance.objects.filter(
             term=current_term,
             previous_arrears__gt=0
         ).select_related('student').order_by('-previous_arrears')[:5]
         context['students_with_arrears'] = students_with_arrears
-        context['students_in_arrears_count'] = StudentBalance.objects.filter(
-            term=current_term,
-            previous_arrears__gt=0
-        ).count()
+        
+        # Get counts in single query
+        arrears_counts = StudentBalance.objects.filter(term=current_term).aggregate(
+            arrears_count=Count('id', filter=Q(previous_arrears__gt=0)),
+            no_payment_count=Count('id', filter=Q(amount_paid=0))
+        )
+        context['students_in_arrears_count'] = arrears_counts['arrears_count'] or 0
+        context['no_payment_count'] = arrears_counts['no_payment_count'] or 0
         
         # Students with no payment (highest priority)
         no_payment_students = StudentBalance.objects.filter(
@@ -59,24 +72,30 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
             amount_paid=0
         ).select_related('student').order_by('student__surname')[:5]
         context['no_payment_students'] = no_payment_students
-        context['no_payment_count'] = StudentBalance.objects.filter(
-            term=current_term,
-            amount_paid=0
-        ).count()
 
         # Recent Registrations
         context['recent_students'] = Student.objects.order_by('-date_enrolled')[:5]
 
-        # Fee Collection Chart Data (Last 6 terms)
+        # Fee Collection Chart Data (Last 6 terms) - CRITICAL FIX: avoid N+1 queries
         term_labels = []
         term_collected = []
         term_due = []
         
-        all_terms = AcademicTerm.objects.order_by('-academic_year', '-term')[:6]
+        all_terms = list(AcademicTerm.objects.order_by('-academic_year', '-term')[:6])
+        # Pre-fetch all balances for these terms in ONE query with aggregation
+        term_aggregates = StudentBalance.objects.filter(
+            term__in=all_terms
+        ).values('term').annotate(
+            total_collected=Sum('amount_paid'),
+            total_due=Sum(F('term_fee') + F('previous_arrears'))
+        )
+        # Create lookup dict for O(1) access
+        term_data = {agg['term']: agg for agg in term_aggregates}
+        
         for term_obj in reversed(all_terms):
-            balances = StudentBalance.objects.filter(term=term_obj)
-            collected = balances.aggregate(total=Sum('amount_paid'))['total'] or Decimal('0')
-            due = balances.aggregate(total=Sum(F('term_fee') + F('previous_arrears')))['total'] or Decimal('0')
+            agg = term_data.get(term_obj.id, {})
+            collected = Decimal(str(agg.get('total_collected') or 0))
+            due = Decimal(str(agg.get('total_due') or 0))
             
             term_labels.append(f"{term_obj.academic_year} T{term_obj.term}")
             term_collected.append(float(collected))

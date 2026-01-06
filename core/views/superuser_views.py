@@ -38,12 +38,12 @@ class IsSuperUserMixin(UserPassesTestMixin):
 
 
 class SuperuserDashboardView(IsSuperUserMixin, TemplateView):
-    """Main superuser dashboard"""
+    """Main superuser dashboard - minimal stats to avoid slowness"""
     template_name = 'superuser/dashboard.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Only show the dashboard - no statistics needed
+        # Only show the dashboard - no statistics needed for performance
         return context
 
 

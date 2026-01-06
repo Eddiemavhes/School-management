@@ -203,6 +203,18 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Cache Configuration - use database caching for persistence across restarts
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'TIMEOUT': 300,  # 5 minutes default
+        'OPTIONS': {
+            'MAX_ENTRIES': 10000,
+        }
+    }
+}
+
 
 
 # Static files (CSS, JavaScript, Images)

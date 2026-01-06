@@ -23,6 +23,11 @@ class ClassAdmin(admin.ModelAdmin):
 	list_filter = ('academic_year', 'grade')
 	search_fields = ('grade', 'section', 'academic_year')
 	inlines = [ECDClassProfileInline, ECDClassFeeInline]
+	
+	def get_queryset(self, request):
+		"""Optimize queryset by selecting related fields to avoid N+1 queries"""
+		qs = super().get_queryset(request)
+		return qs.select_related('academic_year', 'teacher')
 
 
 @admin.register(Student)
@@ -30,6 +35,11 @@ class StudentAdmin(admin.ModelAdmin):
 	list_display = ('__str__', 'current_class', 'is_active')
 	list_filter = ('is_active', 'current_class__grade')
 	search_fields = ('surname', 'first_name', 'birth_entry_number')
+	
+	def get_queryset(self, request):
+		"""Optimize queryset by selecting related fields to avoid N+1 queries"""
+		qs = super().get_queryset(request)
+		return qs.select_related('current_class')
 
 
 @admin.register(ECDClassProfile)
