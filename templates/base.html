@@ -10,6 +10,26 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     {% block head_js %}{% endblock %}
     <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: white;
+            --text-secondary: #cbd5e1;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        html.light-mode {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #f1f5f9;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: rgba(99, 102, 241, 0.15);
+            --glass-bg: rgba(99, 102, 241, 0.04);
+        }
+
         @keyframes gradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -33,10 +53,15 @@
 
         body {
             min-height: 100vh;
-            background: #0f172a;
-            color: white;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             position: relative;
             overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        html.light-mode body {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f0f4f8 100%);
         }
 
         body::before {
@@ -50,18 +75,58 @@
             pointer-events: none;
             z-index: 0;
         }
+
+        /* Light mode navbar styling */
+        html.light-mode nav {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light-mode nav .absolute.inset-0.bg-gradient-to-r {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%) !important;
+        }
+
+        html.light-mode nav .absolute.inset-0.backdrop-blur-2xl {
+            background: transparent !important;
+        }
+
+        html.light-mode nav .absolute.bottom-0 {
+            background: linear-gradient(to right, transparent, rgba(99, 102, 241, 0.3), transparent) !important;
+        }
+
+        html.light-mode .nav-link {
+            color: #475569 !important;
+        }
+
+        html.light-mode .nav-link:hover {
+            color: #0f172a !important;
+            background: rgba(99, 102, 241, 0.08) !important;
+        }
+
+        html.light-mode .dropdown-link {
+            color: #475569 !important;
+        }
+
+        html.light-mode .dropdown-link:hover {
+            color: #0f172a !important;
+            background: rgba(99, 102, 241, 0.1) !important;
+        }
+
+        html.light-mode .text-slate-200 {
+            color: #64748b !important;
+        }
         
         .glass {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--glass-bg);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
             box-shadow: 0 8px 32px 0 rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         .glass-light {
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--glass-bg);
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid var(--border-color);
         }
 
         /* Modern form controls */
@@ -71,11 +136,19 @@
             width: 100%;
             padding: 0.75rem 1rem;
             border-radius: 0.75rem;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1.5px solid rgba(255, 255, 255, 0.1);
-            color: #1e3a5f;
+            background: var(--glass-bg);
+            border: 1.5px solid var(--border-color);
+            color: var(--text-primary);
             box-sizing: border-box;
             transition: all 0.3s ease;
+        }
+
+        html.light-mode .form-input,
+        html.light-mode .form-select,
+        html.light-mode .form-textarea {
+            color: #1e293b !important;
+            background: rgba(255, 255, 255, 0.8);
+            border-color: rgba(0, 0, 0, 0.15);
         }
 
         .form-input:hover,
@@ -83,6 +156,13 @@
         .form-textarea:hover {
             border-color: rgba(99, 102, 241, 0.3);
             background: rgba(255, 255, 255, 0.08);
+        }
+
+        html.light-mode .form-input:hover,
+        html.light-mode .form-select:hover,
+        html.light-mode .form-textarea:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(99, 102, 241, 0.4);
         }
 
         .form-input:focus,
@@ -94,10 +174,35 @@
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), inset 0 0 0 1px rgba(99, 102, 241, 0.3);
         }
 
+        html.light-mode .form-input:focus,
+        html.light-mode .form-select:focus,
+        html.light-mode .form-textarea:focus {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(99, 102, 241, 0.7);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), inset 0 0 0 1px rgba(99, 102, 241, 0.5);
+        }
+
         .form-input::placeholder,
         .form-select::placeholder,
         .form-textarea::placeholder {
             color: rgba(255, 255, 255, 0.4);
+        }
+
+        html.light-mode .form-input::placeholder,
+        html.light-mode .form-select::placeholder,
+        html.light-mode .form-textarea::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Light mode dropdown styling */
+        html.light-mode .bg-slate-800 {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(99, 102, 241, 0.2) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        html.light-mode .ring-slate-700 {
+            --tw-ring-color: rgba(99, 102, 241, 0.2) !important;
         }
 
         input[type="text"],
@@ -333,10 +438,20 @@
             transition: all 0.3s ease;
         }
 
+        html.light-mode .card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
         .card:hover {
             border-color: rgba(99, 102, 241, 0.3);
             box-shadow: 0 10px 40px rgba(99, 102, 241, 0.15);
             transform: translateY(-5px);
+        }
+
+        html.light-mode .card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.1);
         }
 
         /* Badge styling */
@@ -354,9 +469,21 @@
             border: 1px solid rgba(99, 102, 241, 0.3);
         }
 
+        html.light-mode .badge-primary {
+            background: rgba(99, 102, 241, 0.1);
+            color: #4f46e5;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
         .badge-secondary {
             background: rgba(236, 72, 153, 0.2);
             color: #F472B6;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+
+        html.light-mode .badge-secondary {
+            background: rgba(236, 72, 153, 0.1);
+            color: #be185d;
             border: 1px solid rgba(236, 72, 153, 0.3);
         }
 
@@ -406,13 +533,28 @@
             font-weight: 600;
         }
 
+        html.light-mode th {
+            background: rgba(99, 102, 241, 0.08);
+            border-bottom: 2px solid rgba(99, 102, 241, 0.25);
+            color: #0f172a;
+        }
+
         td {
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             padding: 1rem;
         }
 
+        html.light-mode td {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            color: #0f172a;
+        }
+
         tr:hover {
             background: rgba(99, 102, 241, 0.05);
+        }
+
+        html.light-mode tr:hover {
+            background: rgba(99, 102, 241, 0.03);
         }
 
         /* Link styling */
@@ -422,8 +564,16 @@
             transition: color 0.3s ease;
         }
 
+        html.light-mode a {
+            color: #4f46e5;
+        }
+
         a:hover {
             color: #E0E7FF;
+        }
+
+        html.light-mode a:hover {
+            color: #3730a3;
         }
 
         /* Status colors */
@@ -513,12 +663,25 @@
                 </div>
             </a>
 
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg hover:bg-slate-700/50 transition-colors" aria-label="Toggle menu">
-                <svg class="w-6 h-6 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
+            <!-- Mobile Menu Button & Theme Toggle -->
+            <div class="flex items-center gap-2 lg:gap-3">
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-slate-700/50 dark:hover:bg-slate-700/50 transition-colors" aria-label="Toggle theme" title="Toggle dark/light mode">
+                    <svg id="sun-icon" class="w-6 h-6 text-slate-200 hidden" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l-2.83-2.83a1 1 0 00-1.414 1.414l2.83 2.83a1 1 0 001.414-1.414M2.05 6.464a1 1 0 000 1.414l2.83-2.83a1 1 0 00-1.414-1.414L2.05 6.464zm9.9 5a1 1 0 011.414-1.414l2.83 2.83a1 1 0 01-1.414 1.414l-2.83-2.83zm4.95-9.9a1 1 0 00-1.414 0l-2.83 2.83a1 1 0 001.414 1.414l2.83-2.83a1 1 0 000-1.414zM4 11a1 1 0 100-2H2a1 1 0 100 2h2zm12-2h2a1 1 0 110 2h-2a1 1 0 110-2zM4 4a1 1 0 100 2h2a1 1 0 100-2H4z" clip-rule="evenodd" />
+                    </svg>
+                    <svg id="moon-icon" class="w-6 h-6 text-slate-200" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </button>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg hover:bg-slate-700/50 transition-colors" aria-label="Toggle menu">
+                    <svg class="w-6 h-6 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
 
             <!-- Desktop Navigation Links -->
             <div class="hidden lg:flex items-center gap-1">
@@ -947,6 +1110,68 @@
                 if (!btn.classList.contains('premium-button')) btn.classList.add('premium-button');
             });
         });
+
+        // ============================================
+        // THEME TOGGLE FUNCTIONALITY
+        // ============================================
+        
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        // Initialize theme from localStorage or system preference
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            setTheme(savedTheme);
+        }
+
+        // Set theme
+        function setTheme(theme) {
+            if (theme === 'light') {
+                html.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                html.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+            
+            // Update navbar appearance based on theme
+            updateNavbarTheme(theme);
+        }
+
+        // Update navbar styling for theme
+        function updateNavbarTheme(theme) {
+            const nav = document.querySelector('nav');
+            const navBg = nav.querySelector('.absolute.inset-0.bg-gradient-to-r');
+            const navOverlay = nav.querySelector('.absolute.inset-0.backdrop-blur-2xl');
+            
+            if (theme === 'light') {
+                if (navBg) navBg.classList.remove('from-slate-950', 'via-blue-950', 'to-slate-950');
+                if (navBg) navBg.classList.add('from-blue-50', 'via-white', 'to-blue-50');
+                if (navOverlay) navOverlay.classList.remove('bg-white/5');
+                if (navOverlay) navOverlay.classList.add('bg-white/80');
+            } else {
+                if (navBg) navBg.classList.add('from-slate-950', 'via-blue-950', 'to-slate-950');
+                if (navBg) navBg.classList.remove('from-blue-50', 'via-white', 'to-blue-50');
+                if (navOverlay) navOverlay.classList.remove('bg-white/80');
+                if (navOverlay) navOverlay.classList.add('bg-white/5');
+            }
+        }
+
+        // Toggle theme on button click
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.classList.contains('light-mode') ? 'light' : 'dark';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        });
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', initializeTheme);
     </script>
     {% block javascript %}{% endblock %}
 </body>
