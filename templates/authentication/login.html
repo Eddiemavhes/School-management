@@ -4,7 +4,9 @@
 
 {% block content %}
 <style>
-    border-radius: 12px;
+    .premium-input {
+        padding: 12px 16px;
+        border-radius: 12px;
         transition: all 0.3s ease;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), inset 0 1px 2px 0 rgba(255, 255, 255, 0.05);
     }
@@ -150,20 +152,22 @@
     }
 
     html.light-mode .premium-input {
-        background: rgba(255, 255, 255, 0.95);
-        border-color: rgba(99, 102, 241, 0.25);
+        background: rgba(255, 255, 255, 0.98);
+        border-color: rgba(99, 102, 241, 0.4);
         color: #0f172a;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
     }
 
     html.light-mode .premium-input:hover {
-        border-color: rgba(99, 102, 241, 0.4);
+        border-color: rgba(99, 102, 241, 0.6);
         background: rgba(255, 255, 255, 1);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
     }
 
     html.light-mode .premium-input:focus {
-        border-color: rgba(99, 102, 241, 0.6);
+        border-color: rgba(99, 102, 241, 0.8);
         background: rgba(255, 255, 255, 1);
-        box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.3), inset 0 1px 2px 0 rgba(99, 102, 241, 0.1);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), inset 0 1px 2px 0 rgba(99, 102, 241, 0.1);
     }
 
     html.light-mode .premium-input::placeholder {
@@ -171,28 +175,51 @@
     }
 
     html.light-mode .input-icon {
-        color: rgba(99, 102, 241, 0.5);
+        color: rgba(99, 102, 241, 0.7);
     }
 
     html.light-mode .input-group:focus-within .input-icon {
-        color: rgba(99, 102, 241, 0.8);
+        color: rgba(99, 102, 241, 0.9);
+        filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.5));
     }
 
     html.light-mode .logo-badge {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(219, 39, 119, 0.15) 100%);
-        border-color: rgba(99, 102, 241, 0.25);
-        box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(219, 39, 119, 0.2) 100%);
+        border-color: rgba(99, 102, 241, 0.35);
+        box-shadow: 0 0 40px rgba(99, 102, 241, 0.2);
     }
 
     html.light-mode input:autofill,
     html.light-mode input:autofill:hover,
     html.light-mode input:autofill:focus {
-        -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.95) inset !important;
+        -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.98) inset !important;
         -webkit-text-fill-color: #0f172a !important;
     }
 
     html.light-mode .animated-bg {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f0f4f8 100%);
+        background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 50%, #f5f3ff 100%);
+    }
+
+    /* Light mode heading styles */
+    html.light-mode h1.heading-gradient {
+        background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    html.light-mode h2 {
+        color: #0f172a !important;
+    }
+
+    html.light-mode .text-slate-400 {
+        color: #64748b !important;
+    }
+
+    html.light-mode .premium-card {
+        background: rgba(255, 255, 255, 0.98) !important;
+        border: 1.5px solid rgba(99, 102, 241, 0.3) !important;
+        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15) !important;
     }
 </style>
 
