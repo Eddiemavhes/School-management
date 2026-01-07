@@ -40,6 +40,9 @@ class Class(models.Model):
         ordering = ['grade', 'section']
 
     def __str__(self):
+        # For ECD grades, don't append section since it's already in the grade (ECDA, ECDB)
+        if self.grade.startswith('ECD'):
+            return self.get_grade_display()
         return f"{self.get_grade_display()}{self.section}"
 
     def clean(self):
