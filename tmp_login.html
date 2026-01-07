@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AcademiaFlow</title>
+    
+    <!-- Local Tailwind CSS (build with `npm run build:tailwind`) -->
+    <link href="/static/css/tailwind.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: white;
+            --text-secondary: #cbd5e1;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        html.light-mode {
+            --bg-primary: #f0f4ff;
+            --bg-secondary: #e8ecff;
+            --bg-tertiary: #dce3ff;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --border-color: rgba(99, 102, 241, 0.4);
+            --glass-bg: rgba(99, 102, 241, 0.08);
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(236, 72, 153, 0.4); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            position: relative;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        html.light-mode body {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 50%, #f5f3ff 100%);
+        }
+
+        /* Light mode navbar styling */
+        html.light-mode nav {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 50%, #e8ecff 100%) !important;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15) !important;
+        }
+
+        html.light-mode nav .absolute.inset-0.bg-gradient-to-r {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 50%, #e8ecff 100%) !important;
+        }
+
+        html.light-mode nav .absolute.inset-0.backdrop-blur-2xl {
+            background: transparent !important;
+        }
+
+        html.light-mode nav .absolute.bottom-0 {
+            background: linear-gradient(to right, transparent, rgba(99, 102, 241, 0.5), transparent) !important;
+        }
+
+        html.light-mode .nav-link {
+            color: #475569 !important;
+        }
+
+        html.light-mode .nav-link:hover {
+            color: #0f172a !important;
+            background: rgba(99, 102, 241, 0.08) !important;
+        }
+
+        html.light-mode .dropdown-link {
+            color: #475569 !important;
+        }
+
+        html.light-mode .dropdown-link:hover {
+            color: #0f172a !important;
+            background: rgba(99, 102, 241, 0.1) !important;
+        }
+
+        html.light-mode .text-slate-200 {
+            color: #64748b !important;
+        }
+
+        /* Theme toggle button styling */
+        #theme-toggle {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.15) 100%) !important;
+            border: 1.5px solid rgba(99, 102, 241, 0.3) !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+        }
+
+        #theme-toggle:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%) !important;
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3) !important;
+        }
+
+        html.light-mode #theme-toggle {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+            border: 1.5px solid rgba(99, 102, 241, 0.4) !important;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4) !important;
+        }
+
+        html.light-mode #theme-toggle:hover {
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5), 0 0 10px rgba(99, 102, 241, 0.3) !important;
+            transform: translateY(-2px);
+        }
+
+        html.light-mode #sun-icon {
+            color: #fbbf24 !important;
+            filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.6)) !important;
+        }
+
+        html.light-mode #moon-icon {
+            color: #fbbf24 !important;
+            filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.6)) !important;
+        }
+        
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px 0 rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-light {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Modern form controls */
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            background: var(--glass-bg);
+            border: 1.5px solid var(--border-color);
+            color: var(--text-primary);
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        html.light-mode .form-input,
+        html.light-mode .form-select,
+        html.light-mode .form-textarea {
+            color: #0f172a !important;
+            background: rgba(255, 255, 255, 0.98);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-input:hover,
+        .form-select:hover,
+        .form-textarea:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        html.light-mode .form-input:hover,
+        html.light-mode .form-select:hover,
+        html.light-mode .form-textarea:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: rgba(99, 102, 241, 0.6);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), inset 0 0 0 1px rgba(99, 102, 241, 0.3);
+        }
+
+        html.light-mode .form-input:focus,
+        html.light-mode .form-select:focus,
+        html.light-mode .form-textarea:focus {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(99, 102, 241, 0.8);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), inset 0 0 0 1px rgba(99, 102, 241, 0.6);
+        }
+
+        .form-input::placeholder,
+        .form-select::placeholder,
+        .form-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        html.light-mode .form-input::placeholder,
+        html.light-mode .form-select::placeholder,
+        html.light-mode .form-textarea::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Light mode dropdown styling */
+        html.light-mode .bg-slate-800 {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(99, 102, 241, 0.2) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        html.light-mode .ring-slate-700 {
+            --tw-ring-color: rgba(99, 102, 241, 0.2) !important;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            color: #0f172a !important;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        select:focus,
+        textarea:focus {
+            color: #0f172a !important;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            color: #0f172a !important;
+        }
+
+        /* Premium button styling */
+        .premium-button {
+            background: linear-gradient(135deg, #6366F1 0%, #EC4899 100%);
+            padding: 0.55rem 1.2rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .premium-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Login nav button styling */
+        .login-nav-btn {
+            background: linear-gradient(135deg, #2d3e7e 0%, #3d5a9e 50%, #4a7c9e 100%);
+            background-size: 300% 300%;
+            color: white;
+            padding: 0.35rem 0.9rem;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 20px rgba(45, 62, 126, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.6s ease;
+            z-index: 0;
+        }
+
+        .login-nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-nav-btn:hover {
+            background-position: 100% 0;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(45, 62, 126, 0.5), 0 0 20px rgba(96, 165, 250, 0.3);
+        }
+
+        .login-nav-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        }
+
+        .premium-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .premium-button:hover::before {
+            left: 100%;
+        }
+
+        .premium-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 20px 45px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .premium-button:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        /* Secondary button */
+        .secondary-button {
+            background: rgba(236, 72, 153, 0.15);
+            border: 1.5px solid rgba(236, 72, 153, 0.4);
+            color: #EC4899;
+            padding: 0.55rem 1.2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .secondary-button:hover {
+            background: rgba(236, 72, 153, 0.25);
+            border-color: rgba(236, 72, 153, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* Accent button */
+        .accent-button {
+            background: rgba(20, 184, 166, 0.15);
+            border: 1.5px solid rgba(20, 184, 166, 0.4);
+            color: #14B8A6;
+            padding: 0.55rem 1.2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .accent-button:hover {
+            background: rgba(20, 184, 166, 0.25);
+            border-color: rgba(20, 184, 166, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #6366F1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Layout utilities */
+        .mt-4 { margin-top: 1rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .text-center { text-align: center; }
+        .w-full { width: 100%; }
+
+        /* Content area */
+        .content {
+            padding-top: 5rem;
+            min-height: calc(100vh - 4rem);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(99, 102, 241, 0.2);
+            border-top-color: #6366F1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error messages */
+        .error-message {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1.5px solid rgba(239, 68, 68, 0.4);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            color: #FCA5A5;
+        }
+
+        /* Success messages */
+        .success-message {
+            background: rgba(20, 184, 166, 0.15);
+            border: 1.5px solid rgba(20, 184, 166, 0.4);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            color: #5EEAD4;
+        }
+
+        /* Warning messages */
+        .warning-message {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1.5px solid rgba(245, 158, 11, 0.4);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            color: #FCD34D;
+        }
+
+        /* Card styling */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        html.light-mode .card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1.5px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12);
+        }
+
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.15);
+            transform: translateY(-5px);
+        }
+
+        html.light-mode .card:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Badge styling */
+        .badge {
+            display: inline-block;
+            padding: 0.375rem 0.875rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .badge-primary {
+            background: rgba(99, 102, 241, 0.2);
+            color: #A5B4FC;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        html.light-mode .badge-primary {
+            background: rgba(99, 102, 241, 0.1);
+            color: #4f46e5;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .badge-secondary {
+            background: rgba(236, 72, 153, 0.2);
+            color: #F472B6;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+
+        html.light-mode .badge-secondary {
+            background: rgba(236, 72, 153, 0.1);
+            color: #be185d;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+
+        .badge-accent {
+            background: rgba(20, 184, 166, 0.2);
+            color: #5EEAD4;
+            border: 1px solid rgba(20, 184, 166, 0.3);
+        }
+
+        .badge-success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86EFAC;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #FCD34D;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #FCA5A5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Animation classes */
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .glow {
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        /* Table styling */
+        table {
+            border-collapse: collapse;
+        }
+
+        th {
+            background: rgba(99, 102, 241, 0.1);
+            border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        html.light-mode th {
+            background: rgba(99, 102, 241, 0.08);
+            border-bottom: 2px solid rgba(99, 102, 241, 0.25);
+            color: #0f172a;
+        }
+
+        td {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+        }
+
+        html.light-mode td {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            color: #0f172a;
+        }
+
+        tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        html.light-mode tr:hover {
+            background: rgba(99, 102, 241, 0.03);
+        }
+
+        /* Link styling */
+        a {
+            color: #A5B4FC;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        html.light-mode a {
+            color: #4f46e5;
+        }
+
+        a:hover {
+            color: #E0E7FF;
+        }
+
+        html.light-mode a:hover {
+            color: #3730a3;
+        }
+
+        /* Status colors */
+        .status-success { color: #10B981; }
+        .status-warning { color: #F59E0B; }
+        .status-error { color: #EF4444; }
+
+        /* Hide Django messages globally */
+        .messages { display: none !important; }
+        [class*="message"] { display: none !important; }
+
+        /* Blob animations */
+        @keyframes blob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(20px, -50px) scale(1.1); }
+            50% { transform: translate(-20px, 20px) scale(0.9); }
+            75% { transform: translate(50px, 50px) scale(1.05); }
+        }
+        
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+        
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+        
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+        
+        .bg-size-200 {
+            background-size: 200% 100%;
+        }
+        
+        .bg-pos-0 {
+            background-position: 0% center;
+        }
+        
+        .bg-pos-100 {
+            background-position: 100% center;
+        }
+</style>
+    <style>
+        
+    .premium-input {
+        padding: 12px 16px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), inset 0 1px 2px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .premium-input:hover {
+        border-color: rgba(99, 102, 241, 0.3);
+        box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.2), inset 0 1px 2px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .premium-input:focus {
+        outline: none;
+        border-color: rgba(99, 102, 241, 0.8);
+        box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.4), inset 0 1px 2px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .premium-input::placeholder {
+        color: rgba(148, 163, 184, 0.6);
+    }
+
+    .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .input-icon {
+        width: 20px;
+        height: 20px;
+        color: rgba(129, 140, 248, 0.6);
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .input-group:focus-within .input-icon {
+        color: rgba(129, 140, 248, 1);
+        filter: drop-shadow(0 0 8px rgba(129, 140, 248, 0.4));
+    }
+
+    .premium-button {
+        position: relative;
+        width: 100%;
+        padding: 14px 24px;
+        margin-top: 24px;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+        box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.3);
+    }
+
+    .premium-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.5);
+    }
+
+    .premium-button:active {
+        transform: translateY(0);
+    }
+
+    .premium-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .premium-button:hover::before {
+        left: 100%;
+    }
+
+    .button-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .button-arrow {
+        width: 18px;
+        height: 18px;
+        transition: transform 0.3s ease;
+    }
+
+    .premium-button:hover .button-arrow {
+        transform: translateX(4px);
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .logo-badge {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(219, 39, 119, 0.2) 100%);
+        border: 1.5px solid rgba(99, 102, 241, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        animation: float 4s ease-in-out infinite;
+        box-shadow: 0 0 30px rgba(99, 102, 241, 0.2);
+    }
+
+    .heading-gradient {
+        background: linear-gradient(135deg, #ffffff 0%, rgba(199, 210, 254, 0.8) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    input:autofill,
+    input:autofill:hover,
+    input:autofill:focus {
+        -webkit-box-shadow: 0 0 0 30px rgba(30, 41, 59, 0.8) inset !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }
+
+    /* Light mode styling for login page */
+    html.light-mode .heading-gradient {
+        background: linear-gradient(135deg, #0f172a 0%, #4f46e5 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    html.light-mode .premium-input {
+        background: rgba(255, 255, 255, 0.98);
+        border-color: rgba(99, 102, 241, 0.4);
+        color: #0f172a;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+    }
+
+    html.light-mode .premium-input:hover {
+        border-color: rgba(99, 102, 241, 0.6);
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    }
+
+    html.light-mode .premium-input:focus {
+        border-color: rgba(99, 102, 241, 0.8);
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), inset 0 1px 2px 0 rgba(99, 102, 241, 0.1);
+    }
+
+    html.light-mode .premium-input::placeholder {
+        color: rgba(0, 0, 0, 0.4);
+    }
+
+    html.light-mode .input-icon {
+        color: rgba(99, 102, 241, 0.7);
+    }
+
+    html.light-mode .input-group:focus-within .input-icon {
+        color: rgba(99, 102, 241, 0.9);
+        filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.5));
+    }
+
+    html.light-mode .logo-badge {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(219, 39, 119, 0.2) 100%);
+        border-color: rgba(99, 102, 241, 0.35);
+        box-shadow: 0 0 40px rgba(99, 102, 241, 0.2);
+    }
+
+    html.light-mode input:autofill,
+    html.light-mode input:autofill:hover,
+    html.light-mode input:autofill:focus {
+        -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.98) inset !important;
+        -webkit-text-fill-color: #0f172a !important;
+    }
+
+    html.light-mode .animated-bg {
+        background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 50%, #f5f3ff 100%);
+    }
+
+    /* Light mode heading styles */
+    html.light-mode h1.heading-gradient {
+        background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    html.light-mode h2 {
+        color: #0f172a !important;
+    }
+
+    html.light-mode .text-slate-400 {
+        color: #64748b !important;
+    }
+
+    html.light-mode .premium-card {
+        background: rgba(255, 255, 255, 0.98) !important;
+        border: 1.5px solid rgba(99, 102, 241, 0.3) !important;
+        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15) !important;
+    }
+</style>
+
+    </style>
+</head>
+<body class="gradient-background min-h-screen">
+    <!-- Ultra Premium Navigation -->
+    <nav class="fixed w-full z-50 top-0">
+        <!-- Multi-layered animated background -->
+        <div class="absolute inset-0 overflow-hidden">
+            <!-- Base gradient -->
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-blue-950 to-slate-950"></div>
+            
+            <!-- Animated gradient orbs -->
+            <div class="absolute top-0 left-0 w-full h-full opacity-60">
+                <div class="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-600/30 to-cyan-600/30 rounded-full blur-3xl animate-blob"></div>
+                <div class="absolute -top-32 right-0 w-72 h-72 bg-gradient-to-bl from-purple-600/20 to-pink-600/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+                <div class="absolute top-1/2 left-1/3 w-96 h-96 bg-gradient-to-r from-teal-600/20 to-cyan-600/20 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+            </div>
+            
+            <!-- Glassmorphism overlay -->
+            <div class="absolute inset-0 backdrop-blur-2xl bg-white/5"></div>
+            
+            <!-- Border accent -->
+            <div class="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+        </div>
+        
+        <!-- Content -->
+        <div class="relative z-10 mx-auto px-4 sm:px-6 py-5 sm:py-7 flex justify-between items-center">
+            <a href="/" class="inline-flex items-center gap-4 sm:gap-6 group">
+                <!-- SUPREME LUXURY LOGO - Multi-Layer Premium Engineering -->
+                <div class="relative flex-shrink-0">
+                    <!-- Layer 1: Outer radiant aura (always visible, breathing) -->
+                    <div class="absolute -inset-6 bg-gradient-to-r from-cyan-600/40 via-blue-600/35 to-purple-600/40 rounded-[2rem] blur-3xl opacity-100 animate-pulse"></div>
+                    
+                    <!-- Layer 2: Intense hover glow -->
+                    <div class="absolute -inset-5 bg-gradient-to-r from-cyan-500/50 via-blue-500/45 to-purple-500/50 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <!-- Layer 3: Dynamic rotating accent ring -->
+                    <div class="absolute -inset-3 rounded-[1.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500" style="background: conic-gradient(from 0deg, #00d9ff, #0099ff, #6d28d9, #00d9ff); animation: spin 20s linear infinite;"></div>
+                    
+                    <!-- Main premium icon container with refined shadow -->
+                    <div class="relative w-10 h-10 sm:w-14 sm:h-14 rounded-lg overflow-hidden transition-all duration-500 shadow-md" style="box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);">
+                        <!-- Base: Premium gradient foundation -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 group-hover:from-cyan-300 group-hover:via-blue-400 group-hover:to-purple-500 transition-all duration-500"></div>
+                        
+                        <!-- Luxury inner light effect -->
+                        <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-white/10 group-hover:via-white/50 transition-all duration-500"></div>
+                        
+                        <!-- Premium shimmer wave -->
+                        <div class="absolute -inset-full w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-1000"></div>
+                        
+                        <!-- Premium "A" letter -->
+                        <div class="relative inset-0 flex items-center justify-center">
+                            <span class="text-white font-black text-xl sm:text-2xl drop-shadow-lg group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500" style="text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 10px rgba(6, 182, 212, 0.4);">A</span>
+                        </div>
+                        
+                        <!-- Luxury border -->
+                        <div class="absolute inset-0 rounded-lg border border-white/40 group-hover:border-white/70 transition-all duration-500" style="box-shadow: inset 0 1px 8px rgba(255,255,255,0.15);"></div>
+                    </div>
+                </div>
+                
+                <!-- ELITE PREMIUM TEXT BRANDING -->
+                <div class="flex flex-col gap-1 sm:gap-2 min-w-0 group">
+                    <!-- Supreme brand name with luxury multi-gradient -->
+                    <div class="relative inline-block w-fit">
+                        <h1 class="text-2xl sm:text-3xl font-black tracking-tight whitespace-nowrap" style="letter-spacing: -0.02em;">
+                            <span class="bg-gradient-to-r from-cyan-100 via-white to-blue-100 bg-size-200 bg-pos-0 group-hover:bg-pos-100 transition-all duration-1000 bg-clip-text text-transparent drop-shadow-lg" style="filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.5));">AcademiaFlow</span>
+                        </h1>
+                        <!-- Ultra-luxury animated accent line -->
+                        <div class="absolute -bottom-2 left-0 h-2 bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 rounded-full w-0 group-hover:w-full transition-all duration-800 blur-sm" style="box-shadow: 0 0 15px rgba(6, 182, 212, 0.8), 0 0 30px rgba(99, 102, 241, 0.5);"></div>
+                    </div>
+                    
+                    <!-- Premium school name with elite styling -->
+                    
+                    
+                    
+                    <p class="text-xs font-black text-transparent bg-gradient-to-r from-cyan-200 via-white to-cyan-200 bg-clip-text tracking-wide uppercase hidden sm:block" style="letter-spacing: 0.08em; filter: drop-shadow(0 2px 10px rgba(6, 182, 212, 0.6));">Junior Primary School</p>
+                    
+                </div>
+            </a>
+
+            <!-- Mobile Menu Button & Theme Toggle -->
+            <div class="flex items-center gap-2 lg:gap-3">
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-slate-700/50 dark:hover:bg-slate-700/50 transition-colors" aria-label="Toggle theme" title="Toggle dark/light mode">
+                    <svg id="sun-icon" class="w-6 h-6 text-slate-200 hidden" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l-2.83-2.83a1 1 0 00-1.414 1.414l2.83 2.83a1 1 0 001.414-1.414M2.05 6.464a1 1 0 000 1.414l2.83-2.83a1 1 0 00-1.414-1.414L2.05 6.464zm9.9 5a1 1 0 011.414-1.414l2.83 2.83a1 1 0 01-1.414 1.414l-2.83-2.83zm4.95-9.9a1 1 0 00-1.414 0l-2.83 2.83a1 1 0 001.414 1.414l2.83-2.83a1 1 0 000-1.414zM4 11a1 1 0 100-2H2a1 1 0 100 2h2zm12-2h2a1 1 0 110 2h-2a1 1 0 110-2zM4 4a1 1 0 100 2h2a1 1 0 100-2H4z" clip-rule="evenodd" />
+                    </svg>
+                    <svg id="moon-icon" class="w-6 h-6 text-slate-200" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </button>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg hover:bg-slate-700/50 transition-colors" aria-label="Toggle menu">
+                    <svg class="w-6 h-6 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Desktop Navigation Links -->
+            <div class="hidden lg:flex items-center gap-1">
+                
+                    <a href="/login/" class="login-nav-btn">Login</a>
+                
+            </div>
+        </div>
+    </nav>
+    
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg hover:bg-slate-700/50 transition-colors" aria-label="Toggle menu">
+                    <svg class="w-6 h-6 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+                <!-- Desktop Navigation Links -->
+                <div class="hidden lg:flex items-center gap-1">
+                    
+                        <a href="/login/" class="login-nav-btn">Login</a>
+                    
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-700/50 bg-slate-900/95">
+                <div class="px-4 py-3 space-y-2">
+                    
+                        <a href="/login/" class="mobile-nav-link bg-blue-600 hover:bg-blue-700">Login</a>
+                    
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <style>
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: rgba(226, 232, 240, 0.95);
+            transition: all 0.25s ease;
+            position: relative;
+            background: linear-gradient(135deg, rgba(71, 85, 105, 0.18) 0%, rgba(30, 58, 138, 0.12) 100%);
+            border: 1px solid rgba(96, 165, 250, 0.22);
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.3), transparent);
+            transition: left 0.5s ease;
+            z-index: 1;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #14b8a6, #06b6d4);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 2;
+        }
+
+        .nav-link:hover {
+            color: #bfdbfe;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(6, 182, 212, 0.15) 100%);
+            border-color: rgba(96, 165, 250, 0.6);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-link:hover::before {
+            left: 100%;
+        }
+
+        .nav-link:hover::after {
+            transform: scaleX(1);
+        }
+
+        .nav-link:active {
+            transform: translateY(0);
+        }
+
+        .mobile-nav-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: rgba(226, 232, 240, 0.8);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+
+        .mobile-nav-link:hover {
+            background: rgba(96, 165, 250, 0.2);
+            color: #e0f2fe;
+            padding-left: 1.25rem;
+        }
+
+        .mobile-menu-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            color: rgba(226, 232, 240, 0.8);
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 0.5rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .mobile-menu-toggle:hover {
+            background: rgba(96, 165, 250, 0.2);
+            color: #e0f2fe;
+        }
+
+        .dropdown-link {
+            display: block;
+            padding: 0.85rem 1.25rem;
+            color: rgba(226, 232, 240, 0.9);
+            font-size: 0.92rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-left: 4px solid transparent;
+            position: relative;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(59, 130, 246, 0.05) 100%);
+            overflow: hidden;
+        }
+
+        .dropdown-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #3b82f6, #06b6d4, #14b8a6);
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .dropdown-link:hover {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.15) 0%, rgba(6, 182, 212, 0.08) 100%);
+            color: #bfdbfe;
+            border-left-color: #3b82f6;
+            padding-left: 1.5rem;
+            box-shadow: inset 0 1px 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .dropdown-link:hover::before {
+            transform: scaleY(1);
+        }
+    </style>
+
+    <!-- Main Content -->
+    <div class="container mx-auto pt-20 sm:pt-24 px-4 sm:px-6">
+        
+<!-- Animated Background -->
+<div class="animated-bg">
+    <div class="absolute top-20 left-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl animate-pulse" style="animation-duration: 6s;"></div>
+    <div class="absolute bottom-40 right-20 w-48 h-48 bg-pink-500/5 rounded-full blur-3xl animate-pulse" style="animation-duration: 7s; animation-delay: 1s;"></div>
+    <div class="absolute top-1/2 left-1/2 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl animate-pulse" style="animation-duration: 8s; animation-delay: 2s;"></div>
+</div>
+
+<div class="flex justify-center items-center min-h-[calc(100vh-6rem)] py-8 px-4 relative z-10">
+    <div class="w-full max-w-md">
+        <!-- Logo -->
+        <div class="text-center mb-12">
+            <div class="logo-badge">
+                <svg class="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                </svg>
+            </div>
+            <h1 class="heading-gradient mb-2">AcademiaFlow</h1>
+            <p class="text-slate-400 text-sm font-light">School Management System</p>
+        </div>
+
+        <!-- Premium Card -->
+        <div class="premium-card rounded-3xl p-8">
+            <h2 class="text-white text-center mb-1" style="font-size: 28px; font-weight: 800;">Welcome Back</h2>
+            <p class="text-slate-400 text-center text-sm mb-8">Sign in to your administrator account</p>
+            
+            <!-- Error Messages -->
+            
+            
+            <form method="post">
+                <input type="hidden" name="csrfmiddlewaretoken" value="wMyFNUU15UPIIh4DS3PIE7o2lMsgv80dcME2vKHPuopcdzaD4OKzibxbC4iVtm7H">
+                
+                <!-- Email Field -->
+                <div style="margin-bottom: 20px;">
+                    <label for="id_username" style="display: block; color: #cbd5e1; font-size: 11px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em;">Email Address</label>
+                    <div class="input-group">
+                        <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <input type="email" name="username" id="id_username" required 
+                               class="premium-input" style="flex: 1;"
+                               placeholder="admin@school.com">
+                    </div>
+                </div>
+                
+                <!-- Password Field -->
+                <div style="margin-bottom: 20px;">
+                    <label for="id_password" style="display: block; color: #cbd5e1; font-size: 11px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em;">Password</label>
+                    <div class="input-group">
+                        <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        <input type="password" name="password" id="id_password" required 
+                               class="premium-input" style="flex: 1;"
+                               placeholder="••••••••">
+                    </div>
+                </div>
+                
+                <!-- Remember Me -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 16px; margin-bottom: 24px;">
+                    <input type="checkbox" name="remember_me" id="id_remember_me" 
+                           style="width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(71, 85, 105, 0.8); background: rgba(30, 41, 59, 0.8); cursor: pointer; accent-color: #6366f1;">
+                    <label for="id_remember_me" style="font-size: 13px; color: #94a3b8; cursor: pointer; user-select: none;">Remember me</label>
+                </div>
+                
+                <!-- Sign In Button -->
+                <button type="submit" class="premium-button">
+                    <div class="button-content">
+                        <span>Sign In</span>
+                        <svg class="button-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
+                    </div>
+                </button>
+            </form>
+        </div>
+        
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 24px;">
+            <p style="color: #64748b; font-size: 12px;">© 2025 AcademiaFlow. All rights reserved.</p>
+        </div>
+    </div>
+</div>
+
+
+    </div>
+    <script>
+        // Mobile menu toggle functionality
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuToggles = document.querySelectorAll('.mobile-menu-toggle');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when a link is clicked
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Handle submenu toggles
+        menuToggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = toggle.getAttribute('data-target');
+                const submenu = document.getElementById(target);
+                submenu.classList.toggle('hidden');
+                
+                // Rotate the arrow
+                const arrow = toggle.querySelector('svg');
+                if (arrow) {
+                    arrow.classList.toggle('rotate-180');
+                }
+            });
+        });
+
+        // Ensure form controls use the modern classes at runtime (no Tailwind build required)
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('form input, form select, form textarea').forEach(function(el) {
+                var tag = el.tagName.toLowerCase();
+                if (tag === 'select') {
+                    if (!el.classList.contains('form-select')) el.classList.add('form-select');
+                } else if (tag === 'textarea') {
+                    if (!el.classList.contains('form-textarea')) el.classList.add('form-textarea');
+                } else {
+                    // avoid adding to checkboxes/radios
+                    if (el.type !== 'checkbox' && el.type !== 'radio' && !el.classList.contains('form-input')) {
+                        el.classList.add('form-input');
+                    }
+                }
+            });
+            document.querySelectorAll('button[type=submit]').forEach(function(btn){
+                if (!btn.classList.contains('premium-button')) btn.classList.add('premium-button');
+            });
+        });
+
+        // ============================================
+        // THEME TOGGLE FUNCTIONALITY
+        // ============================================
+        
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        // Initialize theme from localStorage or system preference
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            setTheme(savedTheme);
+        }
+
+        // Set theme
+        function setTheme(theme) {
+            if (theme === 'light') {
+                html.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                html.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+            
+            // Update navbar appearance based on theme
+            updateNavbarTheme(theme);
+        }
+
+        // Update navbar styling for theme
+        function updateNavbarTheme(theme) {
+            const nav = document.querySelector('nav');
+            const navBg = nav.querySelector('.absolute.inset-0.bg-gradient-to-r');
+            const navOverlay = nav.querySelector('.absolute.inset-0.backdrop-blur-2xl');
+            
+            if (theme === 'light') {
+                if (navBg) navBg.classList.remove('from-slate-950', 'via-blue-950', 'to-slate-950');
+                if (navBg) navBg.classList.add('from-blue-50', 'via-white', 'to-blue-50');
+                if (navOverlay) navOverlay.classList.remove('bg-white/5');
+                if (navOverlay) navOverlay.classList.add('bg-white/80');
+            } else {
+                if (navBg) navBg.classList.add('from-slate-950', 'via-blue-950', 'to-slate-950');
+                if (navBg) navBg.classList.remove('from-blue-50', 'via-white', 'to-blue-50');
+                if (navOverlay) navOverlay.classList.remove('bg-white/80');
+                if (navOverlay) navOverlay.classList.add('bg-white/5');
+            }
+        }
+
+        // Toggle theme on button click
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.classList.contains('light-mode') ? 'light' : 'dark';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        });
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', initializeTheme);
+    </script>
+    
+</body>
+</html>

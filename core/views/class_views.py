@@ -79,10 +79,12 @@ def class_create(request):
         
         # Render HTML template for browser access
         form = ClassForm()
+        available_teachers = Class.get_available_teachers(active_year)
         context = {
             'form': form,
             'active_year': active_year,
             'all_years': all_years,
+            'available_teachers': available_teachers,
         }
         return render(request, 'classes/create.html', context)
     
