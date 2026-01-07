@@ -609,6 +609,38 @@
         /* Hide Django messages globally */
         .messages { display: none !important; }
         [class*="message"] { display: none !important; }
+
+        /* Blob animations */
+        @keyframes blob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(20px, -50px) scale(1.1); }
+            50% { transform: translate(-20px, 20px) scale(0.9); }
+            75% { transform: translate(50px, 50px) scale(1.05); }
+        }
+        
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+        
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+        
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+        
+        .bg-size-200 {
+            background-size: 200% 100%;
+        }
+        
+        .bg-pos-0 {
+            background-position: 0% center;
+        }
+        
+        .bg-pos-100 {
+            background-position: 100% center;
+        }
     </style>
 </head>
 <body class="gradient-background min-h-screen">
@@ -771,38 +803,6 @@
         </div>
     </nav>
     
-    <style>
-        @keyframes blob {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(20px, -50px) scale(1.1); }
-            50% { transform: translate(-20px, 20px) scale(0.9); }
-            75% { transform: translate(50px, 50px) scale(1.05); }
-        }
-        
-        .animate-blob {
-            animation: blob 7s infinite;
-        }
-        
-        .animation-delay-2000 {
-            animation-delay: 2s;
-        }
-        
-        .animation-delay-4000 {
-            animation-delay: 4s;
-        }
-        
-        .bg-size-200 {
-            background-size: 200% 100%;
-        }
-        
-        .bg-pos-0 {
-            background-position: 0% center;
-        }
-        
-        .bg-pos-100 {
-            background-position: 100% center;
-        }
-    </style>
 
                 <!-- Mobile Menu Button -->
                 <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg hover:bg-slate-700/50 transition-colors" aria-label="Toggle menu">
