@@ -16,7 +16,7 @@ class Class(models.Model):
         ('6', 'Grade 6'),
         ('7', 'Grade 7'),
     ]
-    SECTION_CHOICES = [('A', 'A'), ('B', 'B')]
+    SECTION_CHOICES = [('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')]
     
     grade = models.CharField(max_length=4, choices=GRADE_CHOICES)
     section = models.CharField(max_length=1, choices=SECTION_CHOICES)
