@@ -21,13 +21,13 @@
         }
 
         html.light-mode {
-            --bg-primary: #f8fafc;
-            --bg-secondary: #f1f5f9;
-            --bg-tertiary: #e2e8f0;
+            --bg-primary: #f0f4ff;
+            --bg-secondary: #e8ecff;
+            --bg-tertiary: #dce3ff;
             --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --border-color: rgba(99, 102, 241, 0.15);
-            --glass-bg: rgba(99, 102, 241, 0.04);
+            --text-secondary: #334155;
+            --border-color: rgba(99, 102, 241, 0.4);
+            --glass-bg: rgba(99, 102, 241, 0.08);
         }
 
         @keyframes gradient {
@@ -61,29 +61,17 @@
         }
 
         html.light-mode body {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f0f4f8 100%);
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            pointer-events: none;
-            z-index: 0;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 50%, #f5f3ff 100%);
         }
 
         /* Light mode navbar styling */
         html.light-mode nav {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%) !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 50%, #e8ecff 100%) !important;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15) !important;
         }
 
         html.light-mode nav .absolute.inset-0.bg-gradient-to-r {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%) !important;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 50%, #e8ecff 100%) !important;
         }
 
         html.light-mode nav .absolute.inset-0.backdrop-blur-2xl {
@@ -91,7 +79,7 @@
         }
 
         html.light-mode nav .absolute.bottom-0 {
-            background: linear-gradient(to right, transparent, rgba(99, 102, 241, 0.3), transparent) !important;
+            background: linear-gradient(to right, transparent, rgba(99, 102, 241, 0.5), transparent) !important;
         }
 
         html.light-mode .nav-link {
@@ -115,6 +103,40 @@
         html.light-mode .text-slate-200 {
             color: #64748b !important;
         }
+
+        /* Theme toggle button styling */
+        #theme-toggle {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.15) 100%) !important;
+            border: 1.5px solid rgba(99, 102, 241, 0.3) !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+        }
+
+        #theme-toggle:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%) !important;
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3) !important;
+        }
+
+        html.light-mode #theme-toggle {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+            border: 1.5px solid rgba(99, 102, 241, 0.4) !important;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4) !important;
+        }
+
+        html.light-mode #theme-toggle:hover {
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5), 0 0 10px rgba(99, 102, 241, 0.3) !important;
+            transform: translateY(-2px);
+        }
+
+        html.light-mode #sun-icon {
+            color: #fbbf24 !important;
+            filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.6)) !important;
+        }
+
+        html.light-mode #moon-icon {
+            color: #fbbf24 !important;
+            filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.6)) !important;
+        }
+</style>
         
         .glass {
             background: var(--glass-bg);
@@ -146,9 +168,10 @@
         html.light-mode .form-input,
         html.light-mode .form-select,
         html.light-mode .form-textarea {
-            color: #1e293b !important;
-            background: rgba(255, 255, 255, 0.8);
-            border-color: rgba(0, 0, 0, 0.15);
+            color: #0f172a !important;
+            background: rgba(255, 255, 255, 0.98);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
         }
 
         .form-input:hover,
@@ -161,8 +184,9 @@
         html.light-mode .form-input:hover,
         html.light-mode .form-select:hover,
         html.light-mode .form-textarea:hover {
-            background: rgba(255, 255, 255, 0.95);
-            border-color: rgba(99, 102, 241, 0.4);
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
         }
 
         .form-input:focus,
@@ -178,8 +202,8 @@
         html.light-mode .form-select:focus,
         html.light-mode .form-textarea:focus {
             background: rgba(255, 255, 255, 1);
-            border-color: rgba(99, 102, 241, 0.7);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), inset 0 0 0 1px rgba(99, 102, 241, 0.5);
+            border-color: rgba(99, 102, 241, 0.8);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), inset 0 0 0 1px rgba(99, 102, 241, 0.6);
         }
 
         .form-input::placeholder,
@@ -439,8 +463,9 @@
         }
 
         html.light-mode .card {
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(99, 102, 241, 0.15);
+            background: rgba(255, 255, 255, 0.98);
+            border: 1.5px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12);
         }
 
         .card:hover {
@@ -450,8 +475,8 @@
         }
 
         html.light-mode .card:hover {
-            border-color: rgba(99, 102, 241, 0.3);
-            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.2);
         }
 
         /* Badge styling */
