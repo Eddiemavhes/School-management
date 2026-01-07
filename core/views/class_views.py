@@ -104,9 +104,15 @@ def class_create(request):
                     'error': f'Academic year {academic_year} does not exist. Please create it first in Settings before creating classes.'
                 }, status=400)
             
+            # Combine ECD with section to create ECDA or ECDB
+            grade = data['grade']
+            section = data['section']
+            if grade == 'ECD':
+                grade = f'ECD{section}'
+            
             class_obj = Class(
-                grade=data['grade'],
-                section=data['section'],
+                grade=grade,
+                section=section,
                 academic_year=academic_year,
                 teacher=teacher
             )
