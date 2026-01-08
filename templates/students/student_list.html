@@ -112,7 +112,11 @@
                         <p class="text-slate-500 text-xs uppercase tracking-wide">Class</p>
                         <p class="text-slate-200 font-semibold">
                             {% if student.current_class %}
-                                Gr {{ student.current_class.grade }}{{ student.current_class.section }}
+                                {% if student.current_class.grade == 'ECDA' or student.current_class.grade == 'ECDB' %}
+                                    Gr {{ student.current_class.get_grade_display }}
+                                {% else %}
+                                    Gr {{ student.current_class.grade }}{{ student.current_class.section }}
+                                {% endif %}
                             {% else %}
                                 —
                             {% endif %}

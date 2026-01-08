@@ -14,7 +14,13 @@
             Back to Classes
         </a>
         <div class="flex justify-between items-start">
-            <h1 class="text-4xl font-bold text-white">Grade {{ class.grade }}{{ class.section }}</h1>
+            <h1 class="text-4xl font-bold text-white">
+                {% if class.grade == 'ECDA' or class.grade == 'ECDB' %}
+                    Grade {{ class.get_grade_display }}
+                {% else %}
+                    Grade {{ class.grade }}{{ class.section }}
+                {% endif %}
+            </h1>
             <div class="flex gap-2">
                 <button onclick="editClass({{ class.id }})" 
                         class="premium-button px-4 py-2 flex items-center gap-2">

@@ -22,7 +22,13 @@
         <div class="group p-5 rounded-xl border border-slate-500/20 hover:border-blue-400/50 bg-slate-500/5 hover:bg-slate-400/10 transition-all duration-300">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <p class="text-white font-bold text-lg group-hover:text-blue-200 transition-colors">Grade {{ class.grade }}{{ class.section }}</p>
+                    <p class="text-white font-bold text-lg group-hover:text-blue-200 transition-colors">
+                        {% if class.grade == 'ECDA' or class.grade == 'ECDB' %}
+                            Grade {{ class.get_grade_display }}
+                        {% else %}
+                            Grade {{ class.grade }}{{ class.section }}
+                        {% endif %}
+                    </p>
                     <p class="text-slate-400 text-sm mt-1">{{ class.student_count }} students</p>
                 </div>
                 <div class="w-16 h-16 relative">

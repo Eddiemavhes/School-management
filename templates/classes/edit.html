@@ -21,7 +21,13 @@
                 Back to Classes
             </a>
             <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent mb-2">Edit Class</h1>
-            <p class="text-slate-400 text-lg">Grade {{ class.grade }}{{ class.section }} - {{ class.academic_year }} Academic Year</p>
+            <p class="text-slate-400 text-lg">
+                {% if class.grade == 'ECDA' or class.grade == 'ECDB' %}
+                    Grade {{ class.get_grade_display }} - {{ class.academic_year }} Academic Year
+                {% else %}
+                    Grade {{ class.grade }}{{ class.section }} - {{ class.academic_year }} Academic Year
+                {% endif %}
+            </p>
         </div>
 
         <!-- Form Card -->

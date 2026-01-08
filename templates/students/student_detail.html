@@ -112,7 +112,13 @@
                         <div class="bg-slate-700/40 rounded-lg p-4">
                             <p class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Current Class</p>
                             {% if student.current_class %}
-                            <p class="text-slate-100 text-lg font-bold">Grade {{ student.current_class.grade }}{{ student.current_class.section }}</p>
+                            <p class="text-slate-100 text-lg font-bold">
+                                {% if student.current_class.grade == 'ECDA' or student.current_class.grade == 'ECDB' %}
+                                    Grade {{ student.current_class.get_grade_display }}
+                                {% else %}
+                                    Grade {{ student.current_class.grade }}{{ student.current_class.section }}
+                                {% endif %}
+                            </p>
                             {% else %}
                             <p class="text-slate-400 text-lg">Not assigned</p>
                             {% endif %}
