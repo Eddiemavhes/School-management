@@ -325,12 +325,103 @@ def bulk_promote_students(request):
                         errors.append(f'{student.full_name} - Invalid class data')
                         continue
                     
-                    # Skip ECDA/ECDB students - they follow special progression
-                    # ECDA → ECDB (same year) → Grade 1 (next year)
+                    # Handle ECDA/ECDB students with special progression logic
+                    # ECDA → ECDB (same year) → Grade 1 (next year with random section)
                     if old_class.grade in ['ECDA', 'ECDB']:
-                        failed += 1
-                        errors.append(f'{student.full_name} - ECDA/ECDB students need special handling')
-                        continue
+                        try:
+                            # ECDA → ECDB transition (same year)
+                            if old_class.grade == 'ECDA':
+                                next_class = Class.objects.filter(
+                                    grade='ECDB',
+                                    section=old_class.section,  # Keep same section for ECDA→ECDB
+                                    academic_year=old_class.academic_year
+                                ).first()
+                                
+                                if not next_class:
+                                    failed += 1
+                                    errors.append(f'{student.full_name} - No ECDB class found for same section')
+                                    continue
+                            
+                            # ECDB → Grade 1 transition (next year, RANDOM section)
+                            elif old_class.grade == 'ECDB':
+                                next_year = old_class.academic_year + 1
+                                
+                                # Auto-create next year if needed
+                                from ..models.academic_year import AcademicYear
+                                next_year_obj, _ = AcademicYear.objects.get_or_create(
+                                    year=next_year,
+                                    defaults={
+                                        'is_active': False,
+                                        'start_date': f'{next_year}-01-01',
+                                        'end_date': f'{next_year}-12-31'
+                                    }
+                                )
+                                
+                                # Get all available Grade 1 classes for random selection
+                                grade_1_classes = Class.objects.filter(
+                                    grade='1',
+                                    academic_year=next_year
+                                ).order_by('section')
+                                
+                                if not grade_1_classes.exists():
+                                    failed += 1
+                                    errors.append(f'{student.full_name} - No Grade 1 classes available for {next_year}')
+                                    continue
+                                
+                                # Randomly select one of the available Grade 1 sections
+                                import random
+                                next_class = random.choice(list(grade_1_classes))
+                            
+                            # Create movement record for ECD progression
+                            with transaction.atomic():
+                                current_arrears = student.previous_term_arrears + student.current_term_balance
+                                
+                                movement = StudentMovement(
+                                    student=student,
+                                    from_class=old_class,
+                                    to_class=next_class,
+                                    movement_type='PROMOTION',
+                                    moved_by=request.user,
+                                    previous_arrears=current_arrears,
+                                    preserved_arrears=current_arrears
+                                )
+                                
+                                # Validate movement
+                                try:
+                                    movement.full_clean()
+                                except ValidationError as e:
+                                    failed += 1
+                                    errors.append(f'{student.full_name} - {", ".join(e.messages)}')
+                                    continue
+                                
+                                # Save movement
+                                movement.save()
+                                
+                                # Update student's class
+                                student.current_class = next_class
+                                student.save()
+                                
+                                # Initialize balance for Grade 1 first term if transitioning from ECDB
+                                if old_class.grade == 'ECDB':
+                                    from ..models.fee import StudentBalance
+                                    first_term = AcademicTerm.objects.filter(
+                                        academic_year=next_year,
+                                        term=1
+                                    ).first()
+                                    
+                                    if first_term:
+                                        try:
+                                            StudentBalance.initialize_term_balance(student, first_term)
+                                        except Exception as e:
+                                            print(f"Warning: Could not initialize balance for {student.full_name}: {e}")
+                                
+                                successful += 1
+                        
+                        except Exception as e:
+                            failed += 1
+                            errors.append(f'{student.full_name} - ECD progression error: {str(e)}')
+                        
+                        continue  # Skip regular promotion logic for ECD students
                     
                     # Check if student is already in Grade 7 (highest grade) - GRADUATE them
                     if int(old_class.grade) >= 7:

@@ -288,20 +288,29 @@ class Student(models.Model):
         """Get the next class for student progression.
         
         Progression path:
-        ECD (A/B) → Grade 1 → Grade 2 → ... → Grade 7
+        ECDA (Age 4-5) → ECDB (Age 5-6, same year) → Grade 1 (next year, random section A-D)
+                                                    → Grade 2 → ... → Grade 7 (final)
+        
+        Special Handling:
+        - ECDA → ECDB: Same academic year, preserve section (A→A, B→B)
+        - ECDB → Grade 1: Next academic year, RANDOM section selection (A, B, C, or D)
+        - Grade 1-6 → Next: Keep same section and year progression
+        - Grade 7: No progression (final grade, student graduates)
         
         Returns: Class object or None if student is in Grade 7 (final grade)
         """
+        import random
+        
         if not self.current_class:
             return None
         
         current_grade = self.current_class.grade
-        next_section = self.current_class.section
-        next_year = self.current_class.academic_year + 1
+        current_section = self.current_class.section
         
-        # Define progression map - ECD moves to Grade 1
+        # Define progression map
         progression_map = {
-            'ECD': '1',
+            'ECDA': 'ECDB',  # ECDA → ECDB (same year)
+            'ECDB': '1',     # ECDB → Grade 1 (next year, random section)
             '1': '2',
             '2': '3',
             '3': '4',
@@ -316,16 +325,37 @@ class Student(models.Model):
         if not next_grade:
             return None  # No progression for Grade 7
         
-        # Try to find the next class (same section by default)
+        # Determine next year
+        # ECDA → ECDB stays in same year; ECDB → Grade 1 goes to next year
+        if current_grade == 'ECDB':
+            next_year = self.current_class.academic_year + 1
+        else:
+            next_year = self.current_class.academic_year
+        
+        # For ECDB → Grade 1 transition: randomly select from available sections
+        if current_grade == 'ECDB' and next_grade == '1':
+            available_classes = Class.objects.filter(
+                grade=next_grade,
+                academic_year=next_year
+            ).order_by('section')
+            
+            if available_classes.exists():
+                # Randomly select one of the available Grade 1 sections
+                next_class = random.choice(list(available_classes))
+                return next_class
+            else:
+                return None
+        
+        # For all other transitions: try to preserve section first, then fall back
         try:
             next_class = Class.objects.get(
                 grade=next_grade,
-                section=next_section,
+                section=current_section,
                 academic_year=next_year
             )
             return next_class
         except Class.DoesNotExist:
-            # If section doesn't exist, try to get any available class of that grade
+            # If same section doesn't exist, try to get any available class of that grade
             try:
                 next_class = Class.objects.filter(
                     grade=next_grade,
