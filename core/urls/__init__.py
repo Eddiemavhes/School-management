@@ -24,7 +24,7 @@ from core.views.settings_views import (
     set_current_term, update_term_fee, create_academic_year,
     set_active_year, create_fee, update_password
 )
-from core.views.class_api import get_available_classes
+from core.views.class_api import get_available_classes, ecd_fees_api
 from core.views.student_movement import (
     student_movement_history, promote_student, 
     demote_student, bulk_promote_students, class_transfers
@@ -81,6 +81,7 @@ urlpatterns = [
     path('classes/<int:pk>/', class_detail, name='class_detail'),
     path('classes/<int:pk>/edit/', class_edit, name='class_edit'),
     path('classes/<int:pk>/delete/', class_delete, name='class_delete'),
+    path('api/classes/<int:class_id>/ecd-fees/', ecd_fees_api, name='ecd_fees_api'),
 
     # Teacher Management URLs
     path('teachers/', TeacherListView.as_view(), name='teacher_list'),

@@ -42,4 +42,6 @@ __all__ = [
     'ArrearsVault',
     'ArrearsPaymentLog',
     'ArrearsReport',
+    'ECDClassProfile',
+    'ECDClassFee',
 ]

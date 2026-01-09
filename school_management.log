@@ -2162,3 +2162,139 @@ Traceback (most recent call last):
   File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\http\request.py", line 202, in get_host
     raise DisallowedHost(msg)
 django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+WARNING 2026-01-09 10:01:23,400 log 7300 17496 Not Found: /favicon.ico
+WARNING 2026-01-09 10:01:23,413 basehttp 7300 17496 "GET /favicon.ico HTTP/1.1" 404 29111
+WARNING 2026-01-09 10:05:17,623 log 7300 17496 Forbidden (CSRF token missing.): /classes/2/delete/
+WARNING 2026-01-09 10:05:17,626 basehttp 7300 17496 "POST /classes/2/delete/ HTTP/1.1" 403 2491
+WARNING 2026-01-09 10:06:10,836 log 7300 17496 Not Found: /admin
+WARNING 2026-01-09 10:06:10,838 basehttp 7300 17496 "GET /admin HTTP/1.1" 404 29093
+WARNING 2026-01-09 10:06:29,423 log 7300 17496 Not Found: /admin/
+WARNING 2026-01-09 10:06:29,427 basehttp 7300 17496 "GET /admin/ HTTP/1.1" 404 29096
+WARNING 2026-01-09 10:18:27,332 log 7300 1572 Not Found: /api/classes/2/ecd-fees/
+WARNING 2026-01-09 10:18:27,334 basehttp 7300 1572 "GET /api/classes/2/ecd-fees/ HTTP/1.1" 404 29147
+WARNING 2026-01-09 10:19:26,242 log 7300 1572 Not Found: /api/classes/2/ecd-fees/
+WARNING 2026-01-09 10:19:26,244 basehttp 7300 1572 "GET /api/classes/2/ecd-fees/ HTTP/1.1" 404 29147
+WARNING 2026-01-09 10:20:56,723 log 7300 1572 Not Found: /admin/
+WARNING 2026-01-09 10:20:56,725 basehttp 7300 1572 "GET /admin/ HTTP/1.1" 404 29096
+WARNING 2026-01-09 10:20:58,299 log 7300 1572 Not Found: /admin/
+WARNING 2026-01-09 10:20:58,301 basehttp 7300 1572 "GET /admin/ HTTP/1.1" 404 29096
+WARNING 2026-01-09 10:20:59,179 log 7300 1572 Not Found: /admin/
+WARNING 2026-01-09 10:20:59,180 basehttp 7300 1572 "GET /admin/ HTTP/1.1" 404 29096
+WARNING 2026-01-09 10:26:10,938 log 39060 4540 Not Found: /admin/
+WARNING 2026-01-09 10:26:10,939 basehttp 39060 4540 "GET /admin/ HTTP/1.1" 404 29392
+ERROR 2026-01-09 10:30:17,333 log 39060 31700 Internal Server Error: /api/classes/2/ecd-fees/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\class_api.py", line 60, in ecd_fees_api
+    all_terms = AcademicTerm.objects.filter(academic_year=cls.academic_year).order_by('name')
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\query.py", line 1727, in order_by
+    obj.query.add_ordering(*field_names)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\sql\query.py", line 2305, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\sql\query.py", line 1806, in names_to_path
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: Cannot resolve keyword 'name' into field. Choices are: academic_year, arrearsimportbatch, ecdclassfee, end_date, id, is_completed, is_current, paymentallocation, payments, start_date, student_enrollments, studentarrearsrecord, studentbalance, term, termfee
+ERROR 2026-01-09 10:30:17,351 basehttp 39060 31700 "GET /api/classes/2/ecd-fees/ HTTP/1.1" 500 95740
+ERROR 2026-01-09 10:34:39,064 log 32120 36404 Internal Server Error: /api/classes/2/ecd-fees/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\class_api.py", line 60, in ecd_fees_api
+    all_terms = AcademicTerm.objects.filter(academic_year=cls.academic_year).order_by('name')
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\query.py", line 1727, in order_by
+    obj.query.add_ordering(*field_names)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\sql\query.py", line 2305, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\sql\query.py", line 1806, in names_to_path
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: Cannot resolve keyword 'name' into field. Choices are: academic_year, arrearsimportbatch, ecdclassfee, end_date, id, is_completed, is_current, paymentallocation, payments, start_date, student_enrollments, studentarrearsrecord, studentbalance, term, termfee
+ERROR 2026-01-09 10:34:39,085 basehttp 32120 36404 "GET /api/classes/2/ecd-fees/ HTTP/1.1" 500 95740
+ERROR 2026-01-09 10:38:33,793 log 8316 21324 Internal Server Error: /api/classes/1/ecd-fees/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\class_api.py", line 60, in ecd_fees_api
+    all_terms = AcademicTerm.objects.filter(academic_year=cls.academic_year).order_by('name')
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\query.py", line 1727, in order_by
+    obj.query.add_ordering(*field_names)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\sql\query.py", line 2305, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\sql\query.py", line 1806, in names_to_path
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: Cannot resolve keyword 'name' into field. Choices are: academic_year, arrearsimportbatch, ecdclassfee, end_date, id, is_completed, is_current, paymentallocation, payments, start_date, student_enrollments, studentarrearsrecord, studentbalance, term, termfee
+ERROR 2026-01-09 10:38:33,812 basehttp 8316 21324 "GET /api/classes/1/ecd-fees/ HTTP/1.1" 500 95740
+ERROR 2026-01-09 10:39:11,582 log 8316 21324 Internal Server Error: /api/classes/1/ecd-fees/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "C:\Users\Admin\Desktop\School management\core\views\class_api.py", line 60, in ecd_fees_api
+    all_terms = AcademicTerm.objects.filter(academic_year=cls.academic_year).order_by('name')
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\query.py", line 1727, in order_by
+    obj.query.add_ordering(*field_names)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\sql\query.py", line 2305, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\db\models\sql\query.py", line 1806, in names_to_path
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: Cannot resolve keyword 'name' into field. Choices are: academic_year, arrearsimportbatch, ecdclassfee, end_date, id, is_completed, is_current, paymentallocation, payments, start_date, student_enrollments, studentarrearsrecord, studentbalance, term, termfee
+ERROR 2026-01-09 10:39:11,597 basehttp 8316 21324 "GET /api/classes/1/ecd-fees/ HTTP/1.1" 500 95740
+WARNING 2026-01-09 10:41:21,737 log 17604 8848 Bad Request: /api/classes/1/ecd-fees/
+WARNING 2026-01-09 10:41:21,738 basehttp 17604 8848 "POST /api/classes/1/ecd-fees/ HTTP/1.1" 400 73
+WARNING 2026-01-09 10:42:26,048 log 17604 8848 Bad Request: /api/classes/1/ecd-fees/
+WARNING 2026-01-09 10:42:26,052 basehttp 17604 8848 "POST /api/classes/1/ecd-fees/ HTTP/1.1" 400 68
+WARNING 2026-01-09 10:47:50,457 log 36992 40772 Not Found: /admin/
+WARNING 2026-01-09 10:47:50,460 basehttp 36992 40772 "GET /admin/ HTTP/1.1" 404 29392
+WARNING 2026-01-09 10:47:53,493 log 36992 40772 Not Found: /admin/
+WARNING 2026-01-09 10:47:53,495 basehttp 36992 40772 "GET /admin/ HTTP/1.1" 404 29392
+WARNING 2026-01-09 10:47:59,688 log 36992 40772 Not Found: /classes/1/HGHY
+WARNING 2026-01-09 10:47:59,691 basehttp 36992 40772 "GET /classes/1/HGHY HTTP/1.1" 404 29416
+WARNING 2026-01-09 10:49:56,402 log 36992 40772 Bad Request: /api/classes/1/ecd-fees/
+WARNING 2026-01-09 10:49:56,406 basehttp 36992 40772 "POST /api/classes/1/ecd-fees/ HTTP/1.1" 400 68
+WARNING 2026-01-09 15:29:47,023 log 8944 15640 Not Found: /admin/
+WARNING 2026-01-09 15:29:47,027 basehttp 8944 15640 "GET /admin/ HTTP/1.1" 404 29392
+WARNING 2026-01-09 15:47:06,253 log 8944 40360 Not Found: /admin/
+WARNING 2026-01-09 15:47:06,256 basehttp 8944 40360 "GET /admin/ HTTP/1.1" 404 29392
+WARNING 2026-01-09 15:47:47,975 log 8944 40360 Not Found: /admin/
+WARNING 2026-01-09 15:47:47,976 basehttp 8944 40360 "GET /admin/ HTTP/1.1" 404 29392
+WARNING 2026-01-09 16:07:33,280 log 29108 32916 Not Found: /admin/
+WARNING 2026-01-09 16:07:33,281 basehttp 29108 32916 "GET /admin/?id=eb0e3dee-2080-480e-940f-7e7f55bb7736&vscodeBrowserReqId=1767967653251 HTTP/1.1" 404 29469

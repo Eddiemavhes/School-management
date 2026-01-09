@@ -45,9 +45,19 @@ def class_detail(request, pk):
     class_obj = get_object_or_404(Class.objects.select_related('teacher'), pk=pk)
     students = class_obj.students.all()
     
+    # Load ECD profile and fees if this is an ECD class
+    ecd_profile = None
+    term_fees = []
+    if class_obj.grade in ['ECDA', 'ECDB']:
+        from ..models import ECDClassProfile, ECDClassFee
+        ecd_profile = ECDClassProfile.objects.filter(cls=class_obj).first()
+        term_fees = ECDClassFee.objects.filter(cls=class_obj)
+    
     context = {
         'class': class_obj,
         'students': students,
+        'ecd_profile': ecd_profile,
+        'term_fees': term_fees,
     }
     return render(request, 'classes/detail.html', context)
 

@@ -18,8 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import RedirectView
-from core.views.auth_views import error_404
+from django.views.generic import RedirectView, TemplateView
 
 urlpatterns = [
     path('django-admin/', admin.site.urls),
@@ -28,4 +27,4 @@ urlpatterns = [
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Custom error handlers
-handler404 = error_404
+handler404 = TemplateView.as_view(template_name='404.html')
