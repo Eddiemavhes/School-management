@@ -45,7 +45,7 @@ def update_student_balance_on_payment(sender, instance, created, **kwargs):
         
         # CHECK FOR GRADE 7 TERM 3 ALUMNI CONVERSION
         # If this is a Grade 7 student in Term 3 with zero/negative balance, convert to alumni
-        if student.current_class and student.current_class.grade == 7:
+        if student.current_class and str(student.current_class.grade) == '7':
             if term and term.term == 3:
                 # Check if all fees are paid (balance <= 0)
                 if balance and balance.current_balance <= 0:

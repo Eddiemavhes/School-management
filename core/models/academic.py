@@ -257,12 +257,14 @@ class Payment(models.Model):
         self._handle_excess_payment()
     
     def _handle_excess_payment(self):
-        """Handle excess payments - amount > total due goes to next term
+        """Handle excess payments - credit (negative balance) carries forward to next term
         
-        NOTE: This method does NOT manually set amount_paid. The amount_paid field 
-        is ALWAYS recalculated from actual Payment records via update_balance().
-        This method only logs/tracks that excess exists, but the actual amount_paid
-        calculation happens automatically from Payment records.
+        When a student overpays (current_balance < 0), the credit is carried forward
+        as a NEGATIVE previous_arrears in the next term, which reduces their total due.
+        
+        Example:
+            Term 1: Fee=$100, Paid=$120 -> Balance=-$20 (credit)
+            Term 2: Fee=$100, previous_arrears=-$20 -> Total Due=$80
         """
         from .fee import StudentBalance, TermFee
         
@@ -279,32 +281,46 @@ class Payment(models.Model):
         except StudentBalance.DoesNotExist:
             return  # Should not happen after validation, but be safe
         
-        # Calculate if there's excess
+        # Calculate if there's excess (credit = negative balance)
         if current_balance.current_balance < 0:
-            # Student has overpaid - excess amount
-            excess_amount = abs(current_balance.current_balance)
+            # Student has overpaid - this is the credit amount
+            credit_amount = current_balance.current_balance  # This is negative
             
-            # Get or create next term balance so the system knows excess credit exists
+            # Get or create next term balance so the system knows credit exists
             next_term = self._get_next_term()
             if next_term:
                 try:
-                    term_fee = TermFee.objects.get(term=next_term)
+                    # Determine appropriate fee for the student
+                    student_grade = str(self.student.current_class.grade) if self.student.current_class else ''
+                    if student_grade.startswith('ECD'):
+                        grade_level = 'ECD'
+                    else:
+                        grade_level = 'PRIMARY'
+                    
+                    term_fee = TermFee.objects.get(term=next_term, grade_level=grade_level)
                 except TermFee.DoesNotExist:
                     # No term fee set for next term - don't create balance yet
                     return
                 
-                # Get or create balance for next term
-                next_balance, _ = StudentBalance.objects.get_or_create(
+                # Get or create balance for next term with the credit as previous_arrears
+                next_balance, created = StudentBalance.objects.get_or_create(
                     student=self.student,
                     term=next_term,
                     defaults={
                         'term_fee_record': term_fee,
-                        'previous_arrears': Decimal('0')
+                        'previous_arrears': credit_amount,  # Negative = credit
+                        'amount_paid': Decimal('0')
                     }
                 )
-                # NOTE: amount_paid will be recalculated from Payment records
-                # The excess credit is implicitly available when next term payments are processed
-                next_balance.save()
+                
+                # If balance already exists, update previous_arrears to reflect current credit
+                # Only update if the recalculated credit is different (e.g., more payments made)
+                if not created:
+                    # Recalculate what the previous_arrears should be from the current term's balance
+                    recalculated_arrears = StudentBalance.calculate_arrears(self.student, next_term)
+                    if next_balance.previous_arrears != recalculated_arrears:
+                        next_balance.previous_arrears = recalculated_arrears
+                        next_balance.save(update_fields=['previous_arrears'])
 
     
     def _get_next_term(self):

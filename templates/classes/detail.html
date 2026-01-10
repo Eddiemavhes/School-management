@@ -31,7 +31,7 @@
                     </svg>
                     Edit Class
                 </button>
-                    {% if class_obj.grade == 'ECD' %}
+                    {% if class_obj.grade|slice:":3" == 'ECD' %}
                         <div class="mt-2">
                             {% if class_obj.ecd_profile.premium %}
                                 <span class="inline-block bg-yellow-400 text-black px-2 py-1 rounded">Premium ECD</span>

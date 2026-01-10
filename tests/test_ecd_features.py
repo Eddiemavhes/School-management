@@ -12,8 +12,8 @@ class ECDFeatureTests(TestCase):
         AcademicYear.objects.create(year=2026, start_date='2026-01-01', end_date='2026-12-31', is_active=True)
         cls.term = AcademicTerm.objects.create(academic_year=2026, term=1, start_date='2026-01-01', end_date='2026-03-31', is_current=True)
 
-        # Create an ECD class
-        cls.ecd_class = Class.objects.create(grade='ECD', section='A', academic_year=2026)
+        # Create an ECD class (ECDA = Early Childhood Development A)
+        cls.ecd_class = Class.objects.create(grade='ECDA', section='A', academic_year=2026)
 
         # Create TermFee for ECD
         cls.term_fee = TermFee.objects.create(term=cls.term, grade_level='ECD', amount=Decimal('100.00'))
@@ -39,5 +39,6 @@ class ECDFeatureTests(TestCase):
         self.assertIsNotNone(bal)
         # base fee
         base = bal.term_fee_record.amount
-        # total term_fee should include extras
-        self.assertEqual(bal.term_fee, base + Decimal('25.00'))
+        # total term_fee should include ECDClassProfile meal_plan_fee ($10) + ECDClassFee extras ($25)
+        # Total should be $100 + $10 + $25 = $135
+        self.assertEqual(bal.term_fee, base + Decimal('10.00') + Decimal('25.00'))

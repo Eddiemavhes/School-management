@@ -115,14 +115,15 @@ class StudentBalance(models.Model):
         """Get the correct TermFee for this student based on their class grade.
         
         Returns:
-            TermFee: ECD fees for ECD students, PRIMARY fees for Grade 1-7 students
+            TermFee: ECD fees for ECD students (ECDA/ECDB), PRIMARY fees for Grade 1-7 students
         """
         if not self.student.current_class:
             raise ValidationError("Student must have a current class to determine appropriate fee")
         
         # Determine grade level from student's current class
-        student_grade = self.student.current_class.grade
-        if student_grade == 'ECD':
+        # ECD grades are 'ECDA' or 'ECDB', not just 'ECD'
+        student_grade = str(self.student.current_class.grade)
+        if student_grade.startswith('ECD'):  # Matches ECDA, ECDB
             grade_level = 'ECD'
         else:
             grade_level = 'PRIMARY'  # Grades 1-7 all use PRIMARY fees
@@ -137,18 +138,38 @@ class StudentBalance(models.Model):
     
     @property
     def term_fee(self):
-        """Dynamically get current term fee from TermFee record"""
+        """Dynamically get current term fee from TermFee record
+        
+        For ECD students (ECDA/ECDB), this includes:
+        1. Base TermFee for 'ECD' grade level
+        2. ECDClassProfile fees (meal_plan_fee, nappies_fee, materials_fee) - per-class settings
+        3. ECDClassFee amounts - per-term additional fees
+        """
         base = self.term_fee_record.amount
 
-        # If the student is in an ECD class, include any per-class ECD fees for this term
+        # If the student is in an ECD class (ECDA or ECDB), include all ECD-specific fees
         try:
-            if self.student and self.student.current_class and self.student.current_class.grade == 'ECD':
-                # Sum any ECDClassFee records for this class and term
-                from .ecd import ECDClassFee
-                extras = ECDClassFee.objects.filter(cls=self.student.current_class, term=self.term).aggregate(total=models.Sum('amount'))['total']
-                if extras:
+            if self.student and self.student.current_class:
+                student_grade = str(self.student.current_class.grade)
+                if student_grade.startswith('ECD'):  # Matches ECDA, ECDB
                     from decimal import Decimal
-                    base = base + Decimal(str(extras))
+                    
+                    # 1. Add ECDClassProfile fees (meal_plan, nappies, materials)
+                    from .ecd import ECDClassProfile
+                    try:
+                        profile = ECDClassProfile.objects.get(cls=self.student.current_class)
+                        base = base + profile.meal_plan_fee + profile.nappies_fee + profile.materials_fee
+                    except ECDClassProfile.DoesNotExist:
+                        pass  # No profile configured, that's OK
+                    
+                    # 2. Add ECDClassFee extras for this term
+                    from .ecd import ECDClassFee
+                    extras = ECDClassFee.objects.filter(
+                        cls=self.student.current_class, 
+                        term=self.term
+                    ).aggregate(total=models.Sum('amount'))['total']
+                    if extras:
+                        base = base + Decimal(str(extras))
         except Exception:
             # If anything goes wrong here, fall back to base fee to avoid blocking billing
             pass
@@ -318,6 +339,13 @@ class StudentBalance(models.Model):
                 # Don't create new balance for graduated students in current term
                 return None
         
+        # Determine the appropriate term fee based on student's grade level
+        student_grade = str(student.current_class.grade) if student.current_class else ''
+        if student_grade.startswith('ECD'):  # ECDA, ECDB
+            grade_level = 'ECD'
+        else:
+            grade_level = 'PRIMARY'
+        
         # GRADE 7 CHECK FOR NEW ACADEMIC YEAR:
         # Grade 7 students who enter a new academic year without paying their previous year's balance
         # should NOT get new term fees. They only carry forward their arrears.
@@ -338,11 +366,11 @@ class StudentBalance(models.Model):
                 
                 if previous_year_last_balance and previous_year_last_balance.current_balance > 0:
                     # Grade 7 student with outstanding balance from previous year
-                    # Get the term fee but still create balance (for tracking)
+                    # Get the term fee for the correct grade level
                     try:
-                        term_fee = TermFee.objects.get(term=term)
+                        term_fee = TermFee.objects.get(term=term, grade_level=grade_level)
                     except TermFee.DoesNotExist:
-                        raise ValidationError("Term fee has not been set for this term")
+                        raise ValidationError(f"Term fee has not been set for {grade_level} students in this term")
                     
                     # Do NOT charge new fee - only carry forward the arrears
                     balance, created = cls.objects.get_or_create(
@@ -357,9 +385,9 @@ class StudentBalance(models.Model):
                     return balance
         
         try:
-            term_fee = TermFee.objects.get(term=term)
+            term_fee = TermFee.objects.get(term=term, grade_level=grade_level)
         except TermFee.DoesNotExist:
-            raise ValidationError("Term fee has not been set for this term")
+            raise ValidationError(f"Term fee has not been set for {grade_level} students in this term")
 
         previous_arrears = cls.calculate_arrears(student, term)
 

@@ -34,7 +34,7 @@
             </div>
 
                 <!-- ECD Premium Details (if applicable) -->
-                {% if student.current_class and student.current_class.grade == 'ECD' %}
+                {% if student.current_class and student.current_class.grade|slice:":3" == 'ECD' %}
                 <div class="glass rounded-2xl p-6 border border-cyan-400/20 animate-slideInUp overflow-hidden group" style="animation-delay: 0.25s;">
                     <h2 class="text-2xl font-bold text-slate-100 mb-4">ECD Class Details</h2>
                     <div class="grid grid-cols-1 gap-4">

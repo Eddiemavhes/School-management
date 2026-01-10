@@ -125,7 +125,8 @@ class Student(models.Model):
                 )
             # If this is an ECD class, enforce capacity and premium constraints
             try:
-                if str(self.current_class.grade) == 'ECD':
+                student_grade = str(self.current_class.grade)
+                if student_grade.startswith('ECD'):  # Matches ECDA, ECDB
                     from .ecd import ECDClassProfile
                     profile = getattr(self.current_class, 'ecd_profile', None)
                     if profile:
