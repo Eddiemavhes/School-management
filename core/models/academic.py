@@ -145,6 +145,7 @@ class Payment(models.Model):
         'Administrator',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,  # Allow blank for system-generated payments
         related_name='recorded_payments'
     )
     created_at = models.DateTimeField(auto_now_add=True)
@@ -210,13 +211,24 @@ class Payment(models.Model):
                 )
     
     def _validate_term_fee_exists(self):
-        """Validation 4: Term fee must be set for this term"""
+        """Validation 4: Term fee must be set for this term for the student's grade level"""
         from .fee import TermFee
         
-        try:
-            TermFee.objects.get(term=self.term)
-        except TermFee.DoesNotExist:
-            raise ValidationError(f"Term fee has not been set for {self.term}")
+        # Determine the student's grade level
+        if self.student and self.student.current_class:
+            student_grade = str(self.student.current_class.grade)
+            if student_grade.startswith('ECD'):
+                grade_level = 'ECD'
+            else:
+                grade_level = 'PRIMARY'
+            
+            # Check if fee exists for this grade level
+            if not TermFee.objects.filter(term=self.term, grade_level=grade_level).exists():
+                raise ValidationError(f"Term fee has not been set for {grade_level} students in {self.term}")
+        else:
+            # No class assigned - check if any fee exists for the term
+            if not TermFee.objects.filter(term=self.term).exists():
+                raise ValidationError(f"Term fee has not been set for {self.term}")
 
     def _generate_reference_number(self):
         """Generate reference number based on payment method"""
